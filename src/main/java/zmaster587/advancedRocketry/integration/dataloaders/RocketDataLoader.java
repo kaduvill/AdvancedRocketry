@@ -184,6 +184,12 @@ public abstract class RocketDataLoader {
             "mB");
     }
 
+    private String wrapDestination(AbstractDataContext context, String text) {
+        return context.supportsRichData()
+            ? text
+            : context.translate("msg.top.advancedrocketry.guidance.destination") + " " + text;
+    }
+
     private void addGuidancePrimaryText(AbstractDataContext context, ItemStack stack) {
         if (stack.getItem() instanceof ItemAsteroidChip) {
             ItemAsteroidChip chip = (ItemAsteroidChip) stack.getItem();
@@ -193,7 +199,8 @@ public abstract class RocketDataLoader {
             if (uuid == null || type == null || type.isEmpty()) {
                 context.addMessage(context.translate("msg.top.advancedrocketry.guidance.unprogrammed"), GUIDANCE_UNSET_COLOR);
             } else {
-                context.addMessage(type + " (" + ItemAsteroidChip.shortDisplayId(uuid, type) + ")", GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, type + " (" + ItemAsteroidChip.shortDisplayId(uuid, type) + ")"), 
+                        GUIDANCE_RESOLVED_COLOR);
             }
 
         }
@@ -203,7 +210,8 @@ public abstract class RocketDataLoader {
             if (stationId == 0) {
                 context.addMessage(context.translate("msg.top.advancedrocketry.guidance.unprogrammed"), GUIDANCE_UNSET_COLOR);
             } else {
-                context.addMessage(context.translate("msg.top.advancedrocketry.guidance.station") + " " + stationId, GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, context.translate("msg.top.advancedrocketry.guidance.station") + " " + stationId),
+                        GUIDANCE_RESOLVED_COLOR);
             }
         }
 
@@ -213,7 +221,7 @@ public abstract class RocketDataLoader {
             if (!chip.hasValidDimension(stack) || chip.getDimensionProperties(stack) == null) {
                 context.addMessage(context.translate("msg.top.advancedrocketry.guidance.unprogrammed"), GUIDANCE_UNSET_COLOR);
             } else {
-                context.addMessage(chip.getDimensionProperties(stack).getName(), GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, chip.getDimensionProperties(stack).getName()), GUIDANCE_RESOLVED_COLOR);
             }
 
         }
@@ -239,7 +247,7 @@ public abstract class RocketDataLoader {
         if (stack.isEmpty()
                 && ARConfiguration.getCurrentConfig().experimentalSpaceFlight
                 && destDim != Constants.INVALID_PLANET) {
-            context.addMessage(context.translate("msg.top.advancedrocketry.guidance.orbit"), GUIDANCE_RESOLVED_COLOR);
+            context.addMessage(wrapDestination(context, context.translate("msg.top.advancedrocketry.guidance.orbit")), GUIDANCE_RESOLVED_COLOR);
             return;
         }
 
@@ -252,7 +260,7 @@ public abstract class RocketDataLoader {
                 && destDim == ARConfiguration.getCurrentConfig().spaceDimId) {
             int stationId = ItemStationChip.getUUID(stack);
             if (stationId != 0) {
-                context.addMessage(context.translate("msg.top.advancedrocketry.guidance.station") + " " + stationId, GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, context.translate("msg.top.advancedrocketry.guidance.station") + " " + stationId), GUIDANCE_RESOLVED_COLOR);
             } else {
                 context.addMessage(context.translate("msg.top.advancedrocketry.guidance.unprogrammed"), GUIDANCE_UNSET_COLOR);
             }
@@ -275,9 +283,9 @@ public abstract class RocketDataLoader {
                     text += " " + context.translate("msg.top.advancedrocketry.guidance.pad") + " " + pad;
                 }
 
-                context.addMessage(text, GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, text), GUIDANCE_RESOLVED_COLOR);
             } else {
-                context.addMessage(context.translate("msg.top.advancedrocketry.guidance.space"), GUIDANCE_RESOLVED_COLOR);
+                context.addMessage(wrapDestination(context, context.translate("msg.top.advancedrocketry.guidance.space")), GUIDANCE_RESOLVED_COLOR);
             }
             return;
         }

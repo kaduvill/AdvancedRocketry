@@ -46,5 +46,10 @@ public class WailaDataContext extends AbstractDataContext {
 		// This will only be called on the client, so we can directly use i18n.translate
 		return I18n.format(key);
 	}
+
+	@Override
+	public boolean supportsRichData() {
+		return false;
+	}
     
 }

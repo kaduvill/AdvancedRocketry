@@ -66,5 +66,10 @@ public class TOPDataContext extends AbstractDataContext {
         // this runs on the server side
         return IProbeInfo.STARTLOC + key + IProbeInfo.ENDLOC;
     }
+
+	@Override
+	public boolean supportsRichData() {
+		return true;
+	}
     
 }

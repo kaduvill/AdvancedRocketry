@@ -13,6 +13,7 @@ public abstract class AbstractDataContext {
     public abstract void addProgressBar(@Nullable String message, int amount, int capacity, int border, int background, int filled, int altFilled, String suffix);
     public abstract void pushStack(ItemStack stack);
     public abstract void popStack();
+    public abstract boolean supportsRichData();
 
     /**
      * This method will be called on the side where the data is collected.
