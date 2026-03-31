@@ -12,6 +12,7 @@ public class WailaIntegration implements IWailaPlugin {
 	public void register(IWailaRegistrar waila) {
         RocketEntityProvider rep = new RocketEntityProvider();
 		waila.registerNBTProvider(rep, EntityRocket.class);
+        waila.registerHeadProvider(rep, EntityRocket.class);
         waila.registerBodyProvider(rep, EntityRocket.class);
 	}
     

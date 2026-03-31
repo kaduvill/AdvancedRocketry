@@ -7,11 +7,14 @@ import javax.annotation.Nullable;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaEntityAccessor;
 import mcp.mobius.waila.api.IWailaEntityProvider;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.integration.dataloaders.AbstractDataContext;
 import zmaster587.advancedRocketry.integration.dataloaders.RocketDataLoader;
@@ -82,6 +85,8 @@ public class RocketEntityProvider implements IWailaEntityProvider {
             if (name != null) {
                 tag.setString("dest", name);
             }
+
+            tag.setInteger("fuelType", rocket.getRocketFuelType().id);
         }
         return tag;
     }
@@ -103,6 +108,29 @@ public class RocketEntityProvider implements IWailaEntityProvider {
         }
 
         return currenttip;
+    }
+
+    @Override
+    public List<String> getWailaHead(Entity entity, List<String> currenttip, IWailaEntityAccessor accessor, IWailaConfigHandler config) {
+        NBTTagCompound nbt = accessor.getNBTData();
+        if (nbt.hasKey("fuelType")) {
+            currenttip.remove(0);
+            currenttip.add(TextFormatting.WHITE + getRocketDisplayName(FuelType.getById(nbt.getInteger("fuelType"))) + TextFormatting.RESET);
+        }
+        return currenttip;
+    }
+
+    private static String getRocketDisplayName(FuelType mainFuel) {
+        if (mainFuel == FuelType.LIQUID_MONOPROPELLANT) {
+            return I18n.format("msg.top.advancedrocketry.rocket.monopropellant");
+        }
+        if (mainFuel == FuelType.LIQUID_BIPROPELLANT) {
+            return I18n.format("msg.top.advancedrocketry.rocket.bipropellant");
+        }
+        if (mainFuel == FuelType.NUCLEAR_WORKING_FLUID) {
+            return I18n.format("msg.top.advancedrocketry.rocket.nuclear");
+        }
+        return I18n.format("entity.advancedrocketry.rocket.name");
     }
 
 }
