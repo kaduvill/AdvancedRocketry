@@ -11,10 +11,6 @@ import zmaster587.advancedRocketry.integration.dataloaders.AbstractDataContext;
 public class TOPDataContext extends AbstractDataContext {
 
     Stack<IProbeInfo> probeStack;
-    private static final int FUEL_BORDER_COLOR = 0xFF555555;
-    private static final int FUEL_BACKGROUND_COLOR = 0xFF000000;
-    private static final int FUEL_FILLED_COLOR = 0xFF284892;
-    private static final int FUEL_ALT_FILLED_COLOR = 0xFF162F69;
 
     public TOPDataContext(IProbeInfo probeInfo) {
         this.probeStack = new Stack<>();
@@ -27,22 +23,24 @@ public class TOPDataContext extends AbstractDataContext {
     }
 
     @Override
-    public void addFluidInformation(String message, int amount, int capacity) {
+    public void addProgressBar(String message, int amount, int capacity, int border, int background, int filled, int altFilled, String suffix) {
         IProbeInfo probeInfo = current();
 
-        probeInfo.text(message);
+        if (message != null) {
+            probeInfo.text(message);
+        }
         probeInfo.progress(
             amount,
             capacity,
             probeInfo.defaultProgressStyle()
-                    .borderColor(FUEL_BORDER_COLOR)
-                    .backgroundColor(FUEL_BACKGROUND_COLOR)
-                    .filledColor(FUEL_FILLED_COLOR)
-                    .alternateFilledColor(FUEL_ALT_FILLED_COLOR)
+                    .borderColor(border)
+                    .backgroundColor(background)
+                    .filledColor(filled)
+                    .alternateFilledColor(altFilled)
                     .height(12)
                     .width(100)
                     .showText(true)
-                    .suffix(" mB")
+                    .suffix(" " + suffix)
                     .numberFormat(NumberFormat.COMMAS)
         );
     }

@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.integration.dataloaders;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 
@@ -8,7 +10,7 @@ import net.minecraft.util.text.TextFormatting;
  */
 public abstract class AbstractDataContext {
     public abstract void addMessage(String message, TextFormatting formatting);
-    public abstract void addFluidInformation(String message, int amount, int capacity);
+    public abstract void addProgressBar(@Nullable String message, int amount, int capacity, int border, int background, int filled, int altFilled, String suffix);
     public abstract void pushStack(ItemStack stack);
     public abstract void popStack();
 

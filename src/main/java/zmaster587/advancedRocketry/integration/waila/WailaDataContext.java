@@ -2,6 +2,8 @@ package zmaster587.advancedRocketry.integration.waila;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -21,8 +23,12 @@ public class WailaDataContext extends AbstractDataContext {
 	}
 
 	@Override
-	public void addFluidInformation(String message, int amount, int capacity) {
-        addMessage(message + " (" + amount + "/" + capacity + " mB)");
+	public void addProgressBar(@Nullable String message, int amount, int capacity, int border, int background, int filled, int altFilled, String suffix) {
+		String text = amount + "/" + capacity + " " + suffix;
+		if (message != null) {
+			text = message + " (" + text + ")";
+		}
+        addMessage(text);
 	}
 
 	@Override

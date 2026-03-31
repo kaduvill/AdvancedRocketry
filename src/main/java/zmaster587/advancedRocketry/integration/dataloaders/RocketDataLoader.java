@@ -41,6 +41,10 @@ public abstract class RocketDataLoader {
 
     private static final TextFormatting GUIDANCE_UNSET_COLOR = TextFormatting.GRAY;
     private static final TextFormatting GUIDANCE_RESOLVED_COLOR = TextFormatting.YELLOW;
+    private static final int FUEL_BORDER_COLOR = 0xFF555555;
+    private static final int FUEL_BACKGROUND_COLOR = 0xFF000000;
+    private static final int FUEL_FILLED_COLOR = 0xFF284892;
+    private static final int FUEL_ALT_FILLED_COLOR = 0xFF162F69;
 
     public void addGuidanceInfo(AbstractDataContext context) {
         EntityRocket rocket = getRocket();
@@ -175,7 +179,9 @@ public abstract class RocketDataLoader {
             message = label + ": " + context.translate("msg.top.advancedrocketry.fuel.noFuel");
         }
 
-        context.addFluidInformation(message, amount, capacity);
+        context.addProgressBar(message, amount, capacity,
+            FUEL_BORDER_COLOR, FUEL_BACKGROUND_COLOR, FUEL_FILLED_COLOR, FUEL_ALT_FILLED_COLOR,
+            "mB");
     }
 
     private void addGuidancePrimaryText(AbstractDataContext context, ItemStack stack) {
