@@ -1535,7 +1535,7 @@ tooltip.advancedrocketry.lasergun.shift.1=§d无限耐久
 tooltip.advancedrocketry.lasergun.alt.1=§f挖掘等级：§b钻石
 tooltip.advancedrocketry.lasergun.alt.2=§f范围：§b50格
 
-tooltip.advancedrocketry.platepress=§c同时可破坏矿石方块
+tooltip.advancedrocketry.platepress=§c也可破坏矿石方块
 tooltip.advancedrocketry.platepress.shift.1=§f需要下方两格处存在黑曜石才可工作
 tooltip.advancedrocketry.platepress.alt.1=§f使用红石信号激活
 
