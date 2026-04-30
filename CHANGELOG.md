@@ -1,3 +1,15 @@
+Changelog 2.2.7
+- AtmosphereDetector show and tell player selection. (overhaul, aligned with new holo-projector GUI (libvulpes 0.5.2))
+
+Changelog 2.2.6
+- Void Drill
+  - Fixed old copy-pasta logic causing the drill to load the planet below even in void-mining mode.
+  - Improved performance during frequent on/off power cycling.
+  
+Changelog 2.2.5hotfix
+
+- SmallPlatePress naming reverted. should restore compat
+
 Changelog 2.2.5
 
 - Wireless Transceiver *(warning: existing world instances will disappear)*
@@ -25,7 +37,7 @@ Changelog 2.2.5
 - JEI Integration
   - Added JEI pages for Gas Missions
 
-- The One Probe (TOP) Integration
+- The One Probe (TOP) and Waila Integration
   - Rockets now show destination and fuel bars
   - Gas Mission rockets now show selected gas and fuel bars
   - Databus, Advanced Databus, and Satellite Terminal now show data type and amount bar
