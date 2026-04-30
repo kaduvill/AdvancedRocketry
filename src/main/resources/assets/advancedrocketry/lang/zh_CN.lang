@@ -400,7 +400,8 @@ msg.atmosphere.highpressurenoo2=高压无氧
 msg.atmosphere.superhighpressurenoo2=超高压无氧
 msg.atmosphere.veryhotnoo2=高温无氧
 msg.atmosphere.superheatednooxygen=过热无氧
-
+msg.advancedrocketry.atmosphereDetector.selected=已选择大气：%s
+msg.advancedrocketry.atmosphereDetector.alreadySelected=已选择过该大气：%s
 
 msg.tooltip.data=数据
 msg.tooltip.asteroidselection=小行星选择
