@@ -152,6 +152,7 @@ import java.util.Map.Entry;
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, dependencies = Constants.DEPENDENCIES)
 public class AdvancedRocketry {
 
+    private static final String PLANET = "Planet";
     public static final RecipeHandler machineRecipes = new RecipeHandler();
     public static final Logger logger = LogManager.getLogger(Constants.modId);
     private static final CreativeTabs tabAdvRocketry = new CreativeTabs("advancedRocketry") {
@@ -177,6 +178,7 @@ public class AdvancedRocketry {
         FluidRegistry.enableUniversalBucket(); // Must be called before preInit
     }
 
+    //CONFIG-stuff here to make sure we load early enough
     private boolean resetFromXml;
 
     //Biome registry.
@@ -301,8 +303,24 @@ public class AdvancedRocketry {
         config.load();
 
         ARConfiguration.loadPreInit();
-        resetFromXml = config.getBoolean("resetPlanetsFromXML", Configuration.CATEGORY_GENERAL, false, "setting this to true will force AR to read from the XML file in the config/advRocketry instead of the local data, intended for use pack developers to ensure updates are pushed through");
 
+        resetFromXml = config.getBoolean(
+                "resetPlanetsFromXML",
+                PLANET,
+                false,
+                "Reload planet definitions from config XML on this restart."
+        );
+
+        boolean resetOnlyOnce = config.getBoolean(
+                "ResetOnlyOnce",
+                PLANET,
+                true,
+                "Setting this to false will prevent resetPlanetsFromXML from being set to false upon world reload. Recommended for pack developers who want all saves to always use planetDefs XML from the config folder."
+        );
+
+        if (resetOnlyOnce && resetFromXml) {
+            config.get("Planet", "resetPlanetsFromXML", false).set(false);
+        }
         //Load client and UI positioning stuff
         proxy.loadUILayout(config);
 
@@ -330,7 +348,7 @@ public class AdvancedRocketry {
         PacketHandler.INSTANCE.addDiscriminator(PacketFluidParticle.class);
         PacketHandler.INSTANCE.addDiscriminator(PacketSatellitesUpdate.class);
         PacketHandler.INSTANCE.addDiscriminator(PacketSyncKnownPlanets.class);
-
+        PacketHandler.INSTANCE.addDiscriminator(PacketBackToRocketGui.class);
 
         //if(zmaster587.advancedRocketry.api.Configuration.allowMakingItemsForOtherMods)
         MinecraftForge.EVENT_BUS.register(this);
