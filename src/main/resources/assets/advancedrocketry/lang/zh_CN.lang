@@ -14,6 +14,7 @@ entity.rocket.name=火箭
 entity.deployedRocket.name=火箭
 entity.hovercraft.name=气垫船
 entity.ARPlanetUIItem.name=全息星体
+entity.ARStarUIButton.name=全息恒星
 
 tile.landingPad.name=着陆台
 tile.seat.name=座位
