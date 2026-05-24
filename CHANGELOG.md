@@ -1,3 +1,7 @@
+2.2.10
+
+- Update chinese (thanks to ZY)
+
 Changelog 2.2.9
 - Fixed crater worldgen crash from negative Y placement.
 - Fixed enriched lava flow texture tiling.
