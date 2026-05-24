@@ -1,3 +1,23 @@
+Changelog 2.2.9
+- Fixed crater worldgen crash from negative Y placement.
+- Fixed enriched lava flow texture tiling.
+- Fixed crash when launching without JEI installed.
+- Fixed 3 GL.state.Leaks
+- Fixed false yellow atmosphere warning when creating or joining a world.
+  - Regression from gracetimerpatch (2.2.5).
+- Increased Rocket TP grace timer from 60 to 100 ticks.
+  - Gives slow servers a little more time to complete rocket passenger transfers.
+- Aligned semantics for worldgen frequency multipliers (craters, volcanoes, and geodes).
+  - 2.0 means double frequency, 0.5 means half.
+  - Clamped between 0.01 and 10.0.
+- Reduced memory leaks:
+  - Clear rocket engine sound references when rockets unload/die.
+  - Clear custom rocket particles when changing dimensions.
+  - Clear AtmosphereHandler state onDisconnect
+  - Clear an existing dimension AtmosphereHandler before registering a new one.
+  - Unregister OxygenVent atmosphere blobs when broken or chunk-unloaded.
+
+
 Changelog 2.2.8
 - Nuclear rocket gating:
   - Fixed station-return softlock for stations orbiting gated planets.

@@ -495,37 +495,45 @@ Notes:
 ### 6.2 Atmosphere, gravity, orbit, and rotation
 
 #### `<atmosphereDensity>`
-Atmosphere density value.
 
-```xml
-<atmosphereDensity>100</atmosphereDensity>
-```
+Atmosphere density / pressure value.
+
+Example:
+
+    <atmosphereDensity>100</atmosphereDensity>
 
 Meaning:
-- `100` is Earthlike
-- Values above `75` are generally treated as breathable in the code
-- Atmosphere density influences weather, fog, cloud height, and temperature calculations
-
-Loader clamp:
-- Min: `0`
-- Max: `1600`
+- `100` is Earthlike.
+- Clamped to `[0 - 1600]`
+- Atmosphere pressure category is selected with strict `>` thresholds:
+  - `0–25`: no atmosphere / vacuum
+  - `26–75`: low atmosphere / low oxygen pressure
+  - `76–200`: normal pressure (Breathable)
+  - `201–800`: high pressure
+  - `801–1600`: super-high pressure
+- Temperature can still override the result into hot or superheated atmosphere types.
 
 Notes:
-- World provider uses atmosphere density for rain/snow/ice behavior and cloud rendering
+- World provider uses atmosphere density for rain/snow/ice behavior and cloud rendering.
 
 #### `<hasOxygen>`
-Whether the atmosphere contains oxygen.
 
-```xml
-<hasOxygen>true</hasOxygen>
-```
+Used to disable `breathable` for normal pressure planets
+
+Example:
+
+    <hasOxygen>true</hasOxygen>
 
 Accepted values:
 - `true`
 - `false`
 
-Notes:
-- Used by atmosphere type logic
+Default:
+- `true` if omitted.
+
+Meaning:
+- This tag is mainly useful for disabling oxygen on breathable planets.
+- If the planet has no atmosphere, this tag has no practical breathing effect.
 
 #### `<gravitationalMultiplier>`
 Gravity value, using `100 = Earthlike`.
@@ -732,10 +740,12 @@ Notes:
 - If `<biomeIds>` is provided, the loader uses that explicit biome list instead of automatic biome selection
 
 #### `<craterBiomeWeights>`
-Per-biome crater frequency list.
+Controls which biomes can be used as crater origin biomes, and how likely craters are to generate in each biome.
 
 Accepted format:
-- `biome;frequency`
+- Comma-separated entries
+- Each entry uses `biome;weight`
+- 
 
 Example:
 
@@ -743,9 +753,26 @@ Example:
 <craterBiomeWeights>minecraft:desert;100,minecraft:mesa;60</craterBiomeWeights>
 ```
 
+  Behavior:
+
+- If `<craterBiomeWeights>` is omitted or empty, craters may originate in any biome.
+- If present, only listed biomes are valid crater origin biomes.
+- The weight is a percentage-like chance from `0` to `100`.
+  - `100` = crater origins in this biome are always allowed when the generator attempts one.
+  - `50` = about half of crater origin attempts in this biome are allowed.
+  - `1` = very rare crater origin attempts in this biome.
+  - `0` = effectively disables crater origins in this biome.
+- The biome check is done at the crater origin chunk, not every block touched by the crater.
+  - Large craters may still extend into neighboring biomes.
+- If frequency is omitted, the loader warns and defaults that biome weight to `100`.
+- Invalid biome resource locations are ignored with a warning.
+
 Notes:
-- The loader expects biome resource locations here
-- If frequency is omitted, the loader warns and defaults to `100`
+
+- The loader expects biome resource locations such as `minecraft:desert` or `biomesoplenty:volcanic_island`.
+- This setting controls where craters may originate; it does not change crater shape, size, block palette, or crater ores.
+- Crater generation must still be enabled by both `<generateCraters>true</generateCraters>` and the global `generateCraters` config option.
+- Actual crater generation also depends on atmosphere conditions.
 
 ### 6.5 Generation type and worldgen switches
 
@@ -849,8 +876,12 @@ Crater frequency multiplier.
 <craterFrequencyMultiplier>1.5</craterFrequencyMultiplier>
 ```
 
-Notes:
-- Parsed as float
+Behavior:
+
+- `1.0` = default
+- `2.0` = double
+- `0.5` = half
+- Values are clamped to `0.01` - `10.0`
 
 #### `<volcanoFrequencyMultiplier>`
 Volcano frequency multiplier.
@@ -859,8 +890,12 @@ Volcano frequency multiplier.
 <volcanoFrequencyMultiplier>0.5</volcanoFrequencyMultiplier>
 ```
 
-Notes:
-- Parsed as float
+Behavior:
+
+- `1.0` = default
+- `2.0` = double
+- `0.5` = half
+- Values are clamped to `0.01` - `10.0`
 
 #### `<geodefrequencyMultiplier>`
 Geode frequency multiplier.
@@ -869,9 +904,12 @@ Geode frequency multiplier.
 <geodefrequencyMultiplier>2.0</geodefrequencyMultiplier>
 ```
 
-Notes:
-- Tag spelling is exactly `geodefrequencyMultiplier`
-- Parsed as float
+Behavior:
+
+- `1.0` = default
+- `2.0` = double
+- `0.5` = half
+- Values are clamped to `0.01` - `10.0`
 
 ### 6.6 Blocks, ores, and loot
 
