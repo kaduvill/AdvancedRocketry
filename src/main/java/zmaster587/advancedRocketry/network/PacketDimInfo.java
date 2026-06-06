@@ -6,10 +6,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import zmaster587.advancedRocketry.AdvancedRocketry;
+import net.minecraftforge.fml.common.Loader;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.integration.jei.ARPlugin;
 import zmaster587.advancedRocketry.util.SpawnListEntryNBT;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -59,7 +58,6 @@ public class PacketDimInfo extends BasePacket {
                     i.writeToNBT(nbt2);
                     packetBuffer.writeCompoundTag(nbt2);
                 }
-
             } catch (NullPointerException e) {
                 out.writeBoolean(true);
                 e.printStackTrace();
@@ -72,10 +70,8 @@ public class PacketDimInfo extends BasePacket {
                 packetBuffer.writeString(dimProperties.customIcon);
             } else
                 packetBuffer.writeShort(0);
-
         } else
             out.writeBoolean(flag);
-
     }
 
     @Override
@@ -99,7 +95,6 @@ public class PacketDimInfo extends BasePacket {
                 e.printStackTrace();
                 return;
             }
-
 
             short strLen = packetBuffer.readShort();
             if (strLen > 0) {
@@ -139,18 +134,15 @@ public class PacketDimInfo extends BasePacket {
 
                 DimensionManager.getInstance().setDimProperties(dimNumber, dimProperties);
             } else {
-                //dimProperties = new DimensionProperties(dimNumber);
-                //dimProperties.readFromNBT(dimNBT);
-
-
                 DimensionManager.getInstance().registerDimNoUpdate(dimProperties, true);
             }
         }
-        ARPlugin.requestGasGiantRefresh();
+        if (Loader.isModLoaded("jei")) {
+            zmaster587.advancedRocketry.integration.jei.ARPlugin.requestGasGiantRefresh();
+        }
     }
 
     @Override
     public void executeServer(EntityPlayerMP player) {
     }
-
 }
