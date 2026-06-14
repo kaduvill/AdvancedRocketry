@@ -74,7 +74,6 @@ import zmaster587.advancedRocketry.dimension.DimensionProperties.Temps;
 import zmaster587.advancedRocketry.enchant.EnchantmentSpaceBreathing;
 import zmaster587.advancedRocketry.entity.*;
 import zmaster587.advancedRocketry.event.*;
-import zmaster587.advancedRocketry.integration.CompatibilityMgr;
 import zmaster587.advancedRocketry.integration.GalacticCraftHandler;
 import zmaster587.advancedRocketry.integration.theoneprobe.TopIntegration;
 import zmaster587.advancedRocketry.item.*;
@@ -169,7 +168,6 @@ public class AdvancedRocketry {
     public static AdvancedRocketry instance;
     public static WorldType planetWorldType;
     public static WorldType spaceWorldType;
-    public static CompatibilityMgr compat = new CompatibilityMgr();
     public static MaterialRegistry materialRegistry = new MaterialRegistry();
     public static HashMap<AllowedProducts, HashSet<String>> modProducts = new HashMap<>();
     private static Configuration config;
@@ -1141,7 +1139,6 @@ public class AdvancedRocketry {
             if (event.getSide().isClient())
                 FMLCommonHandler.instance().bus().register(eventHandler);
         }
-        CompatibilityMgr.isSpongeInstalled = Loader.isModLoaded("sponge");
         // End compat stuff
 
         MinecraftForge.EVENT_BUS.register(SpaceObjectManager.getSpaceManager());
