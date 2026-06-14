@@ -18,22 +18,21 @@ import zmaster587.advancedRocketry.api.IPlanetaryProvider;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.util.Vector3F;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 public class RenderPlanetarySky extends IRenderHandler {
 
-
     ResourceLocation currentlyBoundTex = null;
+    private ResourceLocation currentLEOSource = null;
     float celestialAngle;
     Vector3F<Float> axis;
     Minecraft mc = Minecraft.getMinecraft();
@@ -41,7 +40,6 @@ public class RenderPlanetarySky extends IRenderHandler {
     private int starGLCallListSmall;
     private int glSkyList;
     private int glSkyList2;
-
 
     private static float xrotangle = 0; // used for ring rotation because I don't want to bother changing the definitions of methods.
     private static float[] skycolor = {0,0,0}; // used for black hole rendering - same reason as above
@@ -1035,7 +1033,7 @@ GL11.glPopMatrix();
 
 
         // Bind the planet's texture
-        mc.renderEngine.bindTexture(properties.getPlanetIconLEO());
+        mc.renderEngine.bindTexture(getTextureForPlanetLEO(properties));
 
         // Set texture parameters for smooth scaling
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -1083,7 +1081,30 @@ GL11.glPopMatrix();
     }
 
     protected ResourceLocation getTextureForPlanetLEO(DimensionProperties properties) {
-        return properties.getPlanetIcon();
+        ResourceLocation jpgTexture = properties.getPlanetIconLEO();
+
+        // Only check again when the requested planet texture changes
+        if (!jpgTexture.equals(currentLEOSource)) {
+            currentLEOSource = jpgTexture;
+            currentlyBoundTex = jpgTexture;
+
+            try {
+                // Prefer the existing JPG texture
+                mc.getResourceManager().getResource(jpgTexture).close();
+            } catch (IOException e) {
+                String path = jpgTexture.getResourcePath();
+
+                // JPG was not found, so use the matching PNG path
+                if (path.endsWith(".jpg")) {
+                    currentlyBoundTex = new ResourceLocation(
+                            jpgTexture.getResourceDomain(),
+                            path.substring(0, path.length() - 4) + ".png"
+                    );
+                }
+            }
+        }
+
+        return currentlyBoundTex;
     }
 
     protected EnumFacing getRotationAxis(DimensionProperties properties, BlockPos pos) {

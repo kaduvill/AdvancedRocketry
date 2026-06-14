@@ -1,3 +1,15 @@
+2.2.10
+
+- Fixed rocket destination validation:
+  - Unregistered dimensions no longer fall back to Earth (dim 0), preventing invalid custom-dimension and cross-star routes from passing checks.
+  - Improved error messages for unmapped dimensions, instead of silent failure.
+- Allow png LEO textures, 
+  - Add voidleo.png to be used with customicon="void"
+  - Convert asteroidleo to png, and blank background
+- Removed AR.Core (empty modcontainer showing in "Mods")
+- One more small Jei.lodaded guard
+- Update Chinese (thanks to ZY)
+
 Changelog 2.2.9
 - Fixed crater worldgen crash from negative Y placement.
 - Fixed enriched lava flow texture tiling.

@@ -7,7 +7,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.integration.CompatibilityMgr;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +42,6 @@ public class ReloadRecipesCommand extends ARCommand {
 
             sender.sendMessage(new TextComponentString("Recipes reloaded"));
 
-            //CompatibilityMgr.reloadRecipes();
         } catch (Exception e) {
             e.printStackTrace();
             ITextComponent message = new TextComponentString("");

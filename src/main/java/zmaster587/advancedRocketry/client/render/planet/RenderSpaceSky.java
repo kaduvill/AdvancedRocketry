@@ -21,8 +21,6 @@ import zmaster587.libVulpes.util.Vector3F;
 
 import java.util.Objects;
 
-import static java.lang.Math.*;
-
 public class RenderSpaceSky extends RenderPlanetarySky {
 
     Minecraft mc = Minecraft.getMinecraft();
@@ -66,11 +64,8 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 float f10;
                 GL11.glDisable(GL11.GL_BLEND);
                 GL11.glPushMatrix();
-                //GL11.glRotatef(50, 1, 0, 0);
                 GL11.glRotatef(140, -1, 0, 0);
                 GL11.glRotatef(180, 0, 1, 0);
-                //GL11.glRotatef(180, 0, 1, 0);
-
                 GL11.glTranslatef(0, (float) tr_y, 0);
 
                 GL11.glPushMatrix();
@@ -97,9 +92,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
                 GL11.glPushMatrix();
                 GL11.glRotatef(90, 0f, 1f, 0f);
-                //GL11.glRotatef(m, 1f, 0f, 0f);
-                //GL11.glRotatef(diskangle, 0, 0, 1);
-                //GL11.glRotatef(90, 1, 0, 0);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
                 GlStateManager.color((float) 1, (float) .7, (float) .5, 1f);
@@ -198,21 +190,15 @@ public class RenderSpaceSky extends RenderPlanetarySky {
         float[] atmColor = properties.skyColor;
 
         GL11.glPushMatrix();
-        //GL11.glDisable(GL11.GL_BLEND);
-
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GlStateManager.disableFog();
 
-        //GL11.glDisable(GL11.GL_LIGHTING);
 
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ZERO);
         mc.renderEngine.bindTexture(getTextureForPlanet(properties));
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        //int k = mc.theWorld.getMoonPhase();
-        //int l = k % 4;
-        //int i1 = k / 4 % 2;
 
         //Set planet Orbiting distance; size
         float f10 = 100f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
@@ -242,7 +228,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
             //Draw atmosphere if applicable
             if (properties.isGasGiant()) {
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-                //GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 mc.renderEngine.bindTexture(DimensionProperties.getAtmosphereLEOResource());
@@ -290,7 +275,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GlStateManager.enableTexture2D();
             } else if (properties.hasAtmosphere()) {
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-                //GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 mc.renderEngine.bindTexture(DimensionProperties.getAtmosphereLEOResource());
@@ -312,7 +296,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
 
                 GlStateManager.disableTexture2D();
-                //GL11.glDisable(GL11.GL_BLEND);
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -335,7 +318,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
         GlStateManager.color(1f, 1f, 1f, 1f);
         GlStateManager.enableFog();
-        //GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();
     }
 
@@ -352,18 +334,15 @@ public class RenderSpaceSky extends RenderPlanetarySky {
     @Override
     protected void rotateAroundAxis() {
         Vector3F<Float> axis = getRotateAxis();
-        //GL11.glRotatef(90f, axis.x, axis.y, axis.z);
         ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(mc.player.getPosition());
         if (spaceObject != null) {
             GL11.glRotated(spaceObject.getRotation(EnumFacing.UP) * 360, 0, 1, 0);
             GL11.glRotated(spaceObject.getRotation(EnumFacing.EAST) * 360, 1, 0, 0);
         }
-        //GL11.glRotated(360, spaceObject.getRotation(EnumFacing.EAST), spaceObject.getRotation(EnumFacing.UP), spaceObject.getRotation(EnumFacing.NORTH));
-
     }
 
     @Override
     protected ResourceLocation getTextureForPlanet(DimensionProperties properties) {
-        return properties.getPlanetIconLEO();
+        return getTextureForPlanetLEO(properties);
     }
 }

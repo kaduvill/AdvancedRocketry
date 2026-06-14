@@ -56,9 +56,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     /**
      * Contains default graphic {@link ResourceLocation} to display for different planet types
      */
-    public static final ResourceLocation atmosphere = new ResourceLocation("advancedrocketry:textures/planets/Atmosphere2.png");
-    public static final ResourceLocation atmosphereLEO = new ResourceLocation("advancedrocketry:textures/planets/AtmosphereLEO.png");
-    public static final ResourceLocation atmGlow = new ResourceLocation("advancedrocketry:textures/planets/atmGlow.png");
+    public static final ResourceLocation atmosphere = new ResourceLocation("advancedrocketry:textures/planets/atmosphere2.png");
+    public static final ResourceLocation atmosphereLEO = new ResourceLocation("advancedrocketry:textures/planets/atmosphereleo.png");
+    public static final ResourceLocation atmGlow = new ResourceLocation("advancedrocketry:textures/planets/atmglow.png");
     public static final ResourceLocation planetRings = new ResourceLocation("advancedrocketry:textures/planets/rings.png");
     public static final ResourceLocation planetRingsNew = new ResourceLocation("advancedrocketry:textures/planets/ringsnew.png");
     public static final ResourceLocation planetRingShadow = new ResourceLocation("advancedrocketry:textures/planets/ringShadow.png");
@@ -635,6 +635,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         if (isGasGiant())
             return PlanetIcons.GASGIANTBLUE.resourceLEO;
+        if (isAsteroid())
+            return PlanetIcons.ASTEROID.resourceLEO;
 
         if (tempType == Temps.TOOHOT)
             return PlanetIcons.MARSLIKE.resourceLEO;
@@ -2503,7 +2505,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         PlanetIcons(ResourceLocation resource) {
             this.resource = resource;
 
-            this.resourceLEO = new ResourceLocation(resource.toString().substring(0, resource.toString().length() - 4) + "LEO.jpg");
+            this.resourceLEO = new ResourceLocation(resource.toString().substring(0, resource.toString().length() - 4) + "leo.jpg");
         }
 
         PlanetIcons(ResourceLocation resource, ResourceLocation leo) {
