@@ -248,6 +248,7 @@ error.rocket.gatedArtifactMissing=缺失工件。（玩家物品栏中）
 error.rocket.gatedArtifactMissingWithItem=缺失所需工件：%sx %s（玩家物品栏中）
 error.rocket.outsideStarSystem=星际航行需要星际飞船。
 error.rocket.outsidePlanetarySystem=行星航行需要核动力火箭。
+error.rocket.unmappedDimension=导航失败：星系数据库中未找到该维度
 
 advancement.holographic=全息
 advancement.holographic.desc=合成一个全息投影器
@@ -658,6 +659,7 @@ msg.entity.rocket.clear=清除
 msg.entity.rocket.rcs=RCS模式
 msg.entity.rocket.none=未选择
 msg.entity.rocket.openGuiHint=按%s键打开火箭GUI
+msg.entity.rocket.unchartedDimension=无星系数据
 msg.wirelessTransceiver.extract=提取
 msg.wirelessTransceiver.insert=插入
 msg.wirelessTransceiver.type=类型：%s
