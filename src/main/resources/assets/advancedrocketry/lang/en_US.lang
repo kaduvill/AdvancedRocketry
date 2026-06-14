@@ -248,6 +248,7 @@ error.rocket.gatedArtifactMissing=Missing Artifact. (Player Inventory)
 error.rocket.gatedArtifactMissingWithItem=Missing required artifact: %sx %s (Player Inventory)
 error.rocket.outsideStarSystem=Interstellar travel requires a Starship.
 error.rocket.outsidePlanetarySystem=Planetary travel requires a Nuclear Rocket.
+error.rocket.unmappedDimension=Navigation failure: dimension not found in the galactic database
 
 advancement.holographic=Holographic
 advancement.holographic.desc=Craft a Holo-Projector
@@ -658,6 +659,7 @@ msg.entity.rocket.clear=Clear
 msg.entity.rocket.rcs=RCS Mode
 msg.entity.rocket.none=None Selected
 msg.entity.rocket.openGuiHint=Press %s to open Rocket GUI
+msg.entity.rocket.unchartedDimension=No Galactic Data
 msg.wirelessTransceiver.extract=extract
 msg.wirelessTransceiver.insert=insert
 msg.wirelessTransceiver.type=Type: %s

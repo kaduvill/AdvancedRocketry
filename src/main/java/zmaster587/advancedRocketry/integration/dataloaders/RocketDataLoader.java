@@ -290,7 +290,15 @@ public abstract class RocketDataLoader {
             return;
         }
 
-        String text = DimensionManager.getInstance().getDimensionProperties(destDim).getName();
+        String text;
+
+        if (DimensionManager.getInstance().isDimensionCreated(destDim)) {
+            text = DimensionManager.getInstance()
+                    .getDimensionProperties(destDim)
+                    .getName();
+        } else {
+            text = context.translate("msg.entity.rocket.unchartedDimension");
+        }
 
         String name = getDestinationName();
         if (!name.isEmpty()) {

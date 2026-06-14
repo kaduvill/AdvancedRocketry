@@ -466,10 +466,19 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
                 boolean goingToOrbit = ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer().isEmpty();
 
-                if (goingToOrbit)
+                if (goingToOrbit) {
                     displayStr = "Orbit";
-                else {
-                    displayStr = DimensionManager.getInstance().getDimensionProperties(dimid).getName();
+                } else {
+                    if (DimensionManager.getInstance().isDimensionCreated(dimid)) {
+                        displayStr = DimensionManager.getInstance()
+                                .getDimensionProperties(dimid)
+                                .getName();
+                    } else {
+                        displayStr = LibVulpes.proxy.getLocalizedString(
+                                "msg.entity.rocket.unchartedDimension"
+                        );
+                    }
+
                     Vector3F<Float> loc = storage.getDestinationCoordinates(dimid, false);
                     if (loc != null) {
                         String name = storage.getDestinationName(dimid);
@@ -2066,6 +2075,21 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             return;
         }
 
+        int physicalSourceDimId = this.world.provider.getDimension();
+
+        if (physicalSourceDimId == ARConfiguration.getCurrentConfig().spaceDimId) {
+            ISpaceObject sourceStation = SpaceObjectManager.getSpaceManager()
+                    .getSpaceStationFromBlockCoords(this.getPosition());
+
+            if (sourceStation == null || sourceStation.getProperties() == null) {
+                setError("error.rocket.unmappedDimension");
+                return;
+            }
+        } else if (!DimensionManager.getInstance().isDimensionCreated(physicalSourceDimId)) {
+            setError("error.rocket.unmappedDimension");
+            return;
+        }
+
         if (ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer() != null && storage.getGuidanceComputer().isEmpty()) {
             allowLaunch = true;
         } else {
@@ -2074,6 +2098,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             //TODO: lock the computer
             destinationDimId = storage.getDestinationDimId(world.provider.getDimension(), (int) this.posX, (int) this.posZ);
 
+            if (destinationDimId != Constants.INVALID_PLANET
+                    && destinationDimId != ARConfiguration.getCurrentConfig().spaceDimId
+                    && !DimensionManager.getInstance().isDimensionCreated(destinationDimId)) {
+                setError("error.rocket.unmappedDimension");
+                return;
+            }
+
             if (!(DimensionManager.getInstance().canTravelTo(destinationDimId) || (destinationDimId == Constants.INVALID_PLANET && storage.getSatelliteHatches().size() != 0))) {
                 setError("error.rocket.cannotGetThere");
                 return;
@@ -2081,29 +2112,47 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
             boolean destinationIsSpaceStation = false;
             int finalDest = destinationDimId;
+            int destinationStarId = Constants.INVALID_PLANET;
             if (destinationDimId == ARConfiguration.getCurrentConfig().spaceDimId) {
                 ISpaceObject spaceObject = null;
-                Vector3F<Float> vec = storage.getDestinationCoordinates(destinationDimId, false);
+                Vector3F<Float> vec =
+                        storage.getDestinationCoordinates(destinationDimId, false);
 
-                if (vec != null)
-                    spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x, vec.y, vec.z));
+                if (vec != null) {
+                    spaceObject = SpaceObjectManager.getSpaceManager()
+                            .getSpaceStationFromBlockCoords(
+                                    new BlockPos(vec.x, vec.y, vec.z)
+                            );
+                }
 
-                if (spaceObject != null) {
-                    destinationIsSpaceStation = true;
-                    finalDest = spaceObject.getOrbitingPlanetId();
-                } else {
+                if (spaceObject == null || spaceObject.getProperties() == null) {
                     setError("error.rocket.destinationNotExist");
                     return;
                 }
+
+                destinationIsSpaceStation = true;
+                finalDest = spaceObject.getOrbitingPlanetId();
+
+                // Authoritative for stations orbiting planets, moons, or stars.
+                destinationStarId = spaceObject.getProperties().getStarId();
             }
 
 
             //If we're on a space station get the id of the planet, not the station
             int thisDimId = this.world.provider.getDimension();
-            if (this.world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
-                ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPosition());
-                if (spaceObject != null)
-                    thisDimId = spaceObject.getProperties().getParentProperties().getId();
+            int sourceStarId = Constants.INVALID_PLANET;
+
+            if (thisDimId == ARConfiguration.getCurrentConfig().spaceDimId) {
+                ISpaceObject sourceStation = SpaceObjectManager.getSpaceManager()
+                        .getSpaceStationFromBlockCoords(this.getPosition());
+
+                if (sourceStation == null || sourceStation.getProperties() == null) {
+                    setError("error.rocket.unmappedDimension");
+                    return;
+                }
+
+                thisDimId = sourceStation.getOrbitingPlanetId();
+                sourceStarId = sourceStation.getProperties().getStarId();
             }
 
             //Check to see if it's possible to reach (split failure modes)
@@ -2113,9 +2162,22 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 DimensionProperties srcProps  = DimensionManager.getInstance().getDimensionProperties(thisDimId);
 
                 boolean isNuclear = stats.isNuclear();
-                boolean sameStar  = destProps.getStarId() == srcProps.getStarId();
-                boolean outsidePlanetarySystem = !PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(finalDest, thisDimId);
 
+                if (!destinationIsSpaceStation) {
+                    destinationStarId = destProps.getStarId();
+                }
+
+                if (sourceStarId == Constants.INVALID_PLANET) {
+                    sourceStarId = srcProps.getStarId();
+                }
+
+                boolean sameStar = destinationStarId == sourceStarId;
+
+                boolean outsidePlanetarySystem =
+                        !PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(
+                                thisDimId,
+                                finalDest
+                        );
                 // Nuclear artifact gating only.
                 // Normal rockets never care about artifacts; their range is limited separately.
                 if (isNuclear && ARConfiguration.getCurrentConfig().nuclearRocketsRespectArtifactGating) {
