@@ -1,3 +1,11 @@
+2.2.11
+
+- Strenghtened the unProgrammed Satellite launch to make it more intuitive
+  - launching satellite with no destination:
+    - deploys to effective launch-dim
+    - rocket dies, but satellite starts ticking
+- 
+
 2.2.10
 
 - Fixed rocket destination validation:
