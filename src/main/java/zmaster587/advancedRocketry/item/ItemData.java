@@ -22,12 +22,10 @@ public class ItemData extends ItemIngredient implements IDataItem {
         setMaxStackSize(1);
     }
 
-    // ---- OLD API (keep) ----
     public int getMaxData(int damage) {
         return damage == 0 ? 1000 : 0;
     }
 
-    // ---- NEW API (IDataItem) ----
     @Override
     public int getMaxData(@Nonnull ItemStack stack) {
         return getMaxData(stack.getItemDamage());
@@ -56,11 +54,8 @@ public class ItemData extends ItemIngredient implements IDataItem {
             data.setMaxData(getMaxData(item));
             NBTTagCompound nbt = new NBTTagCompound();
             data.writeToNBT(nbt);
-            // NOTE: original ItemData does NOT auto-attach tag here.
-            // Keep behavior to avoid subtle side effects.
         } else {
             data.readFromNBT(item.getTagCompound());
-            // make sure capacity is correct for this item
             data.setMaxData(getMaxData(item));
         }
 
@@ -109,7 +104,6 @@ public class ItemData extends ItemIngredient implements IDataItem {
     public void addInformation(@Nonnull ItemStack stack, @Nullable World world,
                                List<String> list, ITooltipFlag flag) {
         super.addInformation(stack, world, list, flag);
-
         DataStorage data = getDataStorage(stack);
 
         // Type:
@@ -123,14 +117,5 @@ public class ItemData extends ItemIngredient implements IDataItem {
                 + TextFormatting.WHITE + " / "
                 + TextFormatting.GOLD + data.getMaxData());
 
-        // Hold Shift:
-        if (net.minecraft.client.gui.GuiScreen.isShiftKeyDown()) {
-            list.add(TextFormatting.GRAY +
-                    I18n.format("tooltip.advancedrocketry.itemdataunit.shift.1"));
-        } else if (I18n.hasKey("tooltip.advancedrocketry.hold_shift")) {
-            list.add(TextFormatting.DARK_GRAY.toString() +
-                    TextFormatting.ITALIC +
-                    I18n.format("tooltip.advancedrocketry.hold_shift"));
-        }
     }
 }

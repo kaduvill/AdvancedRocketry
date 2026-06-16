@@ -86,6 +86,8 @@ public final class TooltipInjector {
         KEY_BY_ID.put("advancedrocketry:monitoringstation",  "tooltip.advancedrocketry.monitoringstation");
         KEY_BY_ID.put("advancedrocketry:satellitebuilder", "tooltip.advancedrocketry.satellitebuilder");
         KEY_BY_ID.put("advancedrocketry:satellitecontrolcenter",   "tooltip.advancedrocketry.satellitecontrolcenter");
+        KEY_BY_ID.put("advancedrocketry:satellite",   "tooltip.advancedrocketry.satellite");
+        KEY_BY_ID.put("advancedrocketry:dataunit",   "tooltip.advancedrocketry.dataunit");
 
 
         // --- Satellite Primary Function (metas 0..6)
