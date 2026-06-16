@@ -4,7 +4,7 @@
   - launching satellite with no destination:
     - deploys to effective launch-dim
     - rocket dies, but satellite starts ticking
-- 
+- Fixed GL.state.Leak: when orbiting black hole
 
 2.2.10
 
