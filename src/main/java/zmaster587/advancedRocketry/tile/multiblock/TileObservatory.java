@@ -472,9 +472,15 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                         buttonList.add(new ModuleItemSlotButton(sx, sy, -2, this, s, tip));
                     }
 
-                    buttonList.add(new ModuleText(sx, sy,
+                    ModuleText amountText = new ModuleText(
+                            sx,
+                            sy,
                             entry.midpoint + "\n+/- " + entry.variablility,
-                            0xFFFFFF, 0.5f));
+                            0xFFFFFF,
+                            0.5f
+                    );
+                    amountText.setAlwaysOnTop(true);
+                    buttonList.add(amountText);
 
                     g++;
                 }

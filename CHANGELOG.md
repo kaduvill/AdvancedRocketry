@@ -5,6 +5,7 @@
     - deploys to effective launch-dim
     - rocket dies, but satellite starts ticking
 - Fixed GL.state.Leak: when orbiting black hole
+- Observatory: Asteroid composition values now render above the rotating block previews.
 
 2.2.10
 
