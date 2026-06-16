@@ -250,6 +250,13 @@ error.rocket.outsideStarSystem=Interstellar travel requires a Starship.
 error.rocket.outsidePlanetarySystem=Planetary travel requires a Nuclear Rocket.
 error.rocket.unmappedDimension=Navigation failure: dimension not found in the galactic database
 
+msg.satbuilder.build.tooltip=Build satellite
+msg.satbuilder.error.chassis=Requires a Satellite Chassis
+msg.satbuilder.error.primary=Requires a Satellite Core component
+msg.satbuilder.error.power=Requires power-gen
+msg.satbuilder.error.output=The output slot must be empty
+msg.satbuilder.error.controller=Requires correct Satellite Chip or remote
+
 advancement.holographic=Holographic
 advancement.holographic.desc=Craft a Holo-Projector
 advancement.flattening=Flattening
@@ -951,8 +958,8 @@ tooltip.advancedrocketry.monitoringstation.alt.1=§bMissions become active when 
 
 # Satellite Terminal
 tooltip.advancedrocketry.satellitecontrolcenter=Communicates with Satellites
-tooltip.advancedrocketry.satellitecontrolcenter.shift.1=Insert Satellite Chip
-tooltip.advancedrocketry.satellitecontrolcenter.shift.2=Download Data
+tooltip.advancedrocketry.satellitecontrolcenter.shift.1=§bInsert Satellite Chip
+tooltip.advancedrocketry.satellitecontrolcenter.shift.2=§fDownload Data
 tooltip.advancedrocketry.satellitecontrolcenter.alt.1=§fTransfer and Auto-Download Data with Wireless Transceiver or Data Unit
 
 # Satellite Builder
@@ -961,6 +968,10 @@ tooltip.advancedrocketry.satellitebuilder.shift.1=Also Copy Chips/Remotes.
 tooltip.advancedrocketry.satellitebuilder.shift.2=§bMust be on top of a Power Plug!
 tooltip.advancedrocketry.satellitebuilder.alt.1=Insert chassis, Chip/Remote
 tooltip.advancedrocketry.satellitebuilder.alt.2=core component + other components
+
+# Satellite
+tooltip.advancedrocketry.satellite.shift.1=§fAssemble in Satellite Builder
+tooltip.advancedrocketry.satellite.alt.1=§fWhen built, place in the rocket's Satellite Bay
 
 # Orbital Registry
 tooltip.advancedrocketry.orbitalregistry=Tracks man-made objects in space
@@ -1220,45 +1231,40 @@ tooltip.advancedrocketry.itemupgrade.5.alt.1=Stacking has no additional effect.
 tooltip.advancedrocketry.satfunc.optical=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.optical.shift.1=§bCollects Distance Data§7
 tooltip.advancedrocketry.satfunc.optical.shift.2=§oDownload Data in Satellite Terminal
-tooltip.advancedrocketry.satfunc.optical.alt.1=Combine with Satellite Chip
-tooltip.advancedrocketry.satfunc.optical.alt.2=when assembling
+tooltip.advancedrocketry.satfunc.optical.alt.1=§cCombine with Satellite Chip when assembling
 
 tooltip.advancedrocketry.satfunc.composition=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.composition.shift.1=§bCollects Composition Data§7
 tooltip.advancedrocketry.satfunc.composition.shift.2=§oDownload data in Satellite Terminal
-tooltip.advancedrocketry.satfunc.composition.alt.1=Combine with Satellite Chip
-tooltip.advancedrocketry.satfunc.composition.alt.2=when assembling
+tooltip.advancedrocketry.satfunc.composition.alt.1=§cCombine with Satellite Chip when assembling
 
 tooltip.advancedrocketry.satfunc.mass=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.mass.shift.1=§bCollects Mass Data§7
 tooltip.advancedrocketry.satfunc.mass.shift.2=§oDownload data in Satellite Terminal
-tooltip.advancedrocketry.satfunc.mass.alt.1=Combine with Satellite Chip
-tooltip.advancedrocketry.satfunc.mass.alt.2=when assembling
+tooltip.advancedrocketry.satfunc.mass.alt.1=§cCombine with Satellite Chip when assembling
 
 tooltip.advancedrocketry.satfunc.microwave=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.microwave.shift.1=§bGenerates Power in Space§7
 tooltip.advancedrocketry.satfunc.microwave.shift.2=§oNeeds Microwave Receiver (5x5 Multiblock)
-tooltip.advancedrocketry.satfunc.microwave.alt.1=Combine with Satellite Chip
-tooltip.advancedrocketry.satfunc.microwave.alt.2=when assembling
+tooltip.advancedrocketry.satfunc.microwave.alt.1=§cCombine with Satellite Chip when assembling
 
 tooltip.advancedrocketry.satfunc.oremapping=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.oremapping.shift.1=§bScans the planet for Ore§7
-tooltip.advancedrocketry.satfunc.oremapping.alt.1=Combine with Ore Scanner
-tooltip.advancedrocketry.satfunc.oremapping.alt.2=when assembling
+tooltip.advancedrocketry.satfunc.oremapping.alt.1=§cCombine with Ore Scanner when assemblingg
 
 tooltip.advancedrocketry.satfunc.biomechanger=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.biomechanger.shift.1=§bAdjusts biomes§7
-tooltip.advancedrocketry.satfunc.biomechanger.alt.1=Combine with Biome Changer Remote when assembling
+tooltip.advancedrocketry.satfunc.biomechanger.alt.1=§cCombine with Biome Changer Remote when assembling
 tooltip.advancedrocketry.satfunc.biomechanger.alt.2=Requires Power generation and storage!
 
 tooltip.advancedrocketry.satfunc.weather=§5Satellite Core Component
 tooltip.advancedrocketry.satfunc.weather.shift.1=§bDoes some weather stuff!
-tooltip.advancedrocketry.satfunc.weather.alt.1=Combine with Weather Remote when assembling
+tooltip.advancedrocketry.satfunc.weather.alt.1=§cCombine with Weather Remote when assembling
 
 # Weather Remote
 tooltip.advancedrocketry.weathercontrollerremote=§bShift-Right Click to open GUI
 tooltip.advancedrocketry.weathercontrollerremote.shift.1=§fRight-click in hand to use
-tooltip.advancedrocketry.weathercontrollerremote.alt.1=Combine with Weather Controller when assembling
+tooltip.advancedrocketry.weathercontrollerremote.alt.1=§cCombine with Weather Controller when assembling
 tooltip.advancedrocketry.weathercontrollerremote.mode.rain=§eMode: Rain - Fills small basins in the terrain with water
 tooltip.advancedrocketry.weathercontrollerremote.mode.dry=§eMode: Dry - Dries all water in a radius of 16
 tooltip.advancedrocketry.weathercontrollerremote.mode.flood=§eMode: Flood - Floods area with a radius of 16 with water
@@ -1287,19 +1293,19 @@ tooltip.advancedrocketry.satpower.1.shift.2=§oSatellites requires atleast 1 pow
 
 # LibVulpes Batteries
 tooltip.libvulpes.battery.0=§5Satellite Component§7
-tooltip.libvulpes.battery.0.shift.1=Increases Powerstorage
+tooltip.libvulpes.battery.0.shift.1=§bIncreases Powerstorage
 tooltip.libvulpes.battery.0.shift.2=§fCapacity: §c10.000 §fRF§7
 
 tooltip.libvulpes.battery.1=§5Satellite Component
-tooltip.libvulpes.battery.1.shift.1=Increases Powerstorage
+tooltip.libvulpes.battery.1.shift.1=§bIncreases Powerstorage
 tooltip.libvulpes.battery.1.shift.2=§fCapacity: §c40.000 §fRF§7
 
 # Data Unit
 tooltip.advancedrocketry.itemdata.header=§5Satellite Component
 tooltip.advancedrocketry.itemdata.type=§fType: 
 tooltip.advancedrocketry.itemdata.data=§fData stored: 
-tooltip.advancedrocketry.itemdataunit.shift.1=§fIncrease Satellite Data Storage by 1000
-tooltip.advancedrocketry.itemdataunit.alt.1=§fWorks as Datastorage in inventory aswell
+tooltip.advancedrocketry.dataunit.shift.1=§bIncrease Satellite Data Storage by 1000
+tooltip.advancedrocketry.dataunit.alt.1=§cWorks as Datastorage in inventory aswell
 
 ## Chips / remotes
 # Asteroid Chip
@@ -1309,8 +1315,8 @@ tooltip.advancedrocketry.asteroidchip.alt.1=§4Insert programmed Chip in Guidanc
 tooltip.advancedrocketry.asteroidchip.alt.2=§fYou get the chip back after Mission
 
 # Station Chip
-tooltip.advancedrocketry.stationchip=§bMake Backups!
-tooltip.advancedrocketry.stationchip.shift.1=§fProgram in Space Station Assembler
+tooltip.advancedrocketry.stationchip=§bProgram in Space Station Assembler
+tooltip.advancedrocketry.stationchip.shift.1=§fPrintable with Orbital Registry
 tooltip.advancedrocketry.stationchip.shift.2=§cCopied in Satellite Builder
 tooltip.advancedrocketry.stationchip.alt.1=§4Insert programmed Chip in Guidance Computer§7
 tooltip.advancedrocketry.stationchip.namelabel=Name: 
@@ -1322,8 +1328,8 @@ tooltip.advancedrocketry.planetidchip.shift.2=§fSet destination in Rocket GUI t
 tooltip.advancedrocketry.planetidchip.alt.1=§4Doublecheck that this is programmed before Launch!
 
 # Satellite Chip
-tooltip.advancedrocketry.satidchip=§bMake Backups!
-tooltip.advancedrocketry.satidchip.shift.1=§fStores a satellite’s ID.
+tooltip.advancedrocketry.satidchip=§bStores Satellite ID
+tooltip.advancedrocketry.satidchip.shift.1=§fPrintable with Orbital Registry.
 tooltip.advancedrocketry.satidchip.shift.2=§cCopied in Satellite Builder
 tooltip.advancedrocketry.satidchip.alt.1=§4Use in Satellite Terminal to link or in the Microwave Receiver Multiblock (Input hatch). 
 tooltip.advancedrocketry.satidchip.alt.2=§8 (Planet: resolves if put in Terminal)
