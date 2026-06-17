@@ -1,6 +1,6 @@
 2.2.11
 
-- Filtered Slots (+ Feedback for some) (requires LibVulpes 0.5.4):
+- Filtered Slots QoL (+ Tooltip feedback for some) (requires LibVulpes 0.5.4):
   - Observatory
   - Landing Pad
   - Satellite Builder:
