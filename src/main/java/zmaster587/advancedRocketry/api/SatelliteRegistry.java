@@ -108,17 +108,18 @@ public class SatelliteRegistry {
      * @return ID of the satellite, or -1 if not found
      */
     public static long getSatelliteId(@Nonnull ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbt = stack.getTagCompound();
+        if (!stack.hasTagCompound())
+            return -1;
 
-            if (nbt != null) {
-                if (stack.getItem() instanceof ItemSatelliteIdentificationChip)
-                    return nbt.getLong("satelliteId");
-                else
-                    return nbt.getLong("satId");
-            }
-        }
-        return -1;
+        NBTTagCompound nbt = stack.getTagCompound();
+        if (nbt == null)
+            return -1;
+
+        String key = stack.getItem() instanceof ItemSatelliteIdentificationChip
+                ? "satelliteId"
+                : "satId";
+
+        return nbt.hasKey(key) ? nbt.getLong(key) : -1;
     }
 
     /**

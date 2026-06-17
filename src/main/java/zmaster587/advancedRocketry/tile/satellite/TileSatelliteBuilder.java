@@ -369,13 +369,8 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
             return false;
 
         if (slot == chassisSlot) {
-            if (!(stack.getItem() instanceof ItemSatellite))
-                return false;
-
-            SatelliteProperties properties =
-                    SatelliteRegistry.getSatelliteProperties(stack);
-
-            return properties == null || properties.getId() <= 0;
+            return stack.getItem() instanceof ItemSatellite
+                    && SatelliteRegistry.getSatelliteId(stack) == -1;
         }
 
         if (slot == chipSlot || slot == chipCopySlot)
