@@ -146,7 +146,7 @@ public class ItemPlanetIdentificationChip extends ItemIdWithName {
                 String unknown = ChatFormatting.YELLOW + "???";
                 String dimName = stack.getTagCompound().getString(dimensionNameIdentifier);
 
-                list.add(LibVulpes.proxy.getLocalizedString("msg.itemplanetidchip.planetname") + ChatFormatting.DARK_GREEN + dimName);
+                list.add(LibVulpes.proxy.getLocalizedString("msg.itemplanetidchip.planetname") + " " + ChatFormatting.DARK_GREEN + dimName);
 
                 if (!props.getRequiredArtifacts().isEmpty()) {
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemplanetidchip.artifacts"));
@@ -154,13 +154,6 @@ public class ItemPlanetIdentificationChip extends ItemIdWithName {
                         list.add(ChatFormatting.DARK_PURPLE + "    " + stack2.getDisplayName());
                     }
                 }
-
-                //super.addInformation(stack, player, list, bool);
-
-                //list.add("Mass: " + unknown);
-                //list.add("Atmosphere Density: " + unknown);
-                //list.add("Distance From Star: " + unknown);
-
             } else { //Space station
                 list.add(LibVulpes.proxy.getLocalizedString("msg.itemplanetidchip.stationid") + ChatFormatting.DARK_GREEN + stack.getTagCompound().getString(dimensionNameIdentifier));
             }
