@@ -165,10 +165,11 @@ public class ItemBlockDataBusBig extends ItemBlock implements IDataItem {
 
         // Type
         String typeText = I18n.format(data.getDataType().toString());
-        list.add(I18n.format("tooltip.advancedrocketry.itemdata.type") + typeText);
+        list.add(I18n.format("tooltip.advancedrocketry.itemdata.type") +  " "  + typeText);
 
         // Data
         list.add(I18n.format("tooltip.advancedrocketry.itemdata.data")
+                + " "
                 + TextFormatting.GOLD + data.getData()
                 + TextFormatting.WHITE + " / "
                 + TextFormatting.GOLD + data.getMaxData());

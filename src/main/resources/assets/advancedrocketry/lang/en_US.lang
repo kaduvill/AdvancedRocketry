@@ -873,10 +873,8 @@ tooltip.advancedrocketry.monopropmotor.alt.1=Check Fueling Station JEI-page
 # Nuclear Core
 tooltip.advancedrocketry.nuclearcore=§cPart of Rocket
 tooltip.advancedrocketry.nuclearcore.1=§6Allows planetary travel!
-tooltip.advancedrocketry.nuclearcore.shift.1=Needs to be directly on top of a
-tooltip.advancedrocketry.nuclearcore.shift.2=Nuclear Engine or another Nuclear Core.
-tooltip.advancedrocketry.nuclearcore.alt.1=Vertical placement rules don't apply
-tooltip.advancedrocketry.nuclearcore.alt.2=for Unmanned Vehicles (Gas Mission rockets)
+tooltip.advancedrocketry.nuclearcore.shift.1=§fNeeds to be directly on top of a Nuclear Engine or another Nuclear Core.
+tooltip.advancedrocketry.nuclearcore.alt.1=Vertical placement rules don't apply for Unmanned Vehicles (Gas Mission rockets)
 
 # Nuclear rocketengine
 tooltip.advancedrocketry.nuclearmotor=§cPart of Rocket
@@ -922,7 +920,7 @@ tooltip.advancedrocketry.landingpad=Replace the launchpad’s center block with 
 tooltip.advancedrocketry.landingpad.shift.1=§cLinker§f can store this block's exact position (dimension-aware).
 tooltip.advancedrocketry.landingpad.shift.2=§fUse in §4Guidance Computer§7
 tooltip.advancedrocketry.landingpad.alt.1=Insert a Chip or programmed Linker
-tooltip.advancedrocketry.landingpad.alt.2=Rockets launched from this pad will fly to the Linker’s saved coordinates (used for automation).
+tooltip.advancedrocketry.landingpad.alt.2=Rockets launched from this pad lands on stored coordinates (used for automation).
 tooltip.advancedrocketry.landingpad.alt.3=§o(Overridden by guidance computer destination)
 
 # Launch Pad
@@ -937,7 +935,7 @@ tooltip.advancedrocketry.structuretower=Vertical support for the Launch Pad plat
 tooltip.advancedrocketry.structuretower.shift.1=§bTower must be minimum 4 blocks.
 tooltip.advancedrocketry.structuretower.shift.2=§fBottom block must touch the Launch Pad.
 tooltip.advancedrocketry.structuretower.alt.1=Main block for Unmanned Vehicle Assembler structure
-tooltip.advancedrocketry.structuretower.alt.2=Check wiki for more info.
+tooltip.advancedrocketry.structuretower.alt.2=§oCheck wiki for more info.
 
 # Terraformer
 tooltip.advancedrocketry.terraformer=Terraform the entire planet!
@@ -1053,20 +1051,17 @@ tooltip.advancedrocketry.transceiver.alt.2=§o(reinsert chip if stale)
 
 # Atmosphere Detector
 tooltip.advancedrocketry.atmosphereDetector=Emits redstone based on Atmosphere
-tooltip.advancedrocketry.atmosphereDetector.shift.1=Select wanted Atmosphere
-tooltip.advancedrocketry.atmosphereDetector.shift.2=emits if the condition is true
-tooltip.advancedrocketry.atmosphereDetector.alt.1=Can detect: air, vacuum,
-tooltip.advancedrocketry.atmosphereDetector.alt.2=low O₂, No O₂, very hot and more.
+tooltip.advancedrocketry.atmosphereDetector.shift.1=§fSelect wanted Atmosphere, emits redstone if true
+tooltip.advancedrocketry.atmosphereDetector.alt.1=Can detect: air, vacuum, low O₂, No O₂, very hot and more.
 
 # Station Light
-tooltip.advancedrocketry.circlelight=Always on
-tooltip.advancedrocketry.circlelight.shift.1=Does not require
-tooltip.advancedrocketry.circlelight.shift.2=Power or Redstone
+tooltip.advancedrocketry.circlelight=§cAlways on
+tooltip.advancedrocketry.circlelight.shift.1=§fDoes not require Power or Redstone
 
 # Gas Charge Pad
 tooltip.advancedrocketry.oxygencharger=Charges Space Suit O₂ and H₂
 tooltip.advancedrocketry.oxygencharger.shift.1=Stand on pad to refill
-tooltip.advancedrocketry.oxygencharger.alt.1=Does not require Power
+tooltip.advancedrocketry.oxygencharger.alt.1=§fDoes not require Power
 
 # Docking Port
 tooltip.advancedrocketry.dockingport=Marks a station module docking point
@@ -1103,19 +1098,19 @@ tooltip.advancedrocketry.orientationctrl.alt.1=§dCosmetic only§7
 # Gravity Controller
 tooltip.advancedrocketry.gravityctrl=§cSpace Station Controller
 tooltip.advancedrocketry.gravityctrl.shift.1=§bArtificial gravity!
-tooltip.advancedrocketry.gravityctrl.alt.1=Redstone control
+tooltip.advancedrocketry.gravityctrl.alt.1=§fRedstone control
 
 # Altitude Controller
 tooltip.advancedrocketry.altitudectrl=§cSpace Station Controller
 tooltip.advancedrocketry.altitudectrl.shift.1=§bCustomize orbital height
-tooltip.advancedrocketry.altitudectrl.alt.1=§dCosmetic only§7
-tooltip.advancedrocketry.altitudectrl.alt.2=Redstone control
+tooltip.advancedrocketry.altitudectrl.alt.1=§dCosmetic only
+tooltip.advancedrocketry.altitudectrl.alt.2=§fRedstone control
 
 # Co2Scrubber
 tooltip.advancedrocketry.scrubber=Place next to Oxygen Vent
-tooltip.advancedrocketry.scrubber.shift.1=Reduces Oxygen use (max 2)
-tooltip.advancedrocketry.scrubber.alt.1=Each scrubber halves O₂ use, increases Power use.
-tooltip.advancedrocketry.scrubber.alt.2=With 2 Scrubbers, Oxygen Vent won't use Oxygen.
+tooltip.advancedrocketry.scrubber.shift.1=§fReduces Oxygen use (max 2)
+tooltip.advancedrocketry.scrubber.alt.1=§fEach scrubber halves O₂ use, increases Power use.
+tooltip.advancedrocketry.scrubber.alt.2=§fWith 2 Scrubbers, Oxygen Vent won't use Oxygen.
 
 # Oxygen Vent
 tooltip.advancedrocketry.oxygenvent=Creates breathable air in sealed rooms.
@@ -1135,7 +1130,7 @@ tooltip.advancedrocketry.warpcontroller=Turns the station into a §6Starship
 tooltip.advancedrocketry.warpcontroller.shift.1=§fPlace §4Warp Controller§f + §4Warp Core§f on a space station
 tooltip.advancedrocketry.warpcontroller.shift.2=§fWarp between planets and solar systems
 tooltip.advancedrocketry.warpcontroller.alt.1=§fUI shows location, destinations, and warp fuel
-tooltip.advancedrocketry.warpcontroller.alt.2=(You made it this far! check wiki bro)
+tooltip.advancedrocketry.warpcontroller.alt.2=§o(You made it this far! check wiki bro)
 
 # CarbonScrubberCartridge
 tooltip.advancedrocketry.scrubbercart=Used in CO₂ Scrubber
@@ -1280,11 +1275,11 @@ tooltip.advancedrocketry.orescanner.alt.1=§fScan range depends on the satellite
 # Power Sources
 tooltip.advancedrocketry.satpower.0=§5Satellite Component
 tooltip.advancedrocketry.satpower.0.shift.1=§fGenerates §c4 §fRF/t§7
-tooltip.advancedrocketry.satpower.0.shift.2=§oSatellites requires atleast 1 powergen
+tooltip.advancedrocketry.satpower.0.shift.2=§oSatellites requires at least 1 power-gen
 
 tooltip.advancedrocketry.satpower.1=§5Satellite Component
 tooltip.advancedrocketry.satpower.1.shift.1=§fGenerates §c40 §fRF/t§7
-tooltip.advancedrocketry.satpower.1.shift.2=§oSatellites requires atleast 1 powergen
+tooltip.advancedrocketry.satpower.1.shift.2=§oSatellites requires at least 1 power-gen
 
 # LibVulpes Batteries
 tooltip.libvulpes.battery.0=§5Satellite Component§7
@@ -1514,15 +1509,15 @@ tooltip.advancedrocketry.stationassembler.shift.1=§bRequires Launch Pad + Struc
 tooltip.advancedrocketry.stationassembler.alt.1=§fPlace this 1 block higher than Launch Pad, connecting lower corners and facing opposite of the Launch Pad square
 
 # Packet Station
-tooltip.advancedrocketry.packedstructure=Insert in §cSatellite Bay§7 to put in Orbit!
-tooltip.advancedrocketry.packedstructure.shift.1=§eSet the rocket's target planet before launch!
+tooltip.advancedrocketry.packedstructure=§fInsert in §cSatellite Bay§f to put in Orbit!
+tooltip.advancedrocketry.packedstructure.shift.1=§eSet the rocket's target planet before launch
 
 # Deployable Rocket Assembler
 tooltip.advancedrocketry.deployablerocketassembler=§cBuilds Rockets on Space Stations
 tooltip.advancedrocketry.deployablerocketassembler.shift.1=§bRequires Structure Tower blocks
 tooltip.advancedrocketry.deployablerocketassembler.shift.2=§fUsed for §6Gas Missions§7
 tooltip.advancedrocketry.deployablerocketassembler.alt.1=§fPlace this in the middle of an upside-down T facing outward in space, then add horizontal support from the tower top.
-tooltip.advancedrocketry.deployablerocketassembler.alt.2=Check wiki if unsure!
+tooltip.advancedrocketry.deployablerocketassembler.alt.2=§oCheck wiki if unsure!
 
 # Hovercraft
 tooltip.advancedrocketry.hovercraft=Long-lasting dilithium power source. It'll probably outlive you.

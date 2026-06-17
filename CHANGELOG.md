@@ -1,5 +1,8 @@
 2.2.11
 
+- Filtered Slots (requires LibVulpes 0.5.4):
+  - Observatory
+  - 
 - Satellite Builder:
   - Feedback when building satellite
   - Filtered Slots (shift-clicking QoL e.g)
