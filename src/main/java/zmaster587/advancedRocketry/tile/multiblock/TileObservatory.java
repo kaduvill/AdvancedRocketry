@@ -422,7 +422,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         if (tabModule.getTab() == 1) {
 
             //ADD io slots
-            modules.add(new ModuleTexturedSlotArray(5, 120, this, 1, 2, TextureResources.idChip));
+            modules.add(new ModuleTexturedLimitedSlotArray(5, 120, this, 1, 2, TextureResources.idChip));
             modules.add(new ModuleOutputSlotArray(45, 120, this, 2, 3));
 
             ModuleButton scanButton = new ModuleButton(100, 120, 2, LibVulpes.proxy.getLocalizedString("msg.observetory.scan.button"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, LibVulpes.proxy.getLocalizedString("msg.observetory.scan.tooltip"), 64, 18);
@@ -472,9 +472,15 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                         buttonList.add(new ModuleItemSlotButton(sx, sy, -2, this, s, tip));
                     }
 
-                    buttonList.add(new ModuleText(sx, sy,
+                    ModuleText amountText = new ModuleText(
+                            sx,
+                            sy,
                             entry.midpoint + "\n+/- " + entry.variablility,
-                            0xFFFFFF, 0.5f));
+                            0xFFFFFF,
+                            0.5f
+                    );
+                    amountText.setAlwaysOnTop(true);
+                    buttonList.add(amountText);
 
                     g++;
                 }
@@ -902,8 +908,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         if (slot == 2) {
             return false;
         }
-
-        return true;
+        return false;
     }
 
 

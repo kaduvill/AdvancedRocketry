@@ -49,6 +49,7 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
     private static final byte holdingSlot = 10;
     private static final byte chassisSlot = 11;
     EmbeddedInventory inventory;
+    private ModuleButton buildButton;
 
     public TileSatelliteBuilder() {
         inventory = new EmbeddedInventory(5);
@@ -67,31 +68,77 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
     }
 
     public boolean canAssembleSatellite() {
-
-        if (getStackInSlot(chassisSlot).isEmpty())
-            return false;
-
-        boolean hasPowerGeneration = false;
-        //First make sure everything is a satellite part, and check to see if satellite has any power generation
-        for (int i = primaryFunctionSlot; i <= modularFunctionSlotEnd; i++) {
-            ItemStack stack = getStackInSlot(i);
-            if (!stack.isEmpty() && SatelliteRegistry.getSatelliteProperty(stack) != null && SatelliteRegistry.getSatelliteProperty(stack).getPropertyFlag() == SatelliteProperties.Property.POWER_GEN.getFlag() && SatelliteRegistry.getSatelliteProperty(stack).getPowerGeneration() > 0)
-                hasPowerGeneration = true;
-        }
-
-        //Make sure critical parts exist and output is empty
-        if (getStackInSlot(primaryFunctionSlot).isEmpty() || SatelliteRegistry.getSatelliteProperty(getStackInSlot(primaryFunctionSlot)) == null || !hasPowerGeneration)
-            return false;
-        if (!getStackInSlot(holdingSlot).isEmpty() || !getStackInSlot(outputSlot).isEmpty())
-            return false;
-
-        String satType = SatelliteRegistry.getSatelliteProperty(getStackInSlot(primaryFunctionSlot)).getSatelliteType();
-        SatelliteBase sat = SatelliteRegistry.getNewSatellite(satType);
-
-        return sat.isAcceptableControllerItemStack(getStackInSlot(chipSlot));
+        return getAssemblyErrorKey() == null;
     }
 
-    /**
+    @Nullable
+    private String getAssemblyErrorKey() {
+        ItemStack chassis = getStackInSlot(chassisSlot);
+
+        if (chassis.isEmpty() || !isItemValidForSlot(chassisSlot, chassis))
+            return "msg.satbuilder.error.chassis";
+
+        ItemStack primaryStack = getStackInSlot(primaryFunctionSlot);
+        SatelliteProperties primaryProperties =
+                SatelliteRegistry.getSatelliteProperty(primaryStack);
+
+        if (primaryStack.isEmpty() || primaryProperties == null)
+            return "msg.satbuilder.error.primary";
+
+        boolean hasPowerGeneration = false;
+
+        for (int slot = primaryFunctionSlot;
+             slot <= modularFunctionSlotEnd;
+             slot++) {
+
+            SatelliteProperties properties =
+                    SatelliteRegistry.getSatelliteProperty(getStackInSlot(slot));
+
+            if (properties != null
+                    && properties.getPropertyFlag()
+                    == SatelliteProperties.Property.POWER_GEN.getFlag()
+                    && properties.getPowerGeneration() > 0) {
+                hasPowerGeneration = true;
+                break;
+            }
+        }
+
+        if (!hasPowerGeneration)
+            return "msg.satbuilder.error.power";
+
+        if (!getStackInSlot(holdingSlot).isEmpty()
+                || !getStackInSlot(outputSlot).isEmpty()) {
+            return "msg.satbuilder.error.output";
+        }
+
+        SatelliteBase satellite =
+                SatelliteRegistry.getNewSatellite(
+                        primaryProperties.getSatelliteType());
+
+        if (satellite == null
+                || !satellite.isAcceptableControllerItemStack(
+                getStackInSlot(chipSlot))) {
+            return "msg.satbuilder.error.controller";
+        }
+
+        return null;
+    }
+    private void refreshBuildButtonTooltip() {
+        if (buildButton == null || world == null || !world.isRemote)
+            return;
+
+        String errorKey = getAssemblyErrorKey();
+
+        if (errorKey == null) {
+            buildButton.setToolTipText(
+                    LibVulpes.proxy.getLocalizedString(
+                            "msg.satbuilder.build.tooltip"));
+        } else {
+            buildButton.setToolTipText(
+                    LibVulpes.proxy.getLocalizedString(errorKey));
+        }
+    }
+     /**
      * Assumes everything is in the proper place in the inventory to construct the satellite
      * If unsure check canAssembleSatellite() first
      */
@@ -149,30 +196,21 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
         boolean chipsExist = !stack0.isEmpty() && !stack1.isEmpty();
         if (!chipsExist)
             return false;
-        boolean isSatellite = ((stack0.getItem() instanceof ItemSatellite || stack0.getItem() instanceof ItemSatelliteIdentificationChip) && stack1.getItem().equals(stack0.getItem()));
+        boolean isSatelliteChip = stack0.getItem() instanceof ItemSatelliteIdentificationChip && stack1.getItem().equals(stack0.getItem());
         boolean isStation = stack0.getItem() instanceof ItemStationChip && ItemStationChip.getUUID(stack0) != 0 && stack1.getItem() instanceof ItemStationChip;
-        boolean isPlanet = (stack0.getItem() instanceof ItemPlanetIdentificationChip && stack1.getItem() instanceof ItemPlanetIdentificationChip);
-        boolean isOreScanner = (stack0.getItem() instanceof ItemOreScanner && stack1.getItem() instanceof ItemOreScanner);
-        return !isRunning() && getStackInSlot(outputSlot).isEmpty() && (isStation || stack0.hasTagCompound()) &&
-                (isSatellite || isStation || isPlanet || isOreScanner);
+        boolean isPlanet = stack0.getItem() instanceof ItemPlanetIdentificationChip && stack1.getItem() instanceof ItemPlanetIdentificationChip;
+        boolean isOreScanner = stack0.getItem() instanceof ItemOreScanner && stack1.getItem() instanceof ItemOreScanner;
+        return !isRunning() && getStackInSlot(outputSlot).isEmpty() && (isStation || stack0.hasTagCompound()) && (isSatelliteChip
+                || isStation || isPlanet || isOreScanner);
     }
 
     private void copyChip() {
+        setInventorySlotContents(
+                holdingSlot,
+                getStackInSlot(chipSlot).copy());
 
-        ItemStack slot0 = getStackInSlot(chipSlot);
-        ItemStack slot1 = getStackInSlot(chipCopySlot);
-
-        if (slot0.getItem() instanceof ItemSatelliteIdentificationChip || slot0.getItem() instanceof ItemOreScanner || slot0.getItem() instanceof ItemPlanetIdentificationChip || slot0.getItem() instanceof ItemStationChip) {
-            setInventorySlotContents(holdingSlot, getStackInSlot(chipSlot).copy());
-        } else {
-            ItemSatelliteIdentificationChip itemIdChip = (ItemSatelliteIdentificationChip) slot1.getItem();
-
-            itemIdChip.setSatellite(slot1, SatelliteRegistry.getSatelliteProperty(slot0));
-            setInventorySlotContents(holdingSlot, slot1);
-        }
         decrStackSize(chipCopySlot, 1);
         completionTime = 100;
-
         this.markDirty();
     }
 
@@ -180,7 +218,6 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
         super.useNetworkData(player, side, id, nbt);
-
 
         onInventoryButtonPressed(id - 100);
     }
@@ -195,11 +232,13 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
         modules.add(new ModuleTexturedLimitedSlotArray(116, 50, this, 4, 7, TextureResources.ioSlot));
         modules.add(new ModuleTexturedLimitedSlotArray(38, 16, this, chassisSlot, chassisSlot + 1, TextureResources.slotSatellite));    // Id chip
         modules.add(new ModuleOutputSlotArray(58, 36, this, 7, 8));   // Output
-        modules.add(new ModuleTexturedSlotArray(58, 16, this, chipSlot, chipSlot + 1, TextureResources.idChip));    // Id chip
-        modules.add(new ModuleTexturedSlotArray(82, 16, this, chipCopySlot, chipCopySlot + 1, TextureResources.idChip));    // Id chip
+        modules.add(new ModuleTexturedLimitedSlotArray(58, 16, this, chipSlot, chipSlot + 1, TextureResources.idChip));
+        modules.add(new ModuleTexturedLimitedSlotArray(82, 16,this,chipCopySlot,chipCopySlot + 1, TextureResources.idChip));
         modules.add(new ModuleProgress(75, 36, 0, new ProgressBarImage(217, 0, 17, 17, 234, 0, EnumFacing.DOWN, TextureResources.progressBars), this));
         String buildLabel = LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.build");
-        modules.add(new ModuleButton(40, 56, 0, buildLabel, this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
+        buildButton = new ModuleButton(40, 56, 0, buildLabel, this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild);
+        refreshBuildButtonTooltip();
+        modules.add(buildButton);
         modules.add(new ModuleButton(173, 3, 1, "", this, TextureResources.buttonCopy, LibVulpes.proxy.getLocalizedString("msg.satbuilder.writesecondchip"), 24, 24));
 
         return modules;
@@ -207,16 +246,23 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        if (world.isRemote)
-            PacketHandler.sendToServer(new PacketMachine(this, (byte) (buttonId + 100)));
+        if (world.isRemote) {
+            if (buttonId == 0)
+                refreshBuildButtonTooltip();
+
+            PacketHandler.sendToServer(
+                    new PacketMachine(
+                            this,
+                            (byte) (buttonId + 100)));
+        }
 
         if (buttonId == 0) {
             if (canAssembleSatellite())
                 assembleSatellite();
-        } else if (buttonId == 1)
+        } else if (buttonId == 1) {
             if (canCopy())
                 copyChip();
-
+        }
     }
 
     @Override
@@ -254,13 +300,14 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
                 EmbeddedInventory inv = ((ItemSatellite) chassis.getItem()).readInvFromNBT(chassis);
                 ItemStack stack = inv.decrStackSize(slot, amt);
                 ((ItemSatellite) chassis.getItem()).writeInvToNBT(chassis, inv);
+                refreshBuildButtonTooltip();
                 return stack;
             }
-
             return ItemStack.EMPTY;
         }
-
-        return inventory.decrStackSize(slot - 7, amt);
+        ItemStack stack = inventory.decrStackSize(slot - 7, amt);
+        refreshBuildButtonTooltip();
+        return stack;
     }
 
 
@@ -274,9 +321,11 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
                 inv.setInventorySlotContents(slot, stack);
                 ((ItemSatellite) chassis.getItem()).writeInvToNBT(chassis, inv);
             }
+            refreshBuildButtonTooltip();
             return;
         }
         inventory.setInventorySlotContents(slot - 7, stack);
+        refreshBuildButtonTooltip();
     }
 
     @Override
@@ -304,18 +353,41 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
         inventory.closeInventory(player);
     }
 
+    private boolean isValidChipSlotItem(@Nonnull ItemStack stack) {
+        return stack.getItem() instanceof ItemSatelliteIdentificationChip
+                || stack.getItem() instanceof ItemStationChip
+                || stack.getItem() instanceof ItemPlanetIdentificationChip
+                || stack.getItem() instanceof ItemOreScanner;
+    }
+
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        if (slot < outputSlot) {
+        if (stack.isEmpty())
+            return false;
+
+        if (slot == outputSlot || slot == holdingSlot)
+            return false;
+
+        if (slot == chassisSlot) {
+            return stack.getItem() instanceof ItemSatellite
+                    && SatelliteRegistry.getSatelliteId(stack) == -1;
+        }
+
+        if (slot == chipSlot || slot == chipCopySlot)
+            return isValidChipSlotItem(stack);
+
+        if (slot >= primaryFunctionSlot && slot <= modularFunctionSlotEnd) {
             ItemStack chassis = getStackInSlot(chassisSlot);
 
             if (!chassis.isEmpty() && chassis.getItem() instanceof ItemSatellite) {
-                EmbeddedInventory inv = ((ItemSatellite) chassis.getItem()).readInvFromNBT(chassis);
+                EmbeddedInventory inv =
+                        ((ItemSatellite) chassis.getItem()).readInvFromNBT(chassis);
+
                 return inv.isItemValidForSlot(slot, stack);
             }
-            return false;
         }
-        return inventory.isItemValidForSlot(slot - 7, stack);
+
+        return false;
     }
 
     @Override
@@ -349,12 +421,14 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
                 EmbeddedInventory inv = ((ItemSatellite) chassis.getItem()).readInvFromNBT(chassis);
                 ItemStack stack = inv.removeStackFromSlot(index);
                 ((ItemSatellite) chassis.getItem()).writeInvToNBT(chassis, inv);
+                refreshBuildButtonTooltip();
                 return stack;
             }
             return ItemStack.EMPTY;
         }
-
-        return inventory.removeStackFromSlot(index - 7);
+        ItemStack stack = inventory.removeStackFromSlot(index - 7);
+        refreshBuildButtonTooltip();
+        return stack;
     }
 
     @Override
@@ -376,6 +450,7 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
     @Override
     public void clear() {
         inventory.clear();
+        refreshBuildButtonTooltip();
     }
 
     @Override

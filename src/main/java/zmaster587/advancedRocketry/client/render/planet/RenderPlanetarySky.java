@@ -106,12 +106,6 @@ public class RenderPlanetarySky extends IRenderHandler {
     public static void renderPlanetPubHelper(BufferBuilder buffer, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, double ringAngle, boolean hasDecorators, float[] shadowColorMultiplier, float alphaMultiplier2) {
         GlStateManager.enableBlend();
 
-
-        //GL11.glDepthFunc(GL11.GL_LEQUAL);
-        //int k = mc.theWorld.getMoonPhase();
-        //int l = k % 4;
-        //int i1 = k / 4 % 2;
-
         //Set planet Orbiting distance; size
 
         float f14 = 1f;//(float)(l + 0) / 4.0F;

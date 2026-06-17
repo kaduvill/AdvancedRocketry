@@ -229,6 +229,15 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
     }
 
+    private void unlinkInfrastructure() {
+        Iterator<IInfrastructure> iterator = connectedInfrastructure.iterator();
+
+        while (iterator.hasNext()) {
+            iterator.next().unlinkRocket();
+            iterator.remove();
+        }
+    }
+
     private void clearPlanetSelectorCache() {
         dimCache = null;
         planetSelectorProgress.setProps(null);
@@ -387,10 +396,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     @Override
     public AxisAlignedBB getEntityBoundingBox() {
         if (storage != null) {
-            //MobileAABB aabb = new MobileAABB(super.getEntityBoundingBox());
-            //aabb.setStorageChunk(storage);
-            //aabb.setRemote(worldObj.isRemote);
-            //return aabb;
             return super.getEntityBoundingBox();
         }
         return new AxisAlignedBB(0, 0, 0, 1, 1, 1);
@@ -398,9 +403,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public void setEntityBoundingBox(AxisAlignedBB bb) {
-        //if(storage != null)
-        //	super.setEntityBoundingBox(bb.offset(0, storage.getSizeY(),0));
-        //else
         super.setEntityBoundingBox(bb);
     }
 
@@ -1744,10 +1746,28 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             this.setDead();
             //TODO: Move tracking stations over to the mission handler
         } else {
-            unpackSatellites();
+            destinationDimId = storage.getDestinationDimId(
+                    world.provider.getDimension(),
+                    (int) posX,
+                    (int) posZ
+            );
+
+            boolean deployedUnguidedSatellite = unpackSatellites(
+                    destinationDimId == Constants.INVALID_PLANET
+            );
+
+            if (deployedUnguidedSatellite) {
+                unlinkInfrastructure();
+                setDead();
+                return;
+            }
         }
 
-        destinationDimId = storage.getDestinationDimId(this.world.provider.getDimension(), (int) this.posX, (int) this.posZ);
+        destinationDimId = storage.getDestinationDimId(
+                world.provider.getDimension(),
+                (int) posX,
+                (int) posZ
+        );
         if (destinationDimId == this.world.provider.getDimension()) {
             Vector3F<Float> pos = storage.getDestinationCoordinates(destinationDimId, true);
             storage.setDestinationCoordinates(new Vector3F<>((float) this.posX, (float) this.posY, (float) this.posZ), this.world.provider.getDimension());
@@ -1836,7 +1856,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             while (currentDim.isMoon()) currentDim = currentDim.getParentProperties();
 
             SpacePosition planetSpacePos = currentDim.getSpacePosition();
-
             SpacePosition modifiedPosition = new SpacePosition().getFromSpherical(currentDim.getRenderSizePlanetView() * 1.1, 0);
 
             spacePosition.x = modifiedPosition.x;
@@ -1879,12 +1898,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         pos.y = (float) getEntryHeight(destinationDimId);
 
                     }
-
                     this.changeDimension(destinationDimId, pos.x, pos.y, pos.z);
                     return;
                 }
             }
-
 
             //if coordinates are overridden, make sure we grab them
             destPos = storage.getDestinationCoordinates(destinationDimId, true);
@@ -1930,43 +1947,102 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     }
 
     private void unpackSatellites() {
-        List<TileSatelliteHatch> satelliteHatches = storage.getSatelliteHatches();
+        // Preserve the original behavior for every existing caller,
+        // including reachSpaceManned().
+        unpackSatellites(false);
+    }
+
+    private boolean unpackSatellites(boolean deployUnguidedSatelliteToLaunchBody) {
+        boolean deployedUnguidedSatellite = false;
+
+        List<TileSatelliteHatch> satelliteHatches =
+                storage.getSatelliteHatches();
 
         for (TileSatelliteHatch tile : satelliteHatches) {
             SatelliteBase satellite = tile.getSatellite();
+
             if (satellite == null) {
                 ItemStack stack = tile.getStackInSlot(0);
-                if (!stack.isEmpty() && stack.getItem() == AdvancedRocketryItems.itemSpaceStation) {
-                    StorageChunk storage = ((ItemPackedStructure) stack.getItem()).getStructure(stack);
-                    ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
 
-                    //in case of no NBT data or the like
+                if (!stack.isEmpty()
+                        && stack.getItem() == AdvancedRocketryItems.itemSpaceStation) {
+
+                    StorageChunk storage =
+                            ((ItemPackedStructure) stack.getItem())
+                                    .getStructure(stack);
+
+                    ISpaceObject spaceObject =
+                            SpaceObjectManager.getSpaceManager()
+                                    .getSpaceStation(ItemStationChip.getUUID(stack));
+
+                    // In case of no NBT data or the like
                     if (spaceObject == null) {
                         tile.setInventorySlotContents(0, ItemStack.EMPTY);
                         continue;
                     }
 
-                    SpaceObjectManager.getSpaceManager().moveStationToBody(spaceObject,
-                            DimensionManager.getEffectiveDimId(this.world.provider.getDimension(), getPosition()).getId());
-
-                    //Vector3F<Integer> spawn = spaceObject.getSpawnLocation();
+                    // Existing space-station behavior remains unchanged.
+                    SpaceObjectManager.getSpaceManager().moveStationToBody(
+                            spaceObject,
+                            DimensionManager.getEffectiveDimId(
+                                    world.provider.getDimension(),
+                                    getPosition()
+                            ).getId()
+                    );
 
                     spaceObject.onModuleUnpack(storage);
                     tile.setInventorySlotContents(0, ItemStack.EMPTY);
                 }
             } else {
-                int destinationId = storage.getDestinationDimId(world.provider.getDimension(), (int) posX, (int) posZ);
-                DimensionProperties properties = DimensionManager.getEffectiveDimId_byID(destinationId, this.getPosition());
-                int world2;
-                if (destinationId == ARConfiguration.getCurrentConfig().spaceDimId || destinationId == Constants.INVALID_PLANET)
-                    world2 = properties.getId();
-                else
-                    world2 = destinationId;
+                int destinationId = storage.getDestinationDimId(
+                        world.provider.getDimension(),
+                        (int) posX,
+                        (int) posZ
+                );
 
-                properties.addSatellite(satellite, world2, world.isRemote);
+                DimensionProperties properties;
+                int satelliteDimensionId;
+
+                if (deployUnguidedSatelliteToLaunchBody
+                        && destinationId == Constants.INVALID_PLANET) {
+
+                    // Unmanned ordinary satellite with no usable destination:
+                    // register it on the active launch-body properties.
+                    properties = DimensionManager.getEffectiveDimId(
+                            world,
+                            getPosition()
+                    );
+
+                    satelliteDimensionId = properties.getId();
+                    deployedUnguidedSatellite = true;
+                } else {
+                    // Preserve the original guided and manned behavior.
+                    properties = DimensionManager.getEffectiveDimId_byID(
+                            destinationId,
+                            getPosition()
+                    );
+
+                    if (destinationId
+                            == ARConfiguration.getCurrentConfig().spaceDimId
+                            || destinationId == Constants.INVALID_PLANET) {
+
+                        satelliteDimensionId = properties.getId();
+                    } else {
+                        satelliteDimensionId = destinationId;
+                    }
+                }
+
+                properties.addSatellite(
+                        satellite,
+                        satelliteDimensionId,
+                        world.isRemote
+                );
+
                 tile.setInventorySlotContents(0, ItemStack.EMPTY);
             }
         }
+
+        return deployedUnguidedSatellite;
     }
 
     /**

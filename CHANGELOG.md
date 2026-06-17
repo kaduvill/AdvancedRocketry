@@ -1,3 +1,18 @@
+2.2.11
+
+- Satellite Builder:
+  - Feedback when building satellite
+  - Filtered Slots (shift-clicking QoL e.g)
+  - Corrected inconsistencies with Satellite ID 0
+
+- Strenghtened the unProgrammed Satellite launch to make it more intuitive
+  - launching satellite with no destination:
+    - deploys to effective launch-dim
+    - rocket dies, but satellite starts ticking
+- Fixed GL.state.Leak: when orbiting black hole
+- Observatory: Asteroid composition values now render above the rotating block previews.
+- Tooltips polished
+
 2.2.10
 
 - Fixed rocket destination validation:

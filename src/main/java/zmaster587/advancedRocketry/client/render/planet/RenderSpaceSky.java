@@ -58,11 +58,11 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
             float ro = -20f;
             if (properties.getStar().isBlackHole()) {
-                GL11.glDepthMask(true);
-                GL11.glEnable(GL11.GL_ALPHA_TEST);
-                GL11.glAlphaFunc(GL11.GL_GREATER, 0.01f);
+                GlStateManager.depthMask(true);
+                GlStateManager.enableAlpha();
+                GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
                 float f10;
-                GL11.glDisable(GL11.GL_BLEND);
+                GlStateManager.disableBlend();
                 GL11.glPushMatrix();
                 GL11.glRotatef(140, -1, 0, 0);
                 GL11.glRotatef(180, 0, 1, 0);
@@ -76,8 +76,8 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GlStateManager.disableCull();
                 renderSphere(0, 0, 0, f10, 32, 23);
                 GlStateManager.enableCull();
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glDepthMask(false);
+                GlStateManager.enableBlend();
+                GlStateManager.depthMask(false);
 
                 GL11.glPopMatrix();
 
@@ -180,13 +180,23 @@ public class RenderSpaceSky extends RenderPlanetarySky {
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
             GlStateManager.depthMask(false);
 
+            GlStateManager.enableCull();
+            GlStateManager.enableAlpha();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            GlStateManager.enableTexture2D();
+            GlStateManager.blendFunc(
+                    GL11.GL_SRC_ALPHA,
+                    GL11.GL_ONE_MINUS_SRC_ALPHA
+            );
+            GlStateManager.disableBlend();
+            GlStateManager.color(1F, 1F, 1F, 1F);
 
             return;
         }
         if (Objects.equals(properties.customIcon, "void"))
             return;
 
-
+        GlStateManager.enableBlend();
         float[] atmColor = properties.skyColor;
 
         GL11.glPushMatrix();
@@ -258,7 +268,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
 
                 GlStateManager.disableTexture2D();
-                //GL11.glDisable(GL11.GL_BLEND);
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);

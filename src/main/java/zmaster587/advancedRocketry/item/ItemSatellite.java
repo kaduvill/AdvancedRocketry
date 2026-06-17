@@ -133,9 +133,9 @@ public class ItemSatellite extends ItemIdWithName {
 
     @Override
     public void addInformation(@Nonnull ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
-        // Assembled = has properties AND a real ID (>0)
+        // Assembled = has properties AND an assigned ID (-1 means unassigned)
         SatelliteProperties props = SatelliteRegistry.getSatelliteProperties(stack);
-        final boolean isAssembled = (props != null && props.getId() > 0);
+        final boolean isAssembled = (props != null && props.getId() >= 0);
 
         if (isAssembled) {
             int dataStorage, powerGeneration, powerStorage;
