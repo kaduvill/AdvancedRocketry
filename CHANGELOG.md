@@ -1,12 +1,10 @@
 2.2.11
 
-- Filtered Slots (requires LibVulpes 0.5.4):
+- Filtered Slots (+ Feedback for some) (requires LibVulpes 0.5.4):
   - Observatory
   - Landing Pad
-- Satellite Builder:
-  - Feedback when building satellite
-  - Filtered Slots (shift-clicking QoL e.g)
-  - Corrected inconsistencies with Satellite ID 0
+  - Satellite Builder:
+    - Corrected inconsistencies with Satellite ID 0
 
 - Strenghtened the unProgrammed Satellite launch to make it more intuitive
   - launching satellite with no destination:
