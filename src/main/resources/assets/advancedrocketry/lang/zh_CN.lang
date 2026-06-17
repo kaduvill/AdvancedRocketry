@@ -250,6 +250,13 @@ error.rocket.outsideStarSystem=星际航行需要星际飞船。
 error.rocket.outsidePlanetarySystem=行星航行需要核动力火箭。
 error.rocket.unmappedDimension=导航失败：星系数据库中未找到该维度
 
+msg.satbuilder.build.tooltip=组装卫星
+msg.satbuilder.error.chassis=需要一个卫星框架
+msg.satbuilder.error.primary=需要一个卫星核心组件
+msg.satbuilder.error.power=需要产能组件
+msg.satbuilder.error.output=输出槽位必须为空
+msg.satbuilder.error.controller=需要正确的芯片或遥控终端
+
 advancement.holographic=全息
 advancement.holographic.desc=合成一个全息投影器
 advancement.flattening=压扁
@@ -885,42 +892,38 @@ tooltip.advancedrocketry.bipropmotor.alt.1=查看加油站的JEI页面
 
 # Drill
 tooltip.advancedrocketry.drill=§c火箭的组成部分
-tooltip.advancedrocketry.drill.shift.1=缩短§6采矿任务§f的所需时间
+tooltip.advancedrocketry.drill.shift.1=§f缩短§6采矿任务§f的所需时间
 tooltip.advancedrocketry.drill.shift.2=§b效果可叠加
-tooltip.advancedrocketry.drill.alt.1=此火箭需通过火箭组装机搭建
+tooltip.advancedrocketry.drill.alt.1=采矿火箭需通过火箭组装机搭建
 tooltip.advancedrocketry.drill.alt.2=需要一个已编程的小行星芯片
 
 # Gas Intake
 tooltip.advancedrocketry.intake=§c火箭的组成部分
-tooltip.advancedrocketry.intake.shift.1=缩短§6气体任务§f的所需时间
+tooltip.advancedrocketry.intake.shift.1=§f缩短§6气体任务§f的所需时间
 tooltip.advancedrocketry.intake.shift.2=§b效果可叠加
-tooltip.advancedrocketry.intake.alt.1=此火箭需通过无人载具组装机搭建
+tooltip.advancedrocketry.intake.alt.1=气体火箭需通过无人载具组装机搭建
 tooltip.advancedrocketry.intake.alt.2=从绕气态巨行星运行的空间站发射
 
 # Seat
 tooltip.advancedrocketry.seat=§c火箭的组成部分
-tooltip.advancedrocketry.seat.shift.1=为火箭增加一个乘客位
+tooltip.advancedrocketry.seat.shift.1=§b为火箭增加一个乘客位
 
 # Guidance Computer
 tooltip.advancedrocketry.guidancecomputer=§c火箭的组成部分
-tooltip.advancedrocketry.guidancecomputer.shift.1=放入§c芯片§7或已编程的§c链接器§7
-tooltip.advancedrocketry.guidancecomputer.alt.1=部署卫星或空间站至轨道时
-tooltip.advancedrocketry.guidancecomputer.alt.2=记得设定火箭的目标星球
+tooltip.advancedrocketry.guidancecomputer.shift.1=§f放入§c芯片§f或已编程的§c链接器§f
 
 # Service Monitor
 tooltip.advancedrocketry.servicemonitor=§c火箭的组成部分
-tooltip.advancedrocketry.servicemonitor.shift.1=在火箭界面中
-tooltip.advancedrocketry.servicemonitor.shift.2=启用损伤视图
+tooltip.advancedrocketry.servicemonitor.shift.1=在火箭界面中启用损伤视图
 tooltip.advancedrocketry.servicemonitor.alt.1=未完成
-tooltip.advancedrocketry.servicemonitor.alt.2=
 
 # Docking Pad (landingPad)
 tooltip.advancedrocketry.landingpad=使用此方块替换发射台结构的中心方块
-tooltip.advancedrocketry.landingpad.shift.1=§c链接器§7能够存储此方块的精确位置（包括维度信息）。
-tooltip.advancedrocketry.landingpad.shift.2=将其放入§4导航计算机§7以在此着陆。
-tooltip.advancedrocketry.landingpad.alt.1=在停靠台中放入一个已编程的链接器。
+tooltip.advancedrocketry.landingpad.shift.1=§c链接器§f能够存储此方块的精确位置（包括维度信息）。
+tooltip.advancedrocketry.landingpad.shift.2=在§4导航计算机§7中使用。
+tooltip.advancedrocketry.landingpad.alt.1=放入芯片或已编程的链接器。
 tooltip.advancedrocketry.landingpad.alt.2=从此停靠台发射的火箭会飞往链接器中保存的坐标（用于实现自动化）。
-tooltip.advancedrocketry.landingpad.alt.3=如果火箭的导航计算机中没有其他目标信息。
+tooltip.advancedrocketry.landingpad.alt.3=§o（会被导航计算机的目的地覆盖）
 
 # Launch Pad
 tooltip.advancedrocketry.launchpad=发射台平台的基础方块。
@@ -931,8 +934,8 @@ tooltip.advancedrocketry.launchpad.alt.2=§f火箭/空间站组装机将自动�
 
 # Structure Tower
 tooltip.advancedrocketry.structuretower=发射台平台的垂直支架。
-tooltip.advancedrocketry.structuretower.shift.1=结构塔最低高度为4格。
-tooltip.advancedrocketry.structuretower.shift.2=底部方块必须与发射台相连。
+tooltip.advancedrocketry.structuretower.shift.1=§b结构塔最低高度为4格。
+tooltip.advancedrocketry.structuretower.shift.2=§f底部方块必须与发射台相连。
 tooltip.advancedrocketry.structuretower.alt.1=无人载具组装机的主要方块
 tooltip.advancedrocketry.structuretower.alt.2=查看维基了解更多信息。
 
@@ -945,22 +948,26 @@ tooltip.advancedrocketry.terraformer.alt.2=§f由卫星提供能源
 
 # Rocket Monitoring Station
 tooltip.advancedrocketry.monitoringstation=§c基础设备
-tooltip.advancedrocketry.monitoringstation.shift.1=通过红石信号发射！
+tooltip.advancedrocketry.monitoringstation.shift.1=§b通过红石信号发射！
 tooltip.advancedrocketry.monitoringstation.shift.2=§f需连接至§4火箭组装机/停靠台§f或§4火箭本体
 tooltip.advancedrocketry.monitoringstation.alt.1=§b任务将在进入轨道后激活！
 
 # Satellite Terminal
 tooltip.advancedrocketry.satellitecontrolcenter=用于与卫星通信
-tooltip.advancedrocketry.satellitecontrolcenter.shift.1=放入卫星芯片
-tooltip.advancedrocketry.satellitecontrolcenter.shift.2=下载数据
+tooltip.advancedrocketry.satellitecontrolcenter.shift.1=§b放入卫星芯片
+tooltip.advancedrocketry.satellitecontrolcenter.shift.2=§f下载数据
 tooltip.advancedrocketry.satellitecontrolcenter.alt.1=§f通过无线收发器或数据单元传输并自动下载数据
 
 # Satellite Builder
 tooltip.advancedrocketry.satellitebuilder=用于组装卫星
-tooltip.advancedrocketry.satellitebuilder.shift.1=也可创建芯片/遥控终端副本。
+tooltip.advancedrocketry.satellitebuilder.shift.1=§f也可创建芯片/遥控终端副本。
 tooltip.advancedrocketry.satellitebuilder.shift.2=§b必须放置在能量输入口顶部！
 tooltip.advancedrocketry.satellitebuilder.alt.1=放入框架、芯片/遥控终端
 tooltip.advancedrocketry.satellitebuilder.alt.2=核心组件+其他组件
+
+# Satellite
+tooltip.advancedrocketry.satellite.shift.1=§f在卫星组装机中组装
+tooltip.advancedrocketry.satellite.alt.1=§f组装完成后，将其放入火箭的卫星仓中
 
 # Orbital Registry
 tooltip.advancedrocketry.orbitalregistry=追踪太空中的人造物体
@@ -1020,8 +1027,7 @@ tooltip.advancedrocketry.hatch.gca.alt.2=§f在此降落的火箭将自动建立
 
 # Fueling Station
 tooltip.advancedrocketry.fuelingstation=§c基础设备
-tooltip.advancedrocketry.fuelingstation.shift.1=当空间站燃料类型相同时
-tooltip.advancedrocketry.fuelingstation.shift.2=满载时发出红石信号。
+tooltip.advancedrocketry.fuelingstation.shift.1=§f根据火箭的燃料水平和类型发出红石信号。
 tooltip.advancedrocketry.fuelingstation.alt.1=§f需连接至§4火箭组装机/停靠台§f或§4火箭本体
 tooltip.advancedrocketry.fuelingstation.alt.2=§f在此降落的火箭将自动建立连接。
 
@@ -1091,18 +1097,18 @@ tooltip.advancedrocketry.planetholoselector.alt.2=但采用3D全息投影显示�
 
 # Orientation Controller
 tooltip.advancedrocketry.orientationctrl=§c空间站控制器
-tooltip.advancedrocketry.orientationctrl.shift.1=自定义角速度
-tooltip.advancedrocketry.orientationctrl.alt.1=§b仅影响视觉效果§7
+tooltip.advancedrocketry.orientationctrl.shift.1=§b自定义角速度
+tooltip.advancedrocketry.orientationctrl.alt.1=§d仅影响视觉效果§7
 
 # Gravity Controller
 tooltip.advancedrocketry.gravityctrl=§c空间站控制器
-tooltip.advancedrocketry.gravityctrl.shift.1=人造重力！
+tooltip.advancedrocketry.gravityctrl.shift.1=§b人造重力！
 tooltip.advancedrocketry.gravityctrl.alt.1=红石控制
 
 # Altitude Controller
 tooltip.advancedrocketry.altitudectrl=§c空间站控制器
-tooltip.advancedrocketry.altitudectrl.shift.1=自定义轨道高度
-tooltip.advancedrocketry.altitudectrl.alt.1=§b仅影响视觉效果§7
+tooltip.advancedrocketry.altitudectrl.shift.1=§b自定义轨道高度
+tooltip.advancedrocketry.altitudectrl.alt.1=§d仅影响视觉效果§7
 tooltip.advancedrocketry.altitudectrl.alt.2=红石控制
 
 # Co2Scrubber
@@ -1149,7 +1155,7 @@ tooltip.advancedrocketry.lens.shift.1=§b使用全息投影器！
 # Suit Working Station
 tooltip.advancedrocketry.suitworkingstation=安装/移除§5太空服组件
 tooltip.advancedrocketry.suitworkingstation.shift.1=§f适用于太空服盔甲
-tooltip.advancedrocketry.suitworkingstation.shift.2=（头盔/胸甲/护腿/靴子）
+tooltip.advancedrocketry.suitworkingstation.shift.2=§o（头盔/胸甲/护腿/靴子）
 tooltip.advancedrocketry.suitworkingstation.alt.1=§f不需要能量
 
 # Jetpack
@@ -1220,45 +1226,40 @@ tooltip.advancedrocketry.itemupgrade.5.alt.1=无额外叠加效果。
 tooltip.advancedrocketry.satfunc.optical=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.optical.shift.1=§b收集距离数据§7
 tooltip.advancedrocketry.satfunc.optical.shift.2=§o通过卫星终端下载数据
-tooltip.advancedrocketry.satfunc.optical.alt.1=组装时
-tooltip.advancedrocketry.satfunc.optical.alt.2=与卫星芯片结合
+tooltip.advancedrocketry.satfunc.optical.alt.1=§c组装时与卫星芯片结合
 
 tooltip.advancedrocketry.satfunc.composition=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.composition.shift.1=§b收集成分数据§7
 tooltip.advancedrocketry.satfunc.composition.shift.2=§o通过卫星终端下载数据
-tooltip.advancedrocketry.satfunc.composition.alt.1=组装时
-tooltip.advancedrocketry.satfunc.composition.alt.2=与卫星芯片结合
+tooltip.advancedrocketry.satfunc.composition.alt.1=§c组装时与卫星芯片结合
 
 tooltip.advancedrocketry.satfunc.mass=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.mass.shift.1=§b收集质量数据§7
 tooltip.advancedrocketry.satfunc.mass.shift.2=§o通过卫星终端下载数据
-tooltip.advancedrocketry.satfunc.mass.alt.1=组装时
-tooltip.advancedrocketry.satfunc.mass.alt.2=与卫星芯片结合
+tooltip.advancedrocketry.satfunc.mass.alt.1=§c组装时与卫星芯片结合
 
 tooltip.advancedrocketry.satfunc.microwave=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.microwave.shift.1=§b在太空中产出能量§7
 tooltip.advancedrocketry.satfunc.microwave.shift.2=§o需要微波接收器（5x5多方块结构）
-tooltip.advancedrocketry.satfunc.microwave.alt.1=组装时
-tooltip.advancedrocketry.satfunc.microwave.alt.2=与卫星芯片结合
+tooltip.advancedrocketry.satfunc.microwave.alt.1=§c组装时与卫星芯片结合
 
 tooltip.advancedrocketry.satfunc.oremapping=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.oremapping.shift.1=§b扫描星球上的矿物§7
-tooltip.advancedrocketry.satfunc.oremapping.alt.1=组装时
-tooltip.advancedrocketry.satfunc.oremapping.alt.2=与矿物扫描仪结合
+tooltip.advancedrocketry.satfunc.oremapping.alt.1=§c组装时与矿物扫描仪结合
 
 tooltip.advancedrocketry.satfunc.biomechanger=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.biomechanger.shift.1=§b调节生物群系§7
-tooltip.advancedrocketry.satfunc.biomechanger.alt.1=组装时与生物群系变换器遥控终端结合
+tooltip.advancedrocketry.satfunc.biomechanger.alt.1=§c组装时与生物群系变换器遥控终端结合
 tooltip.advancedrocketry.satfunc.biomechanger.alt.2=需要能量产出和存储组件！
 
 tooltip.advancedrocketry.satfunc.weather=§5卫星核心组件
 tooltip.advancedrocketry.satfunc.weather.shift.1=§b处理天气相关事项！
-tooltip.advancedrocketry.satfunc.weather.alt.1=组装时与天气遥控终端结合
+tooltip.advancedrocketry.satfunc.weather.alt.1=§c组装时与天气遥控终端结合
 
 # Weather Remote
 tooltip.advancedrocketry.weathercontrollerremote=§bShift-右击打开界面
 tooltip.advancedrocketry.weathercontrollerremote.shift.1=§f手持此物品右击来使用
-tooltip.advancedrocketry.weathercontrollerremote.alt.1=组装时与天气控制器结合
+tooltip.advancedrocketry.weathercontrollerremote.alt.1=§c组装时与天气控制器结合
 tooltip.advancedrocketry.weathercontrollerremote.mode.rain=§e模式：降雨——使用水填充地形中的小洼地
 tooltip.advancedrocketry.weathercontrollerremote.mode.dry=§e模式：干旱——蒸发半径16格内的所有水源
 tooltip.advancedrocketry.weathercontrollerremote.mode.flood=§e模式：洪水——用水淹没半径16格的区域
@@ -1287,19 +1288,19 @@ tooltip.advancedrocketry.satpower.1.shift.2=§o卫星需要至少1个产能组�
 
 # LibVulpes Batteries
 tooltip.libvulpes.battery.0=§5卫星组件§7
-tooltip.libvulpes.battery.0.shift.1=增加能量存储
+tooltip.libvulpes.battery.0.shift.1=§b增加能量存储
 tooltip.libvulpes.battery.0.shift.2=§f容量：§c10.000 §fRF§7
 
 tooltip.libvulpes.battery.1=§5卫星组件
-tooltip.libvulpes.battery.1.shift.1=增加能量存储
+tooltip.libvulpes.battery.1.shift.1=§b增加能量存储
 tooltip.libvulpes.battery.1.shift.2=§f容量：§c40.000 §fRF§7
 
 # Data Unit
 tooltip.advancedrocketry.itemdata.header=§5卫星组件
 tooltip.advancedrocketry.itemdata.type=§f类型：
 tooltip.advancedrocketry.itemdata.data=§f数据存储量：
-tooltip.advancedrocketry.itemdataunit.shift.1=§f令卫星数据存储量增加1000
-tooltip.advancedrocketry.itemdataunit.alt.1=§f也可在物品栏中作为数据存储器使用
+tooltip.advancedrocketry.dataunit.shift.1=§b令卫星数据存储量增加1000
+tooltip.advancedrocketry.dataunit.alt.1=§c也可在物品栏中作为数据存储器使用
 
 ## Chips / remotes
 # Asteroid Chip
@@ -1309,8 +1310,8 @@ tooltip.advancedrocketry.asteroidchip.alt.1=§4将已编程的芯片放入导航
 tooltip.advancedrocketry.asteroidchip.alt.2=§f任务完成后会返还芯片
 
 # Station Chip
-tooltip.advancedrocketry.stationchip=§b记得做好备份！
-tooltip.advancedrocketry.stationchip.shift.1=§f在空间站组装机中编程
+tooltip.advancedrocketry.stationchip=§b在空间站组装机中编程
+tooltip.advancedrocketry.stationchip.shift.1=§f在轨道注册站中写入
 tooltip.advancedrocketry.stationchip.shift.2=§c在卫星组装机中复制
 tooltip.advancedrocketry.stationchip.alt.1=§4将已编程的芯片放入导航计算机§7
 tooltip.advancedrocketry.stationchip.namelabel=名称：
@@ -1322,8 +1323,8 @@ tooltip.advancedrocketry.planetidchip.shift.2=§f在火箭界面中设置目的�
 tooltip.advancedrocketry.planetidchip.alt.1=§4发射前请仔细检查是否已完成编程！
 
 # Satellite Chip
-tooltip.advancedrocketry.satidchip=§b记得做好备份！
-tooltip.advancedrocketry.satidchip.shift.1=§f储存卫星的ID。
+tooltip.advancedrocketry.satidchip=§b储存卫星的ID
+tooltip.advancedrocketry.satidchip.shift.1=§f在轨道注册站中写入
 tooltip.advancedrocketry.satidchip.shift.2=§c在卫星组装机中复制
 tooltip.advancedrocketry.satidchip.alt.1=§4在卫星终端中使用以进行链接，或在微波接收器多方块结构（输入仓）中使用。
 tooltip.advancedrocketry.satidchip.alt.2=§8（星球：放入终端时解析信息）
@@ -1352,13 +1353,13 @@ tooltip.advancedrocketry.solarpanel.shift.3=§b使用全息投影器！
 
 # Solar Array Controller
 tooltip.advancedrocketry.solararray=利用阳光产出能量
-tooltip.advancedrocketry.solararray.shift.1=需要63个阵列太阳能板
-tooltip.advancedrocketry.solararray.shift.2=§b使用全息投影器！
+tooltip.advancedrocketry.solararray.shift.1=§b使用全息投影器！
+tooltip.advancedrocketry.solararray.shift.2=§f需要63个阵列太阳能板
 
 # Solar Array Panel
 tooltip.advancedrocketry.solararraypanel=§c多方块结构的组成部分
-tooltip.advancedrocketry.solararraypanel.shift.1=需要63个阵列太阳能板和控制器
-tooltip.advancedrocketry.solararraypanel.shift.2=§b使用全息投影器！
+tooltip.advancedrocketry.solararraypanel.shift.1=§b使用全息投影器！
+tooltip.advancedrocketry.solararraypanel.shift.2=§f需要63个阵列太阳能板和控制器
 
 # Solar Generator
 tooltip.advancedrocketry.solargenerator=基础太阳能板
@@ -1434,7 +1435,7 @@ tooltip.advancedrocketry.centrifuge.shift.1=§b使用全息投影器！
 # Warp Core
 tooltip.advancedrocketry.warpcore=§6星际飞船§f的核心
 tooltip.advancedrocketry.warpcore.shift.1=§b使用全息投影器！
-tooltip.advancedrocketry.warpcore.alt.1=§6星际飞船§7需要§4跃迁控制器§7+§4跃迁核心§7
+tooltip.advancedrocketry.warpcore.alt.1=§6星际飞船§f需要§4跃迁控制器§f+§4跃迁核心§f
 
 # Beacon
 tooltip.advancedrocketry.beacon=远程信标
@@ -1481,9 +1482,9 @@ tooltip.advancedrocketry.vacuumlaser.shift.1=§b使用全息投影器！
 
 # Pump
 tooltip.advancedrocketry.pump=搜索下方的流体
-tooltip.advancedrocketry.pump.shift.1=§c可从64格范围内的相连流体池中抽取。
+tooltip.advancedrocketry.pump.shift.1=§b可从64格范围内的流体池中抽取。
 tooltip.advancedrocketry.pump.alt.1=§f自动弹出到附近储罐
-tooltip.advancedrocketry.pump.alt.2=使用红石信号关闭
+tooltip.advancedrocketry.pump.alt.2=§c使用红石信号关闭
 
 # Parts for Multiblock
 tooltip.advancedrocketry.concrete=§c多方块结构的组成部分
@@ -1514,7 +1515,7 @@ tooltip.advancedrocketry.stationassembler.alt.1=§f将此方块放置在比发�
 
 # Packet Station
 tooltip.advancedrocketry.packedstructure=放入§c卫星仓§7以送入轨道！
-tooltip.advancedrocketry.packedstructure.shift.1=§e发射前记得要设置火箭的目标星球！
+tooltip.advancedrocketry.packedstructure.shift.1=§e发射前需设置火箭的目标星球！
 
 # Deployable Rocket Assembler
 tooltip.advancedrocketry.deployablerocketassembler=§c在空间站中搭建火箭
@@ -1547,7 +1548,7 @@ tooltip.advancedrocketry.lasergun.alt.1=§f挖掘等级：§b钻石
 tooltip.advancedrocketry.lasergun.alt.2=§f范围：§b50格
 
 tooltip.advancedrocketry.platepress=§c也可破坏矿石方块
-tooltip.advancedrocketry.platepress.shift.1=§f需要下方两格处存在黑曜石才可工作
+tooltip.advancedrocketry.platepress.shift.1=§f需要下方两格处存在黑曜石
 tooltip.advancedrocketry.platepress.alt.1=§f使用红石信号激活
 
 ## Crafting items
