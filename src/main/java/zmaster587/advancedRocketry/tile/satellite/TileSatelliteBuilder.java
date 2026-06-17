@@ -75,7 +75,7 @@ public class TileSatelliteBuilder extends TileMultiPowerConsumer implements IMod
     private String getAssemblyErrorKey() {
         ItemStack chassis = getStackInSlot(chassisSlot);
 
-        if (chassis.isEmpty() || !(chassis.getItem() instanceof ItemSatellite))
+        if (chassis.isEmpty() || !isItemValidForSlot(chassisSlot, chassis))
             return "msg.satbuilder.error.chassis";
 
         ItemStack primaryStack = getStackInSlot(primaryFunctionSlot);
