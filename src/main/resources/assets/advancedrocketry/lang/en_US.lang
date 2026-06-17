@@ -437,7 +437,7 @@ msg.spaceElevator.warning.anchored0=This elevator tether has
 msg.spaceElevator.warning.anchored1=the station anchored!
 msg.spaceElevator.warning.unanchored=This elevator has no tether
 msg.spaceElevator.turnedOff=Elevator is turned off
-msg.fuelingStation.link=You program the linker with the fueling station at
+msg.fuelingStation.link=You program the linker with the fueling station at:
 
 msg.monitoringStation.buttonLaunch=Launch!
 msg.monitoringStation.missionProgressNA=Mission Progress: N/A
@@ -452,7 +452,7 @@ msg.monitoringStation.mission.asteroidIdPrefix=Type:
 msg.monitoringStation.mission.plannedAmountPrefix=Amount:
 msg.monitoringStation.mission.plannedAmountPending=Amount: (pending)
 msg.monitoringStation.mission.asteroidType=Asteroid type: (shown on chip / mission)
-msg.monitoringStation.link=You program the linker with the monitoring station at
+msg.monitoringStation.link=You program the linker with the monitoring station at:
 msg.monitoringStation.progress=ETA:
 msg.monitoringStation.prelaunch=Initiating...
 msg.monitoringStation.launching=Launching!
@@ -469,7 +469,7 @@ msg.guidanceComputerHatch.ejectonlanding=Auto Eject Upon Landing
 msg.guidanceComputerHatch.ejectonsatlanding=Allow Ejection of Satellite Chips
 msg.guidanceComputerHatch.ejectonplanetlanding=Allow Ejection of Planet Chips
 msg.guidanceComputerHatch.ejectonstationlanding=Allow Ejection of Station Chips
-msg.guidanceComputerHatch.link=You program the linker with the fluid loader at
+msg.guidanceComputerHatch.link=You program the linker with the fluid loader at:
 msg.fluidLoader.loadingState=Loading State:
 msg.fluidLoader.allowLoading=Allow Loading:
 msg.fluidLoader.allowredstoneinput=Redstone Input (Red)
@@ -622,7 +622,7 @@ msg.serviceStation.wornMotorsText=Engines
 msg.serviceStation.wornSeatsText=Seats
 msg.serviceStation.wornTanksText=Tanks
 msg.serviceStation.assemblerScan=Scan for assemblers
-msg.serviceStation.link=You program the linker with the service station at
+msg.serviceStation.link=You program the linker with the service station at:
 
 msg.itemsatellite.pwr=Power Storage:
 msg.itemsatellite.nopwr=No Power Storage
@@ -918,10 +918,10 @@ tooltip.advancedrocketry.servicemonitor.alt.1=WIP
 # Docking Pad (landingPad)
 tooltip.advancedrocketry.landingpad=Replace the launchpad’s center block with this
 tooltip.advancedrocketry.landingpad.shift.1=§cLinker§f can store this block's exact position (dimension-aware).
-tooltip.advancedrocketry.landingpad.shift.2=§fUse in §4Guidance Computer§7
-tooltip.advancedrocketry.landingpad.alt.1=Insert a Chip or programmed Linker
-tooltip.advancedrocketry.landingpad.alt.2=Rockets launched from this pad lands on stored coordinates (used for automation).
+tooltip.advancedrocketry.landingpad.alt.1=§fInsert programmed §cLinker
+tooltip.advancedrocketry.landingpad.alt.2=§fRockets launched from this pad flies to the stored coordinates (used for automation).
 tooltip.advancedrocketry.landingpad.alt.3=§o(Overridden by guidance computer destination)
+msg.landingpad.linker.tooltip=Insert a Linker programmed to a Docking Pad
 
 # Launch Pad
 tooltip.advancedrocketry.launchpad=Base for Launch Pad platform.
@@ -1305,10 +1305,10 @@ tooltip.advancedrocketry.asteroidchip.alt.1=§4Insert programmed Chip in Guidanc
 tooltip.advancedrocketry.asteroidchip.alt.2=§fYou get the chip back after Mission
 
 # Station Chip
-tooltip.advancedrocketry.stationchip=§bProgram in Space Station Assembler
+tooltip.advancedrocketry.stationchip=§bSelect Landing Pad in Rocket
 tooltip.advancedrocketry.stationchip.shift.1=§fPrintable with Orbital Registry
 tooltip.advancedrocketry.stationchip.shift.2=§cCopied in Satellite Builder
-tooltip.advancedrocketry.stationchip.alt.1=§4Insert programmed Chip in Guidance Computer§7
+tooltip.advancedrocketry.stationchip.alt.1=§4Insert programmed Chip in Guidance Computer§f
 tooltip.advancedrocketry.stationchip.namelabel=Name:
 
 # Planet Chip
@@ -1414,9 +1414,9 @@ tooltip.advancedrocketry.libvulpes.creativepowerbattery=§dInfinite Power
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.1=§cPart of Multiblock
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.2=§bUse Holo-Projector!
 tooltip.advancedrocketry.libvulpes.coalgenerator=§cBurns solid fuels
-tooltip.advancedrocketry.libvulpes.linker.shift.1=§fSneak+Right-click to link, (Use in air to reset.)
-tooltip.advancedrocketry.libvulpes.linker.alt.1=§fLinks §cinfrastructure§f to rockets.
-tooltip.advancedrocketry.libvulpes.linker.alt.2=§fTo use as Guidance Chip, link to §eDocking Pad§f, then place in §eGuidance Computer§f
+tooltip.advancedrocketry.libvulpes.linker.shift.1=§bLinks infrastructure to rocket!
+tooltip.advancedrocketry.libvulpes.linker.shift.2=§fSneak+Right-click to link, (Use in air to reset)
+tooltip.advancedrocketry.libvulpes.linker.alt.1=§fTo use as Guidance Chip, link to §cDocking Pad§f, then place in §cGuidance Computer§f or §cDocking Pad
 
 
 # Planet Analyser
