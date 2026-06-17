@@ -511,7 +511,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             return super.getTextOverlay();
         }
         else if (!isInFlight())
-            return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.2") + displayStr;
+            return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.2") + " " + displayStr;
 
         return super.getTextOverlay();
     }
