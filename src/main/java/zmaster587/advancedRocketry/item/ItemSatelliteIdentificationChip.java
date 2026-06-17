@@ -143,17 +143,17 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
 
                 if (stack.getTagCompound().hasKey(name)) {
 
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + satId);
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + " " + satId);
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planet") + stack.getTagCompound().getString(name));
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.sat") + satelliteName);
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.sat") + " "  + satelliteName);
                 } else {
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planetunk"));
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.satlost")); //TODO: make satellite respond with name until
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.satlost"));
                 }
             } else {
-                list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + satId);
+                list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + " " + satId);
                 list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planetunk"));
-                list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.sat") + satelliteName);
+                list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.sat") + " "  + satelliteName);
             }
         } else
             list.add(LibVulpes.proxy.getLocalizedString("msg.unprogrammed"));
