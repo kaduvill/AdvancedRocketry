@@ -921,7 +921,7 @@ tooltip.advancedrocketry.servicemonitor.alt.1=WIP
 tooltip.advancedrocketry.landingpad=Replace the launchpad’s center block with this
 tooltip.advancedrocketry.landingpad.shift.1=§cLinker§f can store this block's exact position (dimension-aware).
 tooltip.advancedrocketry.landingpad.shift.2=§fUse in §4Guidance Computer§7
-tooltip.advancedrocketry.landingpad.alt.1=Place a programmed Linker in the Docking Pad.
+tooltip.advancedrocketry.landingpad.alt.1=Insert a Chip or programmed Linker
 tooltip.advancedrocketry.landingpad.alt.2=Rockets launched from this pad will fly to the Linker’s saved coordinates (used for automation).
 tooltip.advancedrocketry.landingpad.alt.3=§o(Overridden by guidance computer destination)
 
