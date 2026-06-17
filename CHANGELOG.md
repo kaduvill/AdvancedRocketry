@@ -6,7 +6,7 @@
   - Satellite Builder:
     - Corrected inconsistencies with Satellite ID 0
 
-- Strenghtened the unProgrammed Satellite launch to make it more intuitive
+- Strengthened the unprogrammed Satellite launch to make it more intuitive
   - launching satellite with no destination:
     - deploys to effective launch-dim
     - rocket dies, but satellite starts ticking
