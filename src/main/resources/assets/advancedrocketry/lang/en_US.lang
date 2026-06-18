@@ -1040,7 +1040,7 @@ tooltip.advancedrocketry.servicestation.shift.2=§o(WIP)
 tooltip.advancedrocketry.fluidtank.empty=Empty
 tooltip.advancedrocketry.fluidtank.fluid=Fluid:
 tooltip.advancedrocketry.fluidtank.level=Level:
-tooltip.advancedrocketry.fluidtank.shift.1=§cConnects to tanks above or below to make a bigger tank
+tooltip.advancedrocketry.fluidtank.shift.1=§cConnects to tanks above or below
 
 # Wireless Transceiver
 tooltip.advancedrocketry.transceiver=Transfers §6Data
@@ -1060,7 +1060,7 @@ tooltip.advancedrocketry.circlelight.shift.1=§fDoes not require Power or Redsto
 
 # Gas Charge Pad
 tooltip.advancedrocketry.oxygencharger=Charges Space Suit O₂ and H₂
-tooltip.advancedrocketry.oxygencharger.shift.1=Stand on pad to refill
+tooltip.advancedrocketry.oxygencharger.shift.1=§bStand on pad to refill
 tooltip.advancedrocketry.oxygencharger.alt.1=§fDoes not require Power
 
 # Docking Port

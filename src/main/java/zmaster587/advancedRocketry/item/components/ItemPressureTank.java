@@ -56,9 +56,9 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
         final int amount = (fs != null) ? fs.amount : 0;
 
         // Match main tank style
-        list.add(I18n.format("tooltip.advancedrocketry.itemdata.header"));
-        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.fluid") + fluidName);
-        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.level") + amount + "/" + capMb + " mB");
+        list.add(I18n.format("tooltip.advancedrocketry.itemupgrade.0"));
+        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.fluid") + " " + fluidName);
+        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.level") + " " + amount + "/" + capMb + " mB");
 
         // SHIFT block
         if (GuiScreen.isShiftKeyDown()) {
@@ -90,13 +90,11 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
 
     @Override
     public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-
     }
 
     @Override
     public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
                                @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-
     }
 
     public int getCapacity(@Nonnull ItemStack container) {
@@ -119,8 +117,7 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
         // TODO Auto-generated method stub
     }
 
-   
-    @Override
+       @Override
     public ICapabilityProvider initCapabilities(@Nonnull ItemStack stack, NBTTagCompound nbt) {
         return new TankCapabilityItemStack(stack, getCapacity(stack));
     }
