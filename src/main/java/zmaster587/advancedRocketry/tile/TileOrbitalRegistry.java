@@ -722,7 +722,7 @@ public class TileOrbitalRegistry extends TileMultiPowerConsumer
 
         // ----- CHIP IO + BUTTONS (bottom, same as Observatory) -----
         // Same layout as TileObservatory asteroid tab: (5,120) / (45,120) / 25 / 100
-        modules.add(new ModuleTexturedSlotArray(
+        modules.add(new ModuleTexturedLimitedSlotArray(
                 OBS_CHIP_X, OBS_CHIP_Y,
                 this,
                 SLOT_CHIP_IN, SLOT_CHIP_IN + 1,
@@ -1476,17 +1476,16 @@ public class TileOrbitalRegistry extends TileMultiPowerConsumer
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        if (slot == SLOT_CHIP_IN) {
-            if (stack.getCount() != 1) return false;
-            Item item = stack.getItem();
+        if (slot != SLOT_CHIP_IN || stack.isEmpty())
+            return false;
 
-            return (item instanceof ItemSatelliteIdentificationChip)
-                    || (item instanceof ItemStationChip)
-                    || (item instanceof ItemOreScanner);
-        }
-        return false;
+        Item item = stack.getItem();
+        if (tabModule.getTab() == TAB_STATIONS) {
+            return item instanceof ItemStationChip;}
+
+        return item instanceof ItemSatelliteIdentificationChip
+                || item instanceof ItemOreScanner;
     }
-
 
     @Override
     @Nonnull
