@@ -38,11 +38,11 @@ import java.util.List;
 public class TileCentrifuge extends TileMultiblockMachine {
     public static final Object[][][] structure = {
 
-            {{Blocks.AIR, new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
+            {{null, new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
                     {"casingCentrifuge", "casingCentrifuge", new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
                     {"casingCentrifuge", "casingCentrifuge", null}},
 
-            {{Blocks.AIR, new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
+            {{null, new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
                     {"casingCentrifuge", "casingCentrifuge", new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
                     {"casingCentrifuge", "casingCentrifuge", 'O'}},
 

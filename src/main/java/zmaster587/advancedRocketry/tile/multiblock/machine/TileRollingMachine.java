@@ -20,11 +20,11 @@ import java.util.List;
 public class TileRollingMachine extends TileMultiblockMachine {
 
     public static final Object[][][] structure = new Object[][][]{
-            {{Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR},
+            {{null, null, null, null, null},
                     {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock},
                     {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, "blockSteel", LibVulpesBlocks.blockStructureBlock}},
 
-            {{'P', 'c', 'I', Blocks.AIR, Blocks.AIR},
+            {{'P', 'c', 'I', null, null},
                     {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.motors, LibVulpesBlocks.motors, "blockSteel", LibVulpesBlocks.blockStructureBlock},
                     {LibVulpesBlocks.blockStructureBlock, 'L', 'O', "blockSteel", LibVulpesBlocks.blockStructureBlock}}
     };
