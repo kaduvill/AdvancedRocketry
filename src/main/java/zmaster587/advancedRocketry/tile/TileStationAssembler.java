@@ -207,10 +207,9 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
 
         updateText();
 
-        modules.add(new ModuleSlotArray(90, 40, inventory, 0, 1));
-        modules.add(new ModuleTexturedSlotArray(108, 40, inventory, 1, 2, TextureResources.idChip));
-
-        modules.add(new ModuleSlotArray(90, 60, inventory, 2, 4));
+        modules.add(new ModuleLimitedSlotArray(90, 40, this, 0, 1));
+        modules.add(new ModuleTexturedLimitedSlotArray(108, 40, this, 1, 2, TextureResources.idChip));
+        modules.add(new ModuleOutputSlotArray(90, 60, this, 2, 4));
 
         return modules;
     }
@@ -304,20 +303,23 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
     }
 
     @Override
-    public void openInventory(EntityPlayer pos) {
-
-    }
-
+    public void openInventory(EntityPlayer pos) {    }
 
     @Override
-    public void closeInventory(EntityPlayer pos) {
-
-    }
-
+    public void closeInventory(EntityPlayer pos) {    }
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        return inventory.isItemValidForSlot(slot, stack);
+        if (stack.isEmpty()) return false;
+        if (slot == 0) {
+            ItemStack satelliteHatch =
+                    new ItemStack(AdvancedRocketryBlocks.blockLoader, 1, 1);
+            return satelliteHatch.isItemEqual(stack);}
+
+        if (slot == 1) {
+            return stack.getItem() == AdvancedRocketryItems.itemSpaceStationChip;}
+
+        return false;
     }
 
     @Override

@@ -4,6 +4,7 @@
   - Observatory
   - Landing Pad
   - Satellite Terminal
+  - Station Assembler
   - Orbital Registry
   - Suit Workstation
   - Satellite Builder:
