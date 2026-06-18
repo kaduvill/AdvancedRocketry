@@ -3,6 +3,8 @@
 - Filtered Slots QoL (+ Tooltip feedback for some) (requires LibVulpes 0.5.4):
   - Observatory
   - Landing Pad
+  - Satellite Terminal
+  - Orbital Registry
   - Suit Workstation
   - Satellite Builder:
     - Corrected inconsistencies with Satellite ID 0
