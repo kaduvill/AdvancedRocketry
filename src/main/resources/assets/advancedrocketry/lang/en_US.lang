@@ -511,8 +511,6 @@ msg.terraformingterminal.needredstone.line2=to start the process
 msg.terraformingterminal.insertchip.line1=Place a Biome Changer Remote
 msg.terraformingterminal.insertchip.line2=here to make the Satellite
 msg.terraformingterminal.insertchip.line3=terraform the entire planet
-msg.biomescanner.gas=nyehhh, Gassy, ain't it?
-msg.biomescanner.star=If i only had sunshades...
 msg.gravitycontroller.radius=Radius:
 msg.gravitycontroller.targetgrav=Target Gravity:
 msg.gravitycontroller.none=No Force
@@ -614,6 +612,14 @@ msg.itemplanetidchip.planetname=Planet Name:
 msg.itemplanetidchip.stationid=Station ID:
 msg.itemplanetidchip.artifacts=Artifacts:
 msg.vent.trace=Oxygen Trace
+
+msg.biomescanner.scan.button=Scan
+msg.biomescanner.scan.tooltip=Scan planet below
+msg.biomescanner.scan.required=Scan to detect biomes
+msg.biomescanner.scan.nopower=Insufficient power
+msg.biomescanner.scan.invalid=No valid planet
+msg.biomescanner.gas=Gassy, ain't it?
+msg.biomescanner.star=If i only had sunshades...
 
 msg.serviceStation.destroyProbNA=Destroy probability: N/A
 msg.serviceStation.destroyProb=Destroy probability
@@ -776,8 +782,6 @@ msg.orbitalregistry.writechip.hint.sat.or.idchip=Insert a Satellite ID Chip or C
 msg.orbitalregistry.writechip.hint.sat.badcontroller=Satellite does not accept this chip
 msg.orbitalregistry.writechip.hint.sat.orescanner.only=Ore Scanner can only link to Ore Mapping satellites
 msg.orbitalregistry.writechip.hint.station.unlaunched=This station is not in orbit yet
-
-
 
 commands.weather.always_not_clear=This planet is always not clear...
 commands.weather.cannot_rain=Cannot start a rain here

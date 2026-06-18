@@ -1,24 +1,31 @@
-2.2.11
+Changelog 2.2.11
 
-- Filtered Slots QoL (+ Tooltip feedback for some) (requires LibVulpes 0.5.4):
-  - Observatory
-  - Landing Pad
-  - Satellite Terminal
-  - Station Assembler
-  - Orbital Registry
-  - Suit Workstation
-  - Satellite Builder:
-    - Corrected inconsistencies with Satellite ID 0
+- Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
+  - Added slot filtering and tooltip feedback where relevant:
+    - Observatory
+    - Landing Pad
+    - Satellite Terminal
+    - Station Assembler
+    - Terraforming Terminal
+    - Orbital Registry
+    - Suit Workstation
+    - Satellite Builder
+      - Fixed inconsistencies involving Satellite ID 0
 
-- Strengthened the unprogrammed Satellite launch to make it more intuitive
-  - launching satellite with no destination:
-    - deploys to effective launch-dim
-    - rocket dies, but satellite starts ticking
-- Fixed GL.state.Leak: when orbiting black hole
-- Observatory: Asteroid composition values now render above the rotating block previews.
-- Tooltips polished
+- Improved unprogrammed satellite launches:
+  - Satellites launched without a destination now deploy to the effective launch dimension
+  - The rocket is removed, while the satellite begins ticking normally
+- Fixed an OpenGL state leak when orbiting black holes
+- Upgraded the Biome Scanner:
+  - Now requires power
+  - Improved the GUI
+- Observatory asteroid composition values now render above the rotating block previews
+- Centrifuge and Rolling Machine now accepting anyBlock where AIR was required
+- Fixed a Terraforming Terminal NPE
+- Polished tooltips
 
-2.2.10
+
+Changelog 2.2.10
 
 - Fixed rocket destination validation:
   - Unregistered dimensions no longer fall back to Earth (dim 0), preventing invalid custom-dimension and cross-star routes from passing checks.
