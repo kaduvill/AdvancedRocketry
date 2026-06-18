@@ -13,8 +13,7 @@ Changelog 2.2.11
       - Fixed inconsistencies involving Satellite ID 0
 
 - Improved unprogrammed satellite launches:
-  - Satellites launched without a destination now deploy to the effective launch dimension
-  - The rocket is removed, while the satellite begins ticking normally
+  - Satellites launched without a destination now deploy to the effective launch dimension (rocket dies, satellite starts ticking normally)
 - Fixed an OpenGL state leak when orbiting black holes
 - Upgraded the Biome Scanner:
   - Now requires power
