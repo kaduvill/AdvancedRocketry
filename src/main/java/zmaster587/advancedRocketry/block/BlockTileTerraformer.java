@@ -1,7 +1,4 @@
 package zmaster587.advancedRocketry.block;//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;

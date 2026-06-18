@@ -124,6 +124,8 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public void update() {
+        if (world == null) {
+            return;}
 
         // Fast path: truly idle — no chip and never enabled
         if (getStackInSlot(0).isEmpty() && !was_enabled_last_tick) {
