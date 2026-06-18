@@ -55,8 +55,8 @@ public class ItemBlockFluidTank extends ItemBlock {
         final String fluidName = (fs != null && fs.getFluid() != null) ? fs.getLocalizedName() : I18n.format("tooltip.advancedrocketry.fluidtank.empty");;
         final int amount = (fs != null) ? fs.amount : 0;
 
-        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.fluid") + fluidName);
-        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.level") + amount + "/" + capMb + " mB");
+        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.fluid") + " " + fluidName);
+        list.add(I18n.format("tooltip.advancedrocketry.fluidtank.level") + " " + amount + "/" + capMb + " mB");
 
 
         // --- SHIFT for more info ---
