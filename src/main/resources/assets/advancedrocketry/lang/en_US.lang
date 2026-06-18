@@ -773,7 +773,7 @@ msg.orbitalregistry.writechip.hint.select=Select an entry from the list
 msg.orbitalregistry.writechip.hint.output=Clear the output slot first
 msg.orbitalregistry.writechip.hint.sat.or.stationchip=Insert a Station Chip
 msg.orbitalregistry.writechip.hint.sat.or.idchip=Insert a Satellite ID Chip or Controller
-msg.orbitalregistry.writechip.hint.sat.badcontroller=This satellite does not accept this chip, use correct controller instead!
+msg.orbitalregistry.writechip.hint.sat.badcontroller=Satellite does not accept this chip
 msg.orbitalregistry.writechip.hint.sat.orescanner.only=Ore Scanner can only link to Ore Mapping satellites
 msg.orbitalregistry.writechip.hint.station.unlaunched=This station is not in orbit yet
 

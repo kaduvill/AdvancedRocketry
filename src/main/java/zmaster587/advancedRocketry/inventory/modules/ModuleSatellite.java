@@ -8,10 +8,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.libVulpes.inventory.modules.ModuleSlotArray;
+import zmaster587.libVulpes.inventory.modules.ModuleLimitedSlotArray;
 import zmaster587.libVulpes.util.IconResource;
 
-public class ModuleSatellite extends ModuleSlotArray {
+public class ModuleSatellite extends ModuleLimitedSlotArray {
 
     SatelliteBase satellite;
     IconResource satelliteSlot = TextureResources.idChip;
@@ -68,5 +68,4 @@ public class ModuleSatellite extends ModuleSlotArray {
     public void setSatellite(SatelliteBase satellite) {
         this.satellite = satellite;
     }
-
 }

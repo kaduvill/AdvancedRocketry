@@ -163,13 +163,11 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        if (stack.isEmpty()) return true;
+        if (stack.isEmpty()) return false;
         if (slot == 0) return stack.getItem() instanceof ItemSatelliteIdentificationChip;
         if (slot == 1) return stack.getItem() instanceof IDataItem;
         return false;
     }
-
-
 
     @Override
     public boolean canPerformFunction() {
@@ -187,8 +185,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
         maybeAutoDownloadFromSatellite(false);
     }
 
-
-
     // Old custom packet not used anymore; keep empty to satisfy INetworkMachine
     @Override
     public void writeDataToNetwork(ByteBuf out, byte packetId) { }
@@ -196,13 +192,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
     // Old custom packet not used anymore; keep empty to satisfy INetworkMachine
     @Override
     public void readDataFromNetwork(ByteBuf in, byte packetId, NBTTagCompound nbt) { }
-
-    // Tick: nothing needed; the module polls the tile every 9 tick while GUI is open
-    //@Override
-    //public void update() {
-    //    super.update();
-        // no status pushing needed
-    //}
 
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
@@ -256,7 +245,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
         }
     }
 
-    
     @Nullable
     private SatelliteBase resolveSatelliteFresh() {
         ItemStack s0 = getStackInSlot(0);
@@ -296,7 +284,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
             zmaster587.libVulpes.inventory.TextureResources.buttonBuild,
             LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.autodl_hint") // tooltip
         ));
-
 
         modules.add(new ModuleButton(173, 3, 1, "",
             this, TextureResources.buttonKill,
@@ -407,8 +394,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
         }
     }
 
-
-
     @Override
     public int extractData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {
         // 1) Type guard
@@ -427,7 +412,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
         }
         return removed;
     }
-
 
     @Override
     public int addData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {
@@ -460,7 +444,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer
     public void invalidate() {
         super.invalidate();
     }
-
 
     @Override
     public boolean canInteractWithContainer(EntityPlayer entity) { return true; }
