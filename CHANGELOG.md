@@ -18,12 +18,11 @@ Changelog 2.2.11
 - Fixed an OpenGL state leak when orbiting black holes
 - Upgraded the Biome Scanner:
   - Now requires power
-  - Improved the GUI
+  - Improved GUI
 - Observatory asteroid composition values now render above the rotating block previews
 - Centrifuge and Rolling Machine now accepting anyBlock where AIR was required
 - Fixed a Terraforming Terminal NPE
 - Polished tooltips
-
 
 Changelog 2.2.10
 
