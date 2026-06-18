@@ -42,16 +42,12 @@ import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 
-
 public class TileTerraformingTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory {
 
     private ModuleText moduleText;
-
     public boolean was_enabled_last_tick;
-
     private int sat_power_per_tick;
     private float randomblocks_per_tick;
-
 
     public TileTerraformingTerminal() {
         super(1, 1);
@@ -73,7 +69,9 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        return true;
+        return slot == 0
+                && !stack.isEmpty()
+                && stack.getItem() instanceof ItemBiomeChanger;
     }
 
     @Override
@@ -123,7 +121,6 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         super.setInventorySlotContents(slot, stack);
         updateInventoryInfo();
     }
-
 
     @Override
     public void update() {
@@ -259,7 +256,6 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         }
     }
 
-
     public boolean hasValidBiomeChanger() {
         ItemStack biomeChanger = getStackInSlot(0);
         SatelliteBase satellite;
@@ -274,9 +270,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
 
-
         List<ModuleBase> modules = new LinkedList<>();
-        //modules.add(buttonstopall);
         ModuleSatellite moduleSatellite = new ModuleSatellite(152, 10, this, 0);
         modules.add(moduleSatellite);
 
