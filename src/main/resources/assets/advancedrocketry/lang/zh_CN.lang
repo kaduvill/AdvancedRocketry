@@ -14,6 +14,7 @@ entity.rocket.name=火箭
 entity.deployedRocket.name=火箭
 entity.hovercraft.name=气垫船
 entity.ARPlanetUIItem.name=全息星体
+entity.ARPlanetUIButton.name=按钮
 entity.ARStarUIButton.name=全息恒星
 
 tile.landingPad.name=着陆台
@@ -510,8 +511,6 @@ msg.terraformingterminal.needredstone.line2=启动改造流程
 msg.terraformingterminal.insertchip.line1=在此处放入生物群系
 msg.terraformingterminal.insertchip.line2=变换器遥控终端来让
 msg.terraformingterminal.insertchip.line3=卫星改造整颗星球
-msg.biomescanner.gas=哈，是气体环境，对吧？
-msg.biomescanner.star=要是我有太阳镜就好了……
 msg.gravitycontroller.radius=半径：
 msg.gravitycontroller.targetgrav=目标重力：
 msg.gravitycontroller.none=无作用力
@@ -614,6 +613,14 @@ msg.itemplanetidchip.planetname=星球名称：
 msg.itemplanetidchip.stationid=空间站ID：
 msg.itemplanetidchip.artifacts=工件：
 msg.vent.trace=氧气追踪
+
+msg.biomescanner.scan.button=扫描
+msg.biomescanner.scan.tooltip=扫描下方星球
+msg.biomescanner.scan.required=进行扫描来检测生物群系
+msg.biomescanner.scan.nopower=能量不足
+msg.biomescanner.scan.invalid=无效星球
+msg.biomescanner.gas=哈，是气体环境，对吧？
+msg.biomescanner.star=要是我有太阳镜就好了……
 
 msg.serviceStation.destroyProbNA=破坏概率：N/A
 msg.serviceStation.destroyProb=破坏概率
@@ -773,11 +780,9 @@ msg.orbitalregistry.writechip.hint.select=从列表中选择一个条目
 msg.orbitalregistry.writechip.hint.output=需先清空输出槽位
 msg.orbitalregistry.writechip.hint.sat.or.stationchip=放入空间站芯片
 msg.orbitalregistry.writechip.hint.sat.or.idchip=放入卫星ID芯片或控制器
-msg.orbitalregistry.writechip.hint.sat.badcontroller=该卫星不接受此芯片，请使用对应的控制器！
+msg.orbitalregistry.writechip.hint.sat.badcontroller=卫星不接受此芯片，请使用对应的控制器！
 msg.orbitalregistry.writechip.hint.sat.orescanner.only=矿石扫描仪仅能链接至矿石勘探卫星
 msg.orbitalregistry.writechip.hint.station.unlaunched=该空间站尚未进入轨道
-
-
 
 commands.weather.always_not_clear=这颗星球从未晴朗过……
 commands.weather.cannot_rain=此处无法降雨
@@ -874,10 +879,8 @@ tooltip.advancedrocketry.monopropmotor.alt.1=查看加油站的JEI页面
 # Nuclear Core
 tooltip.advancedrocketry.nuclearcore=§c火箭的组成部分
 tooltip.advancedrocketry.nuclearcore.1=§6可进行行星航行！
-tooltip.advancedrocketry.nuclearcore.shift.1=必须直接放置在核热发动机
-tooltip.advancedrocketry.nuclearcore.shift.2=或其他核热堆芯正上方。
-tooltip.advancedrocketry.nuclearcore.alt.1=垂直放置规则不适用于
-tooltip.advancedrocketry.nuclearcore.alt.2=无人载具（气体任务火箭）
+tooltip.advancedrocketry.nuclearcore.shift.1=§f必须直接放置在核热发动机或其他核热堆芯的正上方。
+tooltip.advancedrocketry.nuclearcore.alt.1=垂直放置规则不适用于无人载具（气体任务火箭）
 
 # Nuclear rocketengine
 tooltip.advancedrocketry.nuclearmotor=§c火箭的组成部分
@@ -921,10 +924,10 @@ tooltip.advancedrocketry.servicemonitor.alt.1=未完成
 # Docking Pad (landingPad)
 tooltip.advancedrocketry.landingpad=使用此方块替换发射台结构的中心方块
 tooltip.advancedrocketry.landingpad.shift.1=§c链接器§f能够存储此方块的精确位置（包括维度信息）。
-tooltip.advancedrocketry.landingpad.shift.2=在§4导航计算机§7中使用。
-tooltip.advancedrocketry.landingpad.alt.1=放入芯片或已编程的链接器。
-tooltip.advancedrocketry.landingpad.alt.2=从此停靠台发射的火箭会飞往链接器中保存的坐标（用于实现自动化）。
+tooltip.advancedrocketry.landingpad.alt.1=§f放入已编程的§c链接器
+tooltip.advancedrocketry.landingpad.alt.2=§f从该停靠台发射的火箭会飞往保存的坐标（用于实现自动化）。
 tooltip.advancedrocketry.landingpad.alt.3=§o（会被导航计算机的目的地覆盖）
+msg.landingpad.linker.tooltip=放入编程到停靠台的链接器
 
 # Launch Pad
 tooltip.advancedrocketry.launchpad=发射台平台的基础方块。
@@ -938,7 +941,7 @@ tooltip.advancedrocketry.structuretower=发射台平台的垂直支架。
 tooltip.advancedrocketry.structuretower.shift.1=§b结构塔最低高度为4格。
 tooltip.advancedrocketry.structuretower.shift.2=§f底部方块必须与发射台相连。
 tooltip.advancedrocketry.structuretower.alt.1=无人载具组装机的主要方块
-tooltip.advancedrocketry.structuretower.alt.2=查看维基了解更多信息。
+tooltip.advancedrocketry.structuretower.alt.2=§o查看维基了解更多信息。
 
 # Terraformer
 tooltip.advancedrocketry.terraformer=改变整颗星球的地形环境！
@@ -1043,7 +1046,7 @@ tooltip.advancedrocketry.servicestation.shift.2=§o（未完成）
 tooltip.advancedrocketry.fluidtank.empty=空
 tooltip.advancedrocketry.fluidtank.fluid=流体：
 tooltip.advancedrocketry.fluidtank.level=液位：
-tooltip.advancedrocketry.fluidtank.shift.1=§c与上下的储罐连接构成大型储罐
+tooltip.advancedrocketry.fluidtank.shift.1=§c会与上下的储罐连接
 
 # Wireless Transceiver
 tooltip.advancedrocketry.transceiver=传输§6数据
@@ -1054,20 +1057,17 @@ tooltip.advancedrocketry.transceiver.alt.2=§o（如数据过期请重新放入�
 
 # Atmosphere Detector
 tooltip.advancedrocketry.atmosphereDetector=根据大气环境发出红石信号
-tooltip.advancedrocketry.atmosphereDetector.shift.1=选择需要检测的大气类型
-tooltip.advancedrocketry.atmosphereDetector.shift.2=条件符合时即会发射信号
-tooltip.advancedrocketry.atmosphereDetector.alt.1=可检测：空气、真空、
-tooltip.advancedrocketry.atmosphereDetector.alt.2=低氧气、无氧气、高温等多种状态
+tooltip.advancedrocketry.atmosphereDetector.shift.1=§f选择需要检测的大气类型，条件符合时发出红石信号
+tooltip.advancedrocketry.atmosphereDetector.alt.1=可检测：空气、真空、低氧气、无氧气、高温等多种状态
 
 # Station Light
-tooltip.advancedrocketry.circlelight=总是发光
-tooltip.advancedrocketry.circlelight.shift.1=不需要
-tooltip.advancedrocketry.circlelight.shift.2=能量或信号
+tooltip.advancedrocketry.circlelight=§c总是发光
+tooltip.advancedrocketry.circlelight.shift.1=§f不需要能量或信号
 
 # Gas Charge Pad
 tooltip.advancedrocketry.oxygencharger=为太空服装填氧气和氢气
-tooltip.advancedrocketry.oxygencharger.shift.1=站在装填台上填充气体
-tooltip.advancedrocketry.oxygencharger.alt.1=不需要能量
+tooltip.advancedrocketry.oxygencharger.shift.1=§b站在装填台上填充气体
+tooltip.advancedrocketry.oxygencharger.alt.1=§f不需要能量
 
 # Docking Port
 tooltip.advancedrocketry.dockingport=标记空间站模块的对接点
@@ -1104,19 +1104,19 @@ tooltip.advancedrocketry.orientationctrl.alt.1=§d仅影响视觉效果§7
 # Gravity Controller
 tooltip.advancedrocketry.gravityctrl=§c空间站控制器
 tooltip.advancedrocketry.gravityctrl.shift.1=§b人造重力！
-tooltip.advancedrocketry.gravityctrl.alt.1=红石控制
+tooltip.advancedrocketry.gravityctrl.alt.1=§f红石控制
 
 # Altitude Controller
 tooltip.advancedrocketry.altitudectrl=§c空间站控制器
 tooltip.advancedrocketry.altitudectrl.shift.1=§b自定义轨道高度
-tooltip.advancedrocketry.altitudectrl.alt.1=§d仅影响视觉效果§7
-tooltip.advancedrocketry.altitudectrl.alt.2=红石控制
+tooltip.advancedrocketry.altitudectrl.alt.1=§d仅影响视觉效果
+tooltip.advancedrocketry.altitudectrl.alt.2=§f红石控制
 
 # Co2Scrubber
 tooltip.advancedrocketry.scrubber=与氧气排放口相邻放置
-tooltip.advancedrocketry.scrubber.shift.1=减少氧气消耗（最多2个）
-tooltip.advancedrocketry.scrubber.alt.1=每个净化器可令氧气消耗减半，增加能量消耗。
-tooltip.advancedrocketry.scrubber.alt.2=使用2个净化器时，氧气排放口将不消耗氧气。
+tooltip.advancedrocketry.scrubber.shift.1=§f减少氧气消耗（最多2个）
+tooltip.advancedrocketry.scrubber.alt.1=§f每个净化器可令氧气消耗减半，增加能量消耗。
+tooltip.advancedrocketry.scrubber.alt.2=§f使用2个净化器时，氧气排放口将不消耗氧气。
 
 # Oxygen Vent
 tooltip.advancedrocketry.oxygenvent=在密闭房间中产出可呼吸的空气。
@@ -1136,7 +1136,7 @@ tooltip.advancedrocketry.warpcontroller=将空间站转变为§6跃迁飞船
 tooltip.advancedrocketry.warpcontroller.shift.1=§f在空间站上放置§4跃迁控制器§f和§4跃迁核心§f
 tooltip.advancedrocketry.warpcontroller.shift.2=§f在行星和恒星系之间进行跃迁旅行
 tooltip.advancedrocketry.warpcontroller.alt.1=§f界面中会显示位置、目的地和跃迁燃料
-tooltip.advancedrocketry.warpcontroller.alt.2=（都走到这一步了！去看看Wiki吧伙计）
+tooltip.advancedrocketry.warpcontroller.alt.2=§o（都走到这一步了！去看看Wiki吧伙计）
 
 # CarbonScrubberCartridge
 tooltip.advancedrocketry.scrubbercart=用于二氧化碳净化器
@@ -1311,10 +1311,10 @@ tooltip.advancedrocketry.asteroidchip.alt.1=§4将已编程的芯片放入导航
 tooltip.advancedrocketry.asteroidchip.alt.2=§f任务完成后会返还芯片
 
 # Station Chip
-tooltip.advancedrocketry.stationchip=§b在空间站组装机中编程
+tooltip.advancedrocketry.stationchip=§b在火箭中选择着陆台
 tooltip.advancedrocketry.stationchip.shift.1=§f在轨道注册站中写入
 tooltip.advancedrocketry.stationchip.shift.2=§c在卫星组装机中复制
-tooltip.advancedrocketry.stationchip.alt.1=§4将已编程的芯片放入导航计算机§7
+tooltip.advancedrocketry.stationchip.alt.1=§4将已编程的芯片放入导航计算机§f
 tooltip.advancedrocketry.stationchip.namelabel=名称：
 
 # Planet Chip
@@ -1420,9 +1420,9 @@ tooltip.advancedrocketry.libvulpes.creativepowerbattery=§d无限能源
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.1=§c多方块结构的组成部分
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.2=§b使用全息投影器！
 tooltip.advancedrocketry.libvulpes.coalgenerator=§c燃烧固体燃料
-tooltip.advancedrocketry.libvulpes.linker.shift.1=§f潜行+右击以链接（对空气执行该操作以重置）
-tooltip.advancedrocketry.libvulpes.linker.alt.1=§f将§c基础设备§f链接至火箭。
-tooltip.advancedrocketry.libvulpes.linker.alt.2=§f作为导航芯片使用时，先链接至§e停靠台§f，再放入§e导航计算机§f中
+tooltip.advancedrocketry.libvulpes.linker.shift.1=§b将基础设备链接至火箭！
+tooltip.advancedrocketry.libvulpes.linker.shift.2=§f潜行+右击以链接（对空气执行该操作以重置）
+tooltip.advancedrocketry.libvulpes.linker.alt.1=§f作为导航芯片使用时，先链接至§c停靠台§f，再放入§c导航计算机§f或§c停靠台§f中
 
 
 # Planet Analyser
@@ -1515,15 +1515,15 @@ tooltip.advancedrocketry.stationassembler.shift.1=§b需要发射台+结构塔�
 tooltip.advancedrocketry.stationassembler.alt.1=§f将此方块放置在比发射台高1格的位置，连接底部边角且朝向与发射台方块相反
 
 # Packet Station
-tooltip.advancedrocketry.packedstructure=放入§c卫星仓§7以送入轨道！
-tooltip.advancedrocketry.packedstructure.shift.1=§e发射前需设置火箭的目标星球！
+tooltip.advancedrocketry.packedstructure=§f放入§c卫星仓§f以送入轨道！
+tooltip.advancedrocketry.packedstructure.shift.1=§e发射前需设置火箭的目标星球
 
 # Deployable Rocket Assembler
 tooltip.advancedrocketry.deployablerocketassembler=§c在空间站中搭建火箭
 tooltip.advancedrocketry.deployablerocketassembler.shift.1=§b需要结构塔方块
 tooltip.advancedrocketry.deployablerocketassembler.shift.2=§f用于§6气体任务§7
 tooltip.advancedrocketry.deployablerocketassembler.alt.1=§f将此方块放置在倒T形结构的中间，朝向太空外部，然后从塔顶向外延伸出水平支撑。
-tooltip.advancedrocketry.deployablerocketassembler.alt.2=如果不确定，请查看Wiki！
+tooltip.advancedrocketry.deployablerocketassembler.alt.2=§o如果不确定，请查看Wiki！
 
 # Hovercraft
 tooltip.advancedrocketry.hovercraft=使用持久耐用的双锂动力源。可能比你的寿命还长。
