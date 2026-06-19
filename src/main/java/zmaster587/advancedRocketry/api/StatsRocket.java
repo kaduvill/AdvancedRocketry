@@ -84,14 +84,6 @@ public class StatsRocket {
         statTags = new HashMap<>();
     }
 
-	/*public StatsRocket(int thrust, int weight, int fuelRate, int fuel) {
-		this.thrust = thrust;
-		this.weight = weight;
-		this.fuelLiquid = fuel;
-		lastSeatX = -1;
-		engineLoc = new ArrayList<Vector3F>();
-	}*/
-
     public static StatsRocket createFromNBT(NBTTagCompound nbt) {
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
@@ -132,6 +124,10 @@ public class StatsRocket {
     }
 
     public float getWeight_NoFuel() {return weight;}
+
+    public float getNeededThrust(float gravitationalMultiplier) {
+        return getWeight() * (ARConfiguration.getCurrentConfig().gravityAffectsFuel ? gravitationalMultiplier : 1f);
+    }
 
     public float getWeight() {
         float fluidWeight = 0;
@@ -190,8 +186,12 @@ public class StatsRocket {
     }
 
     public float getAcceleration(float gravitationalMultiplier) {
-        float N = getThrust() - (getWeight()  * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1));
-        return N/getWeight() /20f;
+        float weight = getWeight();
+        if (weight <= 0) {
+            return 0f;
+        }
+        float netThrust = getThrust() - getNeededThrust(gravitationalMultiplier);
+        return netThrust / weight / 20f;
     }
 
     public List<Vector3F<Float>> getEngineLocations() {

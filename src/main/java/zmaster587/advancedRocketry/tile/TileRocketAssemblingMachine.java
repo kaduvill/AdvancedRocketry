@@ -222,7 +222,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     public float getNeededThrust() {
-        return getWeight();
+        return stats.getNeededThrust(getGravityMultiplier());
     }
 
     public boolean hasEnoughFuel(@Nonnull FuelType fuelType) {

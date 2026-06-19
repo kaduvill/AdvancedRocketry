@@ -899,6 +899,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return this.getPassengers().size() < stats.getNumPassengerSeats();
     }
 
+    private float getSourceGravityMultiplier() {
+        DimensionProperties src = DimensionManager.getInstance()
+                .getDimensionProperties(this.world.provider.getDimension());
+
+        return src != null ? src.getGravitationalMultiplier() : 1f;
+    }
 
     // Check if we have enough fuel to reach orbit from our current position
     private boolean hasMissionFuelFor(int destDimId) {
@@ -909,12 +915,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         if (isInOrbit()) return true;   // already at orbit
 
-        if (stats.getThrust() <= stats.getWeight()) return false;
-
-        final DimensionProperties src = DimensionManager.getInstance()
-                .getDimensionProperties(this.world.provider.getDimension());
-        final float gSrc = Math.max(0.01f, src.getGravitationalMultiplier()); 
-        final double a = Math.max(0.0001d, stats.getAcceleration(gSrc));    
+        final float gSrc = getSourceGravityMultiplier();
+        if (stats.getThrust() <= stats.getNeededThrust(gSrc)) return false;
+        final double a = Math.max(0.0001d, stats.getAcceleration(gSrc));
         final double h = Math.max(0.0, stats.orbitHeight - this.posY);
 
         long nTicks = (long)Math.ceil(Math.sqrt(2.0 * h / a));
@@ -2290,10 +2293,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             }
         }
 
-
-        if (this.stats.getWeight() >= this.stats.getThrust()) {
+        float sourceGravity = getSourceGravityMultiplier();
+        if (this.stats.getThrust() <= this.stats.getNeededThrust(sourceGravity)) {
             setError("error.rocket.tooHeavy");
-            return; // hard stop; no silent fall-through
+            return;
         }
 
         //Check to see what place we should be going to
@@ -2313,7 +2316,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
             MinecraftForge.EVENT_BUS.post(new RocketLaunchEvent(this));
 
-            // ---- PRELOAD DESTINATION 3x3 (server only) ----
+            // PRELOAD DESTINATION 3x3 (server only)
             if (!world.isRemote) {
                 boolean willTeleportAtAscent =
                     !(ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer().isEmpty());
@@ -2335,8 +2338,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     }
                 }
             }
-            // -----------------------------------------------
-
 
             //Disconnect things linked to the rocket on liftoff
             while (connectedTiles.hasNext()) {
