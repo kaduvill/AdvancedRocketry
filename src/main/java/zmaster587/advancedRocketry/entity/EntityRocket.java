@@ -2109,8 +2109,14 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         this.setDead();
     }
 
-    public void recalculateStats(){
+    public void recalculateStats() {
+        if (this.storage == null) {
+            return;
+        }
         this.storage.recalculateStats(this.stats);
+        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+            this.stats.setWeight(this.storage.recalculateWeight());
+        }
     }
 
     /**
@@ -2127,27 +2133,14 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         boolean allowLaunch = false;
 
-        this.storage.recalculateStats(this.stats);
+        this.recalculateStats();
 
         NBTTagCompound nbtdata = new NBTTagCompound();
         writeToNBT(nbtdata);
         // Can this be done without sending the entity packet again?
         // It causes rocket to skip rendering a few frames when launching
-        PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata), this.world.provider.getDimension(), this.getPosition(), 64);
-
-
-        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-            this.stats.setWeight(storage.recalculateWeight());
-            for (HashedBlockPosition pos : this.infrastructureCoords) {
-                TileEntity te = world.getTileEntity(pos.getBlockPos());
-                if (te instanceof TileRocketAssemblingMachine) {
-                    //this does not work: getWeight() returns weight + fuel. setWeight() should not include fuel weight because it is calculated on every getweight()
-                    // so if you say setweight(getweight()) and next time I call getweight() it returns weight+fuel+fuel
-                    // we do not need this anyway because the assembler has IDataSync interface and syncs itself
-                    //((TileRocketAssemblingMachine) te).getRocketStats().setWeight(this.stats.getWeight());
-                }
-            }
-        }
+        PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata),
+                this.world.provider.getDimension(), this.getPosition(), 64);
 
         if (ARConfiguration.getCurrentConfig().partsWearSystem && storage.shouldBreak()) {
             this.explode();
