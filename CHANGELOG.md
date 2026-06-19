@@ -1,5 +1,11 @@
 Changelog 2.2.11
 
+- Rocket
+  - Really respect gravity, old code used OW gravity for many weight calculations
+  - Sync weight correctly to assembler GUI
+  - Properly use same weight calculation before and after assembling
+  - RocketAssembler stats (actually means something and is correctly displayed)
+
 - Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
   - Added slot filtering and tooltip feedback where relevant:
     - Observatory
