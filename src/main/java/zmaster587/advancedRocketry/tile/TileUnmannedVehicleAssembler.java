@@ -382,17 +382,15 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                     || (thrustMonopropellant > 0 && totalFuelUse > monopropellantfuelUse)
                     || (thrustNuclearTotalLimit > 0 && totalFuelUse > nuclearWorkingFluidUse))) {
                 status = ErrorCodes.COMBINEDTHRUST;
-            } else if (getThrust() <= getNeededThrust()) {
+            } else if (getThrust() <= getPreviewNeededThrust()) {
                 status = ErrorCodes.NOENGINES;
             } else if (((int) stats.getStatTag("intakePower")) <= 0) {
                 status = ErrorCodes.NOINTAKE;
             } else if (!foundFluidTank) {
                 status = ErrorCodes.NOTANK;
-            } else if (thrustBipropellant > 0 && (fuelCapacityBipropellant <= 0 || fuelCapacityOxidizer <= 0)) {
-                status = ErrorCodes.NOFUEL; // missing one of the required tanks
-            } else if (((thrustBipropellant > 0)      && !hasEnoughFuelUnmanned(FuelType.LIQUID_BIPROPELLANT))
-                    || ((thrustMonopropellant > 0)    && !hasEnoughFuelUnmanned(FuelType.LIQUID_MONOPROPELLANT))
-                    || ((thrustNuclearTotalLimit > 0) && !hasEnoughFuelUnmanned(FuelType.NUCLEAR_WORKING_FLUID))) {
+            } else if ((thrustBipropellant > 0 && (!hasEnoughFuelCapacity(FuelType.LIQUID_BIPROPELLANT) || !hasEnoughFuelCapacity(FuelType.LIQUID_OXIDIZER)))
+                    || ((thrustMonopropellant > 0) && !hasEnoughFuelCapacity(FuelType.LIQUID_MONOPROPELLANT))
+                    || ((thrustNuclearTotalLimit > 0) && !hasEnoughFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID))) {
                 status = ErrorCodes.NOFUEL;
             } else {
                 status = ErrorCodes.SUCCESS;
@@ -454,11 +452,11 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         return sCan >= targetS;
     }
 
+    @Override protected int getAssemblerTargetOrbitHeight() { return this.getPos().getY() + 128; }
     @Override public void onLoad() { super.onLoad(); }
     @Override public void invalidate() { super.invalidate(); }
     @Override public void onChunkUnload() { super.onChunkUnload(); }
-    @Override
-    protected boolean verifyScan(AxisAlignedBB bb, World world) {
+    @Override protected boolean verifyScan(AxisAlignedBB bb, World world) {
         return true;
     }
 }
