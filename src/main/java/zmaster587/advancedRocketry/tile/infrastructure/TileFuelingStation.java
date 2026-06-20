@@ -67,7 +67,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
     private Fluid cachedFuelFluid = null, cachedOxFluid = null, cachedWorkFluid = null;
 
     public TileFuelingStation() {
-        super(1000, 3, 5000);
+        super(1000, 3, 10000);
         masterBlock = new HashedBlockPosition(0, -1, 0);
         redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this);
         state = RedstoneState.ON;
@@ -82,7 +82,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
     @Override
     public int getMaxLinkDistance() { return 10; }
 
-    // ---- redstone emission with duplicate suppression ----
+    //redstone emission with suppression
     private void setRedstoneState(boolean condition) {
         if (world == null || world.isRemote) return;
 
@@ -99,9 +99,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
         }
         markDirty();
     }
-
-
-    // ---- small cache to avoid repeated FluidRegistry lookups per tick ----
+    //small cache to avoid repeated FluidRegistry lookups per tick
     private void refreshFluidCachesIfNeeded() {
         if (linkedRocket == null || linkedRocket.stats == null) return;
         String f = linkedRocket.stats.getFuelFluid();
@@ -126,7 +124,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
         refreshFluidCachesIfNeeded();
         if (current == null || linkedRocket == null) return false;
 
-        // --- compare by fluid name, not by instance ---
+        //compare by fluid name, not by instance
         final String currentName = current.getName();
 
         // If a specific fluid was already chosen, match directly by name.
@@ -180,10 +178,8 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
                 syncTE(); // only when something actually changed
             }
         }
-
         super.update(); // IMPORTANT: preserve parent RF/ticking pipeline
     }
-
 
     @Override
     public void performFunction() {
@@ -218,7 +214,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
             FluidStack fs = tank.getFluid();
             if (fs != null && canRocketFitFluid(fs.getFluid())) {
                 fuelingActive = true;   // resume fueling after reload
-                // don’t run expensive work this tick; we’ll catch it on the next throttled pass
+                // don’t run expensive work this tick; we’ll catch it on the next pass
             } else {
                 // already full or no relevant fluid — keep RS accurate
                 setRedstoneState(fs != null && isStationFluidForThisRocket(fs.getFluid())   && !canRocketFitFluid(fs.getFluid()));
@@ -235,7 +231,6 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
             setRedstoneState(false);
             return;
         }
-
         final Fluid currentFluid = currentFluidStack.getFluid();
 
         // Lock rocket to specific fluids if unset
@@ -255,7 +250,6 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
                 linkedRocket.stats.setWorkingFluid(currentFluid.getName());
             }
         }
-
         // Update caches after potential stat change
         refreshFluidCachesIfNeeded();
 
