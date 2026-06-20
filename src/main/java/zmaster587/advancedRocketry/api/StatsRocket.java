@@ -3,8 +3,6 @@ package zmaster587.advancedRocketry.api;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.util.WeightEngine;
@@ -129,24 +127,19 @@ public class StatsRocket {
         return getWeight() * (ARConfiguration.getCurrentConfig().gravityAffectsFuel ? gravitationalMultiplier : 1f);
     }
 
+    private float getPropellantWeight(FuelType fuelType) {
+        return WeightEngine.INSTANCE.getRocketPropellantWeight(fuelType, getFuelAmount(fuelType));
+    }
+
     public float getWeight() {
-        float fluidWeight = 0;
-        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-            if (FluidRegistry.isFluidRegistered(getFuelFluid())) {
-                Fluid f = FluidRegistry.getFluid(getFuelFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_MONOPROPELLANT));
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_BIPROPELLANT));
-            }
-            if (FluidRegistry.isFluidRegistered(getOxidizerFluid())) {
-                Fluid f = FluidRegistry.getFluid(getOxidizerFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_OXIDIZER));
-            }
-            if (FluidRegistry.isFluidRegistered(getWorkingFluid())) {
-                Fluid f = FluidRegistry.getFluid(getWorkingFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.NUCLEAR_WORKING_FLUID));
-            }            
+        if (!ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+            return weight;
         }
-        return weight + fluidWeight;
+        return weight
+                + getPropellantWeight(FuelType.LIQUID_MONOPROPELLANT)
+                + getPropellantWeight(FuelType.LIQUID_BIPROPELLANT)
+                + getPropellantWeight(FuelType.LIQUID_OXIDIZER)
+                + getPropellantWeight(FuelType.NUCLEAR_WORKING_FLUID);
     }
 
     public void setWeight(float weight) {
@@ -690,7 +683,7 @@ public class StatsRocket {
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
-this.reset();
+        this.reset();
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
             this.thrust = stats.getInteger("thrust");

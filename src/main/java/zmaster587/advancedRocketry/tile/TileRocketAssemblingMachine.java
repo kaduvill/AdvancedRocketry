@@ -70,7 +70,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     private final static int MAX_SIZE_Y = 128;
     private final static int MIN_SIZE = 3;
     private final static int MIN_SIZE_Y = 4;
-    private static final ProgressBarImage horizontalProgressBar = new ProgressBarImage(89, 9, 81, 17, 176, 0, 80, 15, 0, 2, EnumFacing.EAST, backdrop);
     private static final Block[] viableBlocks = {AdvancedRocketryBlocks.blockLaunchpad, AdvancedRocketryBlocks.blockLandingPad};
     protected ModuleText errorText;
     protected StatsRocket stats;
@@ -241,24 +240,10 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     private float getPreviewFuelWeight(@Nonnull FuelType type) {
         int amount = Math.max(stats.getFuelCapacity(type), stats.getFuelAmount(type));
-
         if (amount <= 0) {
             return 0f;
         }
-
-        String knownFluidName = getKnownFuelFluidName(type);
-        if (knownFluidName != null && !"null".equals(knownFluidName) && FluidRegistry.isFluidRegistered(knownFluidName)) {
-            return WeightEngine.INSTANCE.getWeight(FluidRegistry.getFluid(knownFluidName), amount);
-        }
-
-        float maxWeight = 0f;
-        for (Fluid fluid : FluidRegistry.getRegisteredFluids().values()) {
-            if (FuelRegistry.instance.isFuel(type, fluid)) {
-                maxWeight = Math.max(maxWeight, WeightEngine.INSTANCE.getWeight(fluid, amount));
-            }
-        }
-
-        return maxWeight;
+        return WeightEngine.INSTANCE.getRocketPropellantWeight(type, amount);
     }
 
     private float getPreviewWetWeight() {
@@ -305,10 +290,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     public float getGravityMultiplier() {
         return DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getGravitationalMultiplier();
-    }
-
-    public int getFuel(@Nullable FuelType fuelType) {
-        return (int) (stats.getFuelCapacity(fuelType) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
     }
 
     public boolean isBuilding() {
@@ -1236,23 +1217,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     @Override
     public float getNormallizedProgress(int id) {
-        if (isScanning() && id != 2)
-            return 0f;
-
-        switch (id) {
-            case 0:
-                FuelType fuelType = (stats.getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT) > 0) ? FuelType.LIQUID_MONOPROPELLANT : (stats.getBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID) > 0) ? FuelType.NUCLEAR_WORKING_FLUID : FuelType.LIQUID_BIPROPELLANT;
-                return (this.getAcceleration(getGravityMultiplier()) > 0) ? MathHelper.clamp(0.5f + 0.5f * ((float) (this.getFuel(fuelType) - this.stats.getFuelCapacity(fuelType)) / this.stats.getFuelCapacity(fuelType)), 0f, 1f) : 0;
-            case 1:
-                return MathHelper.clamp(0.5f + this.getAcceleration(getGravityMultiplier()) * 10, 0f, 1f);
-            case 2:
-                return (float) this.getNormallizedProgress();
-            case 3:
-                return this.getWeight() > 0 ? 0.5f : 0f;
-            case 4:
-                return this.getThrust() > 0 ? 0.9f : 0f;
-        }
-        return 0f;
+        if (id != 2) {return 0f;}
+        return (float) this.getNormallizedProgress();
     }
 
     @Override
