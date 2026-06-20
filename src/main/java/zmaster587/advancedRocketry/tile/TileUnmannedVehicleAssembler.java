@@ -80,7 +80,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             xMin = xCurrent - xMin + 1;
             xMax = xCurrent + xMax;
 
-
             if (direction.getFrontOffsetZ() > 0) {
                 zMax = zCurrent + zSize - 1;
                 zMin++;
@@ -96,7 +95,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         if (yMax < MIN_SIZE_Y || xSize < MIN_SIZE || zSize < MIN_SIZE) {
             return null;
         }
-
         return new AxisAlignedBB(xMin, yCurrent, zMin, xMax, yCurrent + yMax - 1, zMax);
     }
 
@@ -175,8 +173,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         // Rescan to immediately show fresh stats after build
         scanRocket(world, getPos(), bbCache);
     }
-
-
 
     @Override
     public AxisAlignedBB scanRocket(World world, BlockPos pos2, AxisAlignedBB bb) {
@@ -413,7 +409,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-
     private boolean hasEnoughFuelUnmanned(@Nonnull FuelType family) {
         // SD flight: acceleration in entity code is ≈ 0.005 blocks/tick^2
         final float a_station = 0.005f;
@@ -451,26 +446,19 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                 t = cap / (float) rate;
                 break;
             }
-
             default:
                 return false;
         }
-
         // distance under constant accel: s = 0.5 * a * t^2
         final float sCan = 0.5f * a_station * t * t;
         return sCan >= targetS;
     }
 
     @Override public void onLoad() { super.onLoad(); }
-
     @Override public void invalidate() { super.invalidate(); }
-
     @Override public void onChunkUnload() { super.onChunkUnload(); }
-    
-     
     @Override
     protected boolean verifyScan(AxisAlignedBB bb, World world) {
         return true;
     }
-
 }
