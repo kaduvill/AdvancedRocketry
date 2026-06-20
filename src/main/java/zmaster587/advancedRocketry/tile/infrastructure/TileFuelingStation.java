@@ -293,7 +293,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
         }
 
         // Bounded transfer scaled by throttle; drain exactly the delta that actually landed
-        int step = ARConfiguration.getCurrentConfig().fuelPointsPer10Mb;
+        int step = ARConfiguration.getCurrentConfig().fuelingStationTransferRate;
         int toOffer = Math.min(step * OP_THROTTLE_TICKS, tank.getFluidAmount());
         if (toOffer > 0) {
             final int before = linkedRocket.getFuelAmount(typeToFill);
@@ -374,7 +374,7 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
     }
 
     /**
-     * @param fluid the fluid to check whether the rocket has space for it
+     * @param f the fluid to check whether the rocket has space for it
      * @return boolean on whether the rocket can accept the fluid
      */
     private boolean canRocketFitFluid(Fluid f) {

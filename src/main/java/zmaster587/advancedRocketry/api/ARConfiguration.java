@@ -83,7 +83,7 @@ public class ARConfiguration {
     @ConfigProperty(needsSync = true)
     public int spaceDimId = -2;
     @ConfigProperty
-    public int fuelPointsPer10Mb = 10;
+    public int fuelingStationTransferRate = 10;
     @ConfigProperty(needsSync = true)
     public int stationSize = 1024;
     @ConfigProperty(needsSync = true)
@@ -436,16 +436,8 @@ public class ARConfiguration {
         arConfig.gasCollectionMult = config.get(MISSION, "gasMissionMultiplier", 1.0, "Multiplier for gas mission time.").getDouble();
         harvestableGasses = config.getStringList("harvestableGasses", MISSION, new String[]{}, "List of fluid names that can be harvested from any gas giant");
         spawnableGasses = config.getStringList("spawnableGasses", MISSION, new String[]{"hydrogen;125;1600;1.0", "helium;125;1600;0.9", "helium3;175;1600;0.2", "oxygen;0;124;1.0", "nitrogen;0;124;1.0", "ammonia;0;124;0.75", "methane;0;124;0.25"}, "List of fluids that can generate on gas giants. Format: fluid;minGravity;maxGravity;chance");
-        arConfig.gasHarvestAmountMultiplier = config.get(
-            MISSION, "gasHarvestAmountMultiplier", 1.0,
-            "Per-mission harvest cap = 64,000 mB × multiplier. Ignored if gasHarvestInfinite=true."
-        ).getDouble();
-
-        arConfig.gasHarvestInfinite = config.get(
-            MISSION, "gasHarvestInfinite", false,
-            "True sets gasHarvestAmount = MaxInt (2,147,483,647 mB), and ignores the 'gasHarvestAmountMultiplier'"
-        ).getBoolean();
-
+        arConfig.gasHarvestAmountMultiplier = config.get(MISSION, "gasHarvestAmountMultiplier", 1.0, "Per-mission harvest cap = 64,000 mB × multiplier. Ignored if gasHarvestInfinite=true.").getDouble();
+        arConfig.gasHarvestInfinite = config.get(MISSION, "gasHarvestInfinite", false, "True sets gasHarvestAmount = MaxInt (2,147,483,647 mB), and ignores the 'gasHarvestAmountMultiplier'").getBoolean();
 
         //Energy Production
         arConfig.solarGeneratorMult = config.get(ENERGY, "solarGeneratorMultiplier", 1, "Power produced per tick by the solar generator.").getInt();
@@ -467,7 +459,7 @@ public class ARConfiguration {
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "Use AR's custom skybox on space stations").getBoolean();
         arConfig.planetSkyOverride = config.get(CLIENT, "PlanetSkyOverride", true, "Use AR's custom skybox on planets").getBoolean();
         arConfig.skyOverride = config.get(CLIENT, "overworldSkyOverride", true, "Use AR's custom skybox in the overworld.").getBoolean();
-       // arConfig.overworldsealevelterraforming = config.get(CLIENT, "overworldSealvlTerraforming", true).getBoolean();
+        // arConfig.overworldsealevelterraforming = config.get(CLIENT, "overworldSealvlTerraforming", true).getBoolean();
         arConfig.advancedVFX = config.get(CLIENT, "advancedVFX", true, "Advanced visual effects").getBoolean();
         arConfig.enableNausea = config.get(CLIENT, "EnableAtmosphericNausea", true, "Allows nausea effects in non-standard atmospheres.").getBoolean();
         arConfig.electricPlantsSpawnLightning = config.get(CLIENT, "electricPlantsSpawnLightning", true, "Should Electric Mushrooms be able to spawn lightning").getBoolean();
@@ -502,6 +494,7 @@ public class ARConfiguration {
         arConfig.advancedWeightSystemInventories = config.get(ROCKET, "advancedWeightSystemInventories", true, "Include inventory contents in rocket weight. Note: may not work with modded inventories (eg IE storage chests)").getBoolean();
         arConfig.partsWearSystem = config.get(ROCKET, "partsWearSystem", true, "Enable rocket part wear and exploding chance.").getBoolean();
         arConfig.increaseWearIntensityProb = config.get(ROCKET, "increaseWearIntensityProb", 0.025, "Chance for each part to gain wear on launch.").getDouble();
+        arConfig.fuelingStationTransferRate = config.getInt("fuelingStationTransferRate", ROCKET, 10, 1, Integer.MAX_VALUE, "Fueling station transfer rate per tick. Actual transfer per operation is this value multiplied by 5");
 
         //Ore configuration
         final boolean masterToggle = arConfig.generateCopper = config.get(WORLDGEN, "EnableOreGen", true).getBoolean();
