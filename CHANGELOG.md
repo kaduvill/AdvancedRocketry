@@ -1,10 +1,12 @@
 Changelog 2.2.11
 
-- Rocket
-  - Really respect gravity, old code used OW gravity for many weight calculations
-  - Sync weight correctly to assembler GUI
-  - Properly use same weight calculation before and after assembling
-  - RocketAssembler stats (actually means something and is correctly displayed)
+- Rocket Assembler GUI overhaul
+  - Make GUI actually useful
+  - Improved Rocket Assembler stat sync, consistency and flickering GUI preview.
+  - Fixed rocket gravity checks. Rockets now use the source dimension gravity.
+  - Fixed weight, thrust, acceleration, and fuel display in the assembler GUI.
+  - Fixed fuel-rate display. Configured fuel multipliers are now shown before fueling.
+  - Fixed station launches using planet orbit height for fuel checks.
 
 - Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
   - Added slot filtering and tooltip feedback where relevant:
@@ -26,6 +28,7 @@ Changelog 2.2.11
   - Improved GUI
 - Observatory asteroid composition values now render above the rotating block previews
 - Centrifuge and Rolling Machine now accepting anyBlock where AIR was required
+- Fuel station: increase tank size to 10000mb
 - Fixed a Terraforming Terminal NPE
 - Polished tooltips
 
