@@ -83,7 +83,7 @@ public class ARConfiguration {
     @ConfigProperty(needsSync = true)
     public int spaceDimId = -2;
     @ConfigProperty
-    public int fuelingStationTransferRate = 10;
+    public int fuelingStationTransferRate = 20;
     @ConfigProperty(needsSync = true)
     public int stationSize = 1024;
     @ConfigProperty(needsSync = true)
@@ -494,7 +494,7 @@ public class ARConfiguration {
         arConfig.advancedWeightSystemInventories = config.get(ROCKET, "advancedWeightSystemInventories", true, "Include inventory contents in rocket weight. Note: may not work with modded inventories (eg IE storage chests)").getBoolean();
         arConfig.partsWearSystem = config.get(ROCKET, "partsWearSystem", true, "Enable rocket part wear and exploding chance.").getBoolean();
         arConfig.increaseWearIntensityProb = config.get(ROCKET, "increaseWearIntensityProb", 0.025, "Chance for each part to gain wear on launch.").getDouble();
-        arConfig.fuelingStationTransferRate = config.getInt("fuelingStationTransferRate", ROCKET, 10, 1, Integer.MAX_VALUE, "Fueling station transfer rate per tick. Actual transfer per operation is this value multiplied by 5");
+        arConfig.fuelingStationTransferRate = config.getInt("fuelingStationTransferRate", ROCKET, 20, 1, Integer.MAX_VALUE, "Fueling station transfer rate per tick. Actual transfer per operation is this value multiplied by 5");
 
         //Ore configuration
         final boolean masterToggle = arConfig.generateCopper = config.get(WORLDGEN, "EnableOreGen", true).getBoolean();

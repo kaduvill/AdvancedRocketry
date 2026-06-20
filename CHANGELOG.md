@@ -28,7 +28,10 @@ Changelog 2.2.11
   - Improved GUI
 - Observatory asteroid composition values now render above the rotating block previews
 - Centrifuge and Rolling Machine now accepting anyBlock where AIR was required
-- Fuel station: increase tank size to 10000mb
+- Fuel station:
+  - Increase tank size to 10000mb
+  - Correctly load transfer-rate from config
+  - Increase default to 20mb per tick (up from 10mb)
 - Fixed a Terraforming Terminal NPE
 - Polished tooltips
 
