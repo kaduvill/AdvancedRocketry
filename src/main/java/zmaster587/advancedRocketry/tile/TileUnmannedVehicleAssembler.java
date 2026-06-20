@@ -14,7 +14,6 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.*;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityStationDeployedRocket;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.util.StorageChunk;
@@ -26,12 +25,9 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
 
-import javax.annotation.Nonnull;
-
 public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
 
     private final static int MAX_SIZE = 17, MAX_SIZE_Y = 17, MIN_SIZE = 3, MIN_SIZE_Y = 3;
-
     /**
      * Does not make sure the structure is complete, only gets max bounds!
      *
@@ -90,8 +86,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                 zMax--;
             }
         }
-
-        //if tower does not meet criteria then reutrn null
+        //if tower does not meet criteria then return null
         if (yMax < MIN_SIZE_Y || xSize < MIN_SIZE || zSize < MIN_SIZE) {
             return null;
         }
@@ -100,17 +95,16 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
 
     @Override
     public void assembleRocket() {
-
         if (bbCache == null || world.isRemote) return;
 
-        // 1) Rescan like the parent (may update stats/status and tighten AABB)
+        // Rescan like the parent (may update stats/status and tighten AABB)
         AxisAlignedBB rocketBB = scanRocket(world, getPos(), bbCache);
         if (status != ErrorCodes.SUCCESS || rocketBB == null) return;
 
-        // 2) Remove replaceables **inside the tight box**
+        // Remove replaceables **nside the tight box*
         removeReplaceableBlocks(rocketBB);
 
-        // 3) Cut the world using the **tight** AABB 
+        // Cut the world using the **tight** AABB
         final StorageChunk storageChunk;
         try {
             storageChunk = StorageChunk.cutWorldBB(world, rocketBB);
@@ -118,7 +112,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             return;
         }
 
-        // 4) Spawn the SD rocket, centered from the *rescanned* bbox
+        // Spawn the SD rocket, centered from the *rescanned* bbox
         final double cx = rocketBB.minX + (rocketBB.maxX - rocketBB.minX) / 2f + 0.5f;
         final double cz = rocketBB.minZ + (rocketBB.maxZ - rocketBB.minZ) / 2f + 0.5f;
         final double cy = this.getPos().getY();
@@ -130,7 +124,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         rocket.forwardDirection = RotatableBlock.getFront(world.getBlockState(getPos())).getOpposite();
         rocket.launchDirection = EnumFacing.DOWN;
 
-        // 5) Rotate *all* engine types to match forwardDirection (defensive: only if block supports FACING)
+        // Rotate *all* engine types to match forwardDirection
         for (int x = 0; x < storageChunk.getSizeX(); x++) {
             for (int y = 0; y < storageChunk.getSizeY(); y++) {
                 for (int z = 0; z < storageChunk.getSizeZ(); z++) {
@@ -149,7 +143,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             }
         }
 
-        // 6) Spawn + sync
+        // Spawn + sync
         world.spawnEntity(rocket);
         NBTTagCompound nbt = new NBTTagCompound();
         rocket.writeToNBT(nbt);
@@ -161,7 +155,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             rocket.linkInfrastructure(infrastructure);
         }
 
-        // 7) Directly stamp tile stats from the entity we just created
+        // Directly stamp tile stats from the entity
         rocket.recalculateStats();
         this.stats = rocket.stats.copy();
 
@@ -264,7 +258,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                             }
                             continue;
                         }
-
                         if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
                             weight += WeightEngine.INSTANCE.getWeight(world, currPos);
                         } else {
@@ -335,7 +328,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                 }
             }
 
-            // --- Nuclear working fluid scaling (guarded) ---
+            // Nuclear working fluid scaling
             int nuclearWorkingFluidUse = 0;
             if (thrustNuclearNozzleLimit > 0) {
                 thrustNuclearTotalLimit = Math.min(thrustNuclearNozzleLimit, thrustNuclearReactorLimit);
@@ -396,7 +389,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                 status = ErrorCodes.SUCCESS;
             }
         }
-
         // Normalize bounds to avoid inverted AABBs on edge cases
         double minX = Math.min(actualMinX, actualMaxX);
         double minY = Math.min(actualMinY, actualMaxY);
@@ -405,51 +397,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         double maxY = Math.max(actualMaxY, actualMinY);
         double maxZ = Math.max(actualMinZ, actualMaxZ);
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    private boolean hasEnoughFuelUnmanned(@Nonnull FuelType family) {
-        // SD flight: acceleration in entity code is ≈ 0.005 blocks/tick^2
-        final float a_station = 0.005f;
-        final float targetS   = 128f;  // SD rocket switches to orbit after ~128 blocks
-
-        float t; // seconds (ticks) we can sustain full burn
-
-        switch (family) {
-            case LIQUID_MONOPROPELLANT: {
-                final int cap  = stats.getFuelCapacity(FuelType.LIQUID_MONOPROPELLANT);
-                final int rate = stats.getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT);
-                if (cap <= 0 || rate <= 0) return false;
-                t = cap / (float) rate;
-                break;
-            }
-
-            case LIQUID_BIPROPELLANT: {
-                // Both streams must exist; consume in lockstep at their own rates.
-                final int capFuel = stats.getFuelCapacity(FuelType.LIQUID_BIPROPELLANT);
-                final int capOx   = stats.getFuelCapacity(FuelType.LIQUID_OXIDIZER);
-                final int rateFuel= stats.getBaseFuelRate(FuelType.LIQUID_BIPROPELLANT);
-                final int rateOx  = stats.getBaseFuelRate(FuelType.LIQUID_OXIDIZER);
-                if (capFuel <= 0 || capOx <= 0 || rateFuel <= 0 || rateOx <= 0) return false;
-
-                final float tFuel = capFuel / (float) rateFuel;
-                final float tOx   = capOx   / (float) rateOx;
-                t = Math.min(tFuel, tOx);  // limiting stream dictates burn time
-                break;
-            }
-
-            case NUCLEAR_WORKING_FLUID: {
-                final int cap  = stats.getFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID);
-                final int rate = stats.getBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID);
-                if (cap <= 0 || rate <= 0) return false;
-                t = cap / (float) rate;
-                break;
-            }
-            default:
-                return false;
-        }
-        // distance under constant accel: s = 0.5 * a * t^2
-        final float sCan = 0.5f * a_station * t * t;
-        return sCan >= targetS;
     }
 
     @Override protected int getAssemblerTargetOrbitHeight() { return this.getPos().getY() + 128; }
