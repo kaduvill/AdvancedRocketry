@@ -171,7 +171,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         // Always refresh local bounds first
         AxisAlignedBB fresh = getRocketPadBounds(world, getPos());
         if (fresh == null) {
+            stats.reset();
             status = ErrorCodes.INCOMPLETESTRCUTURE; // upstream typo
+            syncStatsToClient();
             return null; // avoid using stale bb
         }
         bbCache = fresh;
@@ -186,6 +188,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             r.recalculateStats();
             this.stats = r.stats.copy();
             this.status = ErrorCodes.ALREADY_ASSEMBLED;
+            syncStatsToClient();
             return null;
         }  
         int thrustMonopropellant = 0;
@@ -386,6 +389,23 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             } else {
                 status = ErrorCodes.SUCCESS;
             }
+            if (!world.isRemote) {
+                System.out.println("[AR SD Assembler] status=" + status
+                        + " thrust=" + getThrust()
+                        + " dryWeight=" + stats.getWeight_NoFuel()
+                        + " monoCap=" + stats.getFuelCapacity(FuelType.LIQUID_MONOPROPELLANT)
+                        + " monoRate=" + stats.getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT)
+                        + " monoEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_MONOPROPELLANT)
+                        + " biCap=" + stats.getFuelCapacity(FuelType.LIQUID_BIPROPELLANT)
+                        + " biRate=" + stats.getBaseFuelRate(FuelType.LIQUID_BIPROPELLANT)
+                        + " biEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_BIPROPELLANT)
+                        + " oxCap=" + stats.getFuelCapacity(FuelType.LIQUID_OXIDIZER)
+                        + " oxRate=" + stats.getBaseFuelRate(FuelType.LIQUID_OXIDIZER)
+                        + " oxEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_OXIDIZER)
+                        + " nucCap=" + stats.getFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID)
+                        + " nucRate=" + stats.getBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID)
+                        + " nucEnough=" + hasEnoughFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID));
+            }
         }
         // Normalize bounds to avoid inverted AABBs on edge cases
         double minX = Math.min(actualMinX, actualMaxX);
@@ -394,6 +414,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         double maxX = Math.max(actualMinX, actualMaxX);
         double maxY = Math.max(actualMaxY, actualMinY);
         double maxZ = Math.max(actualMinZ, actualMaxZ);
+        syncStatsToClient();
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 

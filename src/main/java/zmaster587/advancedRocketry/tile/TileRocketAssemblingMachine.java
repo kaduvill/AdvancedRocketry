@@ -311,24 +311,25 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     @Override
     public void performFunction() {
-
-        if (!isScanning()) return; 
+        if (!isScanning()) return;
         if (progress >= (totalProgress * MAXSCANDELAY)) {
             if (!world.isRemote) {
-                if (building)
+                if (building) {
                     assembleRocket();
-                else
+                } else {
                     scanRocket(world, pos, bbCache);
+                }
             }
             totalProgress = -1;
             progress = 0;
             prevProgress = 0;
-            building = false; //Done building
-
-            //TODO call function instead
-            if (thrustText != null)
+            building = false; // Done building/scanning
+            if (!world.isRemote) {
+                syncStatsToClient();
+            }
+            if (thrustText != null) {
                 updateText();
-
+            }
         }
 
         progress++;
@@ -927,9 +928,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         }
     }
 
-    private void syncStatsToClient() {
+    protected void syncStatsToClient() {
         if (world == null || world.isRemote) {return;}
-
         markDirty();
         IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
@@ -1203,9 +1203,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         modules.add(errorText = new ModuleText(5, 84, "", 0xFFFFFF22));
 
         updateText();
-
-        for (int i = 0; i < 19; i++)
-            modules.add(new ModuleSync(i, this));
         return modules;
     }
 
