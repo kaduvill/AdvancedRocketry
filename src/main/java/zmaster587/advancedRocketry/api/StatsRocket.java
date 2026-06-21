@@ -217,7 +217,6 @@ public class StatsRocket {
      */
     public void addEngineLocation(float x, float y, float z) {
         //We want to be in the center of the block
-        //System.out.println("ADD engine at "+x+":"+y+":"+z);
         engineLoc.add(new Vector3F<>(x, y, z));
     }
 

@@ -38,7 +38,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
     @Override
     public AxisAlignedBB getRocketPadBounds(World world, BlockPos pos2) {
         EnumFacing direction = RotatableBlock.getFront(world.getBlockState(pos2)).getOpposite();
-        int xMin, zMin, xMax, zMax, yMax, yMin;
+        int xMin, zMin, xMax, zMax, yMax;
         int yCurrent = pos2.getY();
         int xCurrent = pos2.getX();
         int zCurrent = pos2.getZ();
@@ -101,10 +101,8 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         AxisAlignedBB rocketBB = scanRocket(world, getPos(), bbCache);
         if (status != ErrorCodes.SUCCESS || rocketBB == null) return;
 
-        // Remove replaceables **nside the tight box*
         removeReplaceableBlocks(rocketBB);
-
-        // Cut the world using the **tight** AABB
+        // Cut the world using the tight AABB
         final StorageChunk storageChunk;
         try {
             storageChunk = StorageChunk.cutWorldBB(world, rocketBB);
@@ -112,7 +110,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             return;
         }
 
-        // Spawn the SD rocket, centered from the *rescanned* bbox
+        // Spawn the SD rocket, centered from the rescanned bbox
         final double cx = rocketBB.minX + (rocketBB.maxX - rocketBB.minX) / 2f + 0.5f;
         final double cz = rocketBB.minZ + (rocketBB.maxZ - rocketBB.minZ) / 2f + 0.5f;
         final double cy = this.getPos().getY();
