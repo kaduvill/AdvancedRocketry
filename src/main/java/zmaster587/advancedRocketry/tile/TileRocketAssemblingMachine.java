@@ -1574,13 +1574,11 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         if (baseRate <= 0) {
             return actualRate;
         }
-
         // If fuel is already known or inserted, use the actual synced rate.
         // This handles packs with multiple valid fluids, e.g. water;5 and rocketfuel;10.
         if (actualRate > 0 && (stats.getFuelAmount(type) > 0 || hasKnownFuelFluid(type) || actualRate != baseRate)) {
             return actualRate;
         }
-
         // Empty/unselected fuel: use conservative expected burn rate.
         // This avoids under-reporting before the player inserts fuel.
         return Math.round(baseRate * getMaxRegisteredFuelMultiplier(type));

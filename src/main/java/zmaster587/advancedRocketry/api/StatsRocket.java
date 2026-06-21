@@ -246,7 +246,6 @@ public class StatsRocket {
             stat.setFuelCapacity(type, this.getFuelCapacity(type));
             stat.setBaseFuelRate(type, this.getBaseFuelRate(type));
         }
-
         stat.pilotSeatPos = new HashedBlockPosition(this.pilotSeatPos.x, this.pilotSeatPos.y, this.pilotSeatPos.z);
         stat.passengerSeats.addAll(passengerSeats);
         stat.engineLoc = new ArrayList<>(engineLoc);
@@ -277,7 +276,6 @@ public class StatsRocket {
                     return fuelNuclearWorkingFluid;
             }
         }
-
         return 0;
     }
 
@@ -304,7 +302,6 @@ public class StatsRocket {
                     return fuelCapacityNuclearWorkingFluid;
             }
         }
-
         return 0;
     }
 
@@ -332,7 +329,6 @@ public class StatsRocket {
             case NUCLEAR_WORKING_FLUID:
                 return fuelRateNuclearWorkingFluid;
         }
-
         return 0;
     }
 
@@ -673,11 +669,9 @@ public class StatsRocket {
                 locs[i] = vec.x;
                 locs[i + 1] = vec.y;
                 locs[i + 2] = vec.z;
-
             }
             stats.setIntArray("passengerSeats", locs);
         }
-
         nbt.setTag(TAGNAME, stats);
     }
 
@@ -723,7 +717,6 @@ public class StatsRocket {
             this.fuelBaseRateIon = stats.getInteger("fuelBaseRateIon");
             this.fuelBaseRateNuclearWorkingFluid = (int)stats.getFloat("fuelBaseRateNuclearWorkingFluid");
             this.fuelBaseRateWarp = stats.getInteger("fuelBaseRateWarp");
-
 
             if (stats.hasKey("dynStats")) {
                 NBTTagCompound dynStats = stats.getCompoundTag("dynStats");
