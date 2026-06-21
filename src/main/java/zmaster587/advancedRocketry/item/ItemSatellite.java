@@ -131,6 +131,10 @@ public class ItemSatellite extends ItemIdWithName {
 
     }
 
+    private static String formatWeight(float weight) {
+        return String.format(Locale.ROOT, "%.2f", weight);
+    }
+
     @Override
     public void addInformation(@Nonnull ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
         // Assembled = has properties AND an assigned ID (-1 means unassigned)
@@ -154,21 +158,21 @@ public class ItemSatellite extends ItemIdWithName {
             if (SatelliteProperties.Property.BATTERY.isOfType(props.getPropertyFlag())) {
                 powerStorage = props.getPowerStorage();
                 list.add((powerStorage > 0)
-                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwr") + powerStorage
+                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwr") + " "  + powerStorage
                     : ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nopwr"));
             }
 
             if (SatelliteProperties.Property.POWER_GEN.isOfType(props.getPropertyFlag())) {
                 powerGeneration = props.getPowerGeneration();
                 list.add((powerGeneration > 0)
-                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwrgen") + powerGeneration
+                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwrgen") + " "  + powerGeneration
                     : ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nopwrgen"));
             }
 
             if (SatelliteProperties.Property.DATA.isOfType(props.getPropertyFlag())) {
                 dataStorage = props.getMaxDataStorage();
                 list.add((dataStorage > 0)
-                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") + ZUtils.formatNumber(dataStorage)
+                    ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") + " "  + ZUtils.formatNumber(dataStorage)
                     : ChatFormatting.YELLOW + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nodata"));
             }
             // Data gen line only meaningful when the satellite has BOTH power generation and data storage.
@@ -180,12 +184,12 @@ public class ItemSatellite extends ItemIdWithName {
             }
             weight = props.getWeight();
             list.add((weight > 0f)
-                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.weight") + weight
+                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.weight") + " "  + formatWeight(weight)
                 : ChatFormatting.YELLOW + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.noweight"));
             return;
         }
 
-        // --- Preview for unassembled chassis ---
+        // Preview for unassembled chassis
         EmbeddedInventory inv = readInvFromNBT(stack);
 
         boolean hasParts = false;
@@ -246,16 +250,16 @@ public class ItemSatellite extends ItemIdWithName {
         powerStor += 720;
 
         // Always show power storage in preview (even if no battery modules are installed)
-        list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwr") + powerStor);
+        list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwr") + " " + powerStor);
 
         if (SatelliteProperties.Property.POWER_GEN.isOfType(flags)) {
             list.add((powerGen > 0)
-                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwrgen") + powerGen
+                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.pwrgen") + " " + powerGen
                 : ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nopwrgen"));
         }
         if (SatelliteProperties.Property.DATA.isOfType(flags)) {
             list.add((dataMax > 0)
-                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") + ZUtils.formatNumber(dataMax)
+                ? LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") + " "  + ZUtils.formatNumber(dataMax)
                 : ChatFormatting.YELLOW + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nodata"));
         }
         // Preview data gen line (same semantics + same formula as runtime)
@@ -263,7 +267,7 @@ public class ItemSatellite extends ItemIdWithName {
             list.add(makeDataGenLine(calcDataPerSecond(powerGen)));
         }       
         if (weight > 0f) {
-            list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.weight") + weight);
+            list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.weight") + " "  + formatWeight(weight));
         }
 
         // Footer LAST

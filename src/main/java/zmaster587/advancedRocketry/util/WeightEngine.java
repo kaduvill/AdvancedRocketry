@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
@@ -23,6 +24,7 @@ import zmaster587.advancedRocketry.block.BlockFuelTank;
 import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
 import zmaster587.advancedRocketry.block.BlockRocketMotor;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
+import zmaster587.libVulpes.api.LibVulpesItems;
 
 import java.io.File;
 import java.io.FileReader;
@@ -56,6 +58,12 @@ public enum WeightEngine {
     private static final double DEFAULT_NUCLEAR_WORKING_FLUID_WEIGHT = 5.0E-4D;
 
     private static final double DEFAULT_CHIP_WEIGHT = 0.05D;
+
+    private static final double DEFAULT_SATELLITE_SOLAR_PANEL_WEIGHT = 0.1D;
+    private static final double DEFAULT_SATELLITE_SOLAR_PANEL_LARGE_WEIGHT = 0.4D;
+    private static final double DEFAULT_SATELLITE_BATTERY_WEIGHT = 0.1D;
+    private static final double DEFAULT_SATELLITE_BATTERY_LARGE_WEIGHT = 0.4D;
+    private static final double DEFAULT_SATELLITE_DATA_UNIT_WEIGHT = 0.05D;
 
     private static final Map<String, Double> ROCKET_BLOCK_WEIGHTS = createRocketBlockWeights();
 
@@ -91,8 +99,6 @@ public enum WeightEngine {
         map.put("advancedrocketry:seat", DEFAULT_SEAT_WEIGHT);
 
         map.put("advancedrocketry:servicemonitor", DEFAULT_ITEM_WEIGHT);
-        map.put("advancedrocketry:dataunit", DEFAULT_ITEM_WEIGHT);
-        map.put("advancedrocketry:satellitepowersource", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:satellite", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:structuretower", DEFAULT_ITEM_WEIGHT);
 
@@ -111,6 +117,11 @@ public enum WeightEngine {
 
         String registryName = stack.getItem().getRegistryName().toString();
 
+        Double satelliteComponentWeight = getDefaultSatelliteComponentWeight(stack);
+        if (satelliteComponentWeight != null) {
+            return (float) (satelliteComponentWeight * stack.getCount());
+        }
+
         Double rocketBlockWeight = getDefaultRocketBlockWeight(stack, registryName);
         if (rocketBlockWeight != null) {
             return (float) (rocketBlockWeight * stack.getCount());
@@ -120,9 +131,35 @@ public enum WeightEngine {
         if (jsonWeight >= 0) {
             return (float) (jsonWeight * stack.getCount());
         }
-
         weights.put(registryName, DEFAULT_ITEM_WEIGHT);
         return (float) (DEFAULT_ITEM_WEIGHT * stack.getCount());
+    }
+
+    private Double getDefaultSatelliteComponentWeight(ItemStack stack) {
+        if (stack.getItem() == AdvancedRocketryItems.itemSatellitePowerSource) {
+            switch (stack.getMetadata()) {
+                case 0:
+                    return DEFAULT_SATELLITE_SOLAR_PANEL_WEIGHT;
+                case 1:
+                    return DEFAULT_SATELLITE_SOLAR_PANEL_LARGE_WEIGHT;
+                default:
+                    return DEFAULT_SATELLITE_SOLAR_PANEL_WEIGHT;
+            }
+        }
+        if (stack.getItem() == LibVulpesItems.itemBattery) {
+            switch (stack.getMetadata()) {
+                case 0:
+                    return DEFAULT_SATELLITE_BATTERY_WEIGHT;
+                case 1:
+                    return DEFAULT_SATELLITE_BATTERY_LARGE_WEIGHT;
+                default:
+                    return DEFAULT_SATELLITE_BATTERY_WEIGHT;
+            }
+        }
+        if (stack.getItem() == AdvancedRocketryItems.itemDataUnit) {
+            return DEFAULT_SATELLITE_DATA_UNIT_WEIGHT;
+        }
+        return null;
     }
 
     private Double getDefaultRocketBlockWeight(ItemStack stack, String registryName) {
