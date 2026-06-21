@@ -7,7 +7,11 @@ Changelog 2.2.11
   - Fixed weight, thrust, acceleration, and fuel display in the assembler GUI.
   - Fixed fuel-rate display. Configured fuel multipliers are now shown before fueling.
   - Fixed station launches using planet orbit height for fuel checks.
-  - Reduced Weight of Fuel by 0.5x
+
+- Weight Engine
+  - Reduced Weight of Fuel by ~0.5x for better scaling
+  - Tuned other rocket components
+  - Satellite Components have different weights, the best satellites will now require bigger rockets to reach orbit
 
 - Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
   - Added slot filtering and tooltip feedback where relevant:
