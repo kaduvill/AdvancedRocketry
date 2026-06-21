@@ -44,13 +44,13 @@ public enum WeightEngine {
     private static final double DEFAULT_ROCKET_MOTOR_WEIGHT = 2.0D;
     private static final double DEFAULT_ADV_ROCKET_MOTOR_WEIGHT = 1.8D;
     private static final double DEFAULT_PRESSURE_TANK_WEIGHT = 5.0D;
-    private static final double DEFAULT_GUIDANCE_COMPUTER_WEIGHT = 1.8D;
+    private static final double DEFAULT_GUIDANCE_COMPUTER_WEIGHT = 1.9D;
     private static final double DEFAULT_SATELLITE_HATCH_WEIGHT = 5.0D;
 
-    private static final double DEFAULT_INTAKE_WEIGHT = 5.0D;
+    private static final double DEFAULT_INTAKE_WEIGHT = 12.0D; // this should always be used in spacedim(giving 0.1g)
     private static final double DEFAULT_DRILL_WEIGHT = 0.8D;
     private static final double DEFAULT_NUCLEARCORE_WEIGHT = 8.0D;
-    private static final double DEFAULT_SEAT_WEIGHT = 1.6D; //not the seat in itself, but "Manned launches" needs more fuel
+    private static final double DEFAULT_SEAT_WEIGHT = 1.8D; //not the seat in itself, but "Manned launches" needs more fuel
 
     private static final double DEFAULT_BIPROPELLANT_FUEL_WEIGHT = 2.0E-4D;
     private static final double DEFAULT_OXIDIZER_WEIGHT = 2.0E-4D;

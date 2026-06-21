@@ -625,13 +625,13 @@ public class StatsRocket {
         stats.setInteger("fuelRateNuclearWorkingFluid", this.fuelRateNuclearWorkingFluid);
         stats.setInteger("fuelRateWarp", this.fuelRateWarp);
 
-        stats.setFloat("fuelBaseRateMonopropellant", this.fuelBaseRateMonopropellant);
-        stats.setFloat("fuelBaseRateBipropellant", this.fuelBaseRateBipropellant);
-        stats.setFloat("fuelBaseRateOxidizer", this.fuelBaseRateOxidizer);
-        stats.setFloat("fuelBaseRateImpulse", this.fuelBaseRateImpulse);
-        stats.setFloat("fuelBaseRateIon", this.fuelBaseRateIon);
-        stats.setFloat("fuelBaseRateNuclearWorkingFluid", this.fuelBaseRateNuclearWorkingFluid);
-        stats.setFloat("fuelBaseRateWarp", this.fuelBaseRateWarp);
+        stats.setInteger("fuelBaseRateMonopropellant", this.fuelBaseRateMonopropellant);
+        stats.setInteger("fuelBaseRateBipropellant", this.fuelBaseRateBipropellant);
+        stats.setInteger("fuelBaseRateOxidizer", this.fuelBaseRateOxidizer);
+        stats.setInteger("fuelBaseRateImpulse", this.fuelBaseRateImpulse);
+        stats.setInteger("fuelBaseRateIon", this.fuelBaseRateIon);
+        stats.setInteger("fuelBaseRateNuclearWorkingFluid", this.fuelBaseRateNuclearWorkingFluid);
+        stats.setInteger("fuelBaseRateWarp", this.fuelBaseRateWarp);
 
         NBTTagCompound dynStats = new NBTTagCompound();
         for (String key : statTags.keySet()) {
@@ -711,12 +711,12 @@ public class StatsRocket {
             this.fuelRateNuclearWorkingFluid = stats.getInteger("fuelRateNuclearWorkingFluid");
             this.fuelRateWarp = stats.getInteger("fuelRateWarp");
 
-            this.fuelBaseRateMonopropellant = (int)stats.getFloat("fuelBaseRateMonopropellant");
-            this.fuelBaseRateBipropellant = (int)stats.getFloat("fuelBaseRateBipropellant");
-            this.fuelBaseRateOxidizer = (int)stats.getFloat("fuelBaseRateOxidizer");
+            this.fuelBaseRateMonopropellant = stats.getInteger("fuelBaseRateMonopropellant");
+            this.fuelBaseRateBipropellant = stats.getInteger("fuelBaseRateBipropellant");
+            this.fuelBaseRateOxidizer = stats.getInteger("fuelBaseRateOxidizer");
             this.fuelBaseRateImpulse = stats.getInteger("fuelBaseRateImpulse");
             this.fuelBaseRateIon = stats.getInteger("fuelBaseRateIon");
-            this.fuelBaseRateNuclearWorkingFluid = (int)stats.getFloat("fuelBaseRateNuclearWorkingFluid");
+            this.fuelBaseRateNuclearWorkingFluid = stats.getInteger("fuelBaseRateNuclearWorkingFluid");
             this.fuelBaseRateWarp = stats.getInteger("fuelBaseRateWarp");
 
             if (stats.hasKey("dynStats")) {

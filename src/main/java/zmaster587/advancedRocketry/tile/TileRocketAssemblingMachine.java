@@ -567,8 +567,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         stats.setDrillingPower(drillPower);
 
         //Total stats, used to check if the user has tried to apply two or more types of thrust/fuel
-        int totalFuel = fuelCapacityBipropellant + fuelCapacityNuclearWorkingFluid + fuelCapacityMonopropellant;
-        int totalFuelUse = bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
+        long totalFuel = (long) fuelCapacityBipropellant + fuelCapacityNuclearWorkingFluid + fuelCapacityMonopropellant;
+        long totalFuelUse = (long) bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
 
         //Set status
         if (invalidBlock) {

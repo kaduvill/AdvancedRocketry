@@ -363,8 +363,8 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             stats.setStatTag("liquidCapacity", fluidCapacity);
 
             // Cross-family checks
-            int totalFuel    = fuelCapacityBipropellant + fuelCapacityNuclearWorkingFluid + fuelCapacityMonopropellant;
-            int totalFuelUse = bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
+            long totalFuel = (long) fuelCapacityBipropellant + fuelCapacityNuclearWorkingFluid + fuelCapacityMonopropellant;
+            long totalFuelUse = (long) bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
 
             if (invalidBlock) {
                 status = ErrorCodes.INVALIDBLOCK;
