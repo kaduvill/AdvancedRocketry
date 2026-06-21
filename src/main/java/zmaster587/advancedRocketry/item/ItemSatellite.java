@@ -196,7 +196,6 @@ public class ItemSatellite extends ItemIdWithName {
             list.add(ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.empty"));
             return;
         }
-
         int flags = 0;
         int powerGen = 0, powerStor = 0, dataMax = 0;
         float weight = 0f;
@@ -221,10 +220,8 @@ public class ItemSatellite extends ItemIdWithName {
                 }
             }
         }
-
         // Preview: show for "type empty" OR data collectors
         showDataGenPreview = satType.isEmpty() || (satBase instanceof SatelliteData);
-
 
         // Modules: stats + weight
         for (int i = FIRST_MOD_SLOT; i <= LAST_MOD_SLOT; i++) {
@@ -272,5 +269,4 @@ public class ItemSatellite extends ItemIdWithName {
         // Footer LAST
         list.add(ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.unassembled"));
     }
-
 }

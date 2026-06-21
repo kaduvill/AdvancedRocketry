@@ -22,6 +22,7 @@ import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
 import zmaster587.advancedRocketry.block.BlockFuelTank;
 import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
 import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 
 import java.io.File;
 import java.io.FileReader;
@@ -37,21 +38,24 @@ public enum WeightEngine {
     private static final double DEFAULT_ITEM_WEIGHT = 0.1D;
     private static final double DEFAULT_GENERIC_FLUID_WEIGHT = 0.001D;
 
-    private static final double DEFAULT_ROCKET_TANK_WEIGHT = 0.2D;
+    private static final double DEFAULT_ROCKET_TANK_WEIGHT = 0.3D;
     private static final double DEFAULT_ROCKET_MOTOR_WEIGHT = 2.0D;
+    private static final double DEFAULT_ADV_ROCKET_MOTOR_WEIGHT = 1.8D;
     private static final double DEFAULT_PRESSURE_TANK_WEIGHT = 5.0D;
     private static final double DEFAULT_GUIDANCE_COMPUTER_WEIGHT = 1.8D;
     private static final double DEFAULT_SATELLITE_HATCH_WEIGHT = 5.0D;
 
     private static final double DEFAULT_INTAKE_WEIGHT = 5.0D;
     private static final double DEFAULT_DRILL_WEIGHT = 0.8D;
-
     private static final double DEFAULT_NUCLEARCORE_WEIGHT = 8.0D;
+    private static final double DEFAULT_SEAT_WEIGHT = 1.6D; //not the seat in itself, but "Manned launches" needs more fuel
 
     private static final double DEFAULT_BIPROPELLANT_FUEL_WEIGHT = 2.0E-4D;
-    private static final double DEFAULT_OXIDIZER_WEIGHT = 3.0E-4D;
-    private static final double DEFAULT_MONOPROPELLANT_WEIGHT = 5.0E-4D;
+    private static final double DEFAULT_OXIDIZER_WEIGHT = 2.0E-4D;
+    private static final double DEFAULT_MONOPROPELLANT_WEIGHT = 4.0E-4D;
     private static final double DEFAULT_NUCLEAR_WORKING_FLUID_WEIGHT = 5.0E-4D;
+
+    private static final double DEFAULT_CHIP_WEIGHT = 0.05D;
 
     private static final Map<String, Double> ROCKET_BLOCK_WEIGHTS = createRocketBlockWeights();
 
@@ -72,9 +76,9 @@ public enum WeightEngine {
         map.put("advancedrocketry:nuclearfueltank", DEFAULT_ROCKET_TANK_WEIGHT);
 
         map.put("advancedrocketry:rocketmotor", DEFAULT_ROCKET_MOTOR_WEIGHT);
-        map.put("advancedrocketry:advrocketmotor", DEFAULT_ROCKET_MOTOR_WEIGHT);
+        map.put("advancedrocketry:advrocketmotor", DEFAULT_ADV_ROCKET_MOTOR_WEIGHT);
         map.put("advancedrocketry:bipropellantrocketmotor", DEFAULT_ROCKET_MOTOR_WEIGHT);
-        map.put("advancedrocketry:advbipropellantrocketmotor", DEFAULT_ROCKET_MOTOR_WEIGHT);
+        map.put("advancedrocketry:advbipropellantrocketmotor", DEFAULT_ADV_ROCKET_MOTOR_WEIGHT);
         map.put("advancedrocketry:nuclearrocketmotor", DEFAULT_ROCKET_MOTOR_WEIGHT);
 
         map.put("advancedrocketry:liquidtank", DEFAULT_PRESSURE_TANK_WEIGHT);
@@ -84,14 +88,18 @@ public enum WeightEngine {
         map.put("advancedrocketry:intake", DEFAULT_INTAKE_WEIGHT);
         map.put("advancedrocketry:drill", DEFAULT_DRILL_WEIGHT);
         map.put("advancedrocketry:nuclearcore", DEFAULT_NUCLEARCORE_WEIGHT);
+        map.put("advancedrocketry:seat", DEFAULT_SEAT_WEIGHT);
 
         map.put("advancedrocketry:servicemonitor", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:dataunit", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:satellitepowersource", DEFAULT_ITEM_WEIGHT);
-        map.put("advancedrocketry:seat", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:satellite", DEFAULT_ITEM_WEIGHT);
-        map.put("advancedrocketry:spacestationchip", DEFAULT_ITEM_WEIGHT);
         map.put("advancedrocketry:structuretower", DEFAULT_ITEM_WEIGHT);
+
+        map.put("advancedrocketry:spacestationchip", DEFAULT_CHIP_WEIGHT);
+        map.put("advancedrocketry:planetidchip", DEFAULT_CHIP_WEIGHT);
+        map.put("advancedrocketry:asteroidchip", DEFAULT_CHIP_WEIGHT);
+        map.put("libvulpes:linker", DEFAULT_CHIP_WEIGHT);
 
         return map;
     }
@@ -203,9 +211,8 @@ public enum WeightEngine {
             return 0;
         }
         float weight = 0;
-        if (te == null) {
-            return weight;
-        }
+        if (te == null) {return weight;}
+        if (te instanceof TileSatelliteHatch) {return 0;} //sat hatch already counted in special sat-case
 
         IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (capability != null) {
