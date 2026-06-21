@@ -551,6 +551,7 @@ public class StatsRocket {
         for (FuelType type : FuelType.values()) {
             setFuelAmount(type, 0);
             setFuelRate(type, 0);
+            setBaseFuelRate(type, 0);
             setFuelCapacity(type, 0);
         }
 
