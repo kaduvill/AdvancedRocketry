@@ -23,17 +23,11 @@ public class DimensionCompat {
     public static int getDefaultSpawnDimension() {
         try {
             if (JEDSpawnID != null && JEDEnableOverride != null && (boolean) JEDEnableOverride.get(null)) {
-
                 return (int) JEDSpawnID.get(null);
-
             }
         } catch (Exception e) {
-            //No nonsense
             return 0;
         }
-
-
         return 0;
     }
-
 }
