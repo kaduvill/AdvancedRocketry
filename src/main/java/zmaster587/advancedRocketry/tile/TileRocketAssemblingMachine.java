@@ -158,12 +158,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         unregisterFromBus();
         relinkRetries = 0;
         nextRelinkAttempt = 0L;
-        // Clear caches
-        bbCache = null;
-        stats.reset();
-        blockPos.clear();
     }
-
 
     private void unregisterFromBus() {
         if (registeredBus) {
@@ -330,15 +325,13 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             if (thrustText != null) {
                 updateText();
             }
+            return;
         }
-
         progress++;
-
         if (!this.world.isRemote && this.energy.getUniversalEnergyStored() < getPowerPerOperation() && progress - prevProgress > 0) {
             prevProgress = progress;
             PacketHandler.sendToNearby(new PacketMachine(this, (byte) 2), this.world.provider.getDimension(), this.getPos(), 32);
         }
-
     }
 
     @Override
@@ -942,29 +935,27 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
         if (id == 0) {
-
+            if (world.isRemote || isScanning())
+                return;
             bbCache = getRocketPadBounds(world, pos);
             if (!canScan())
                 return;
-
-            totalProgress = (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10);
-            this.markDirty();
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+            totalProgress = Math.max(1, (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10));
+            progress = 0;
+            prevProgress = 0;
+            building = false;
+            syncStatsToClient();
         } else if (id == 1) {
-
-            if (isScanning())
+            if (world.isRemote || isScanning())
                 return;
-
             building = true;
-
             bbCache = getRocketPadBounds(world, pos);
             if (!canScan())
                 return;
-
-            totalProgress = (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10);
-            this.markDirty();
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
-
+            totalProgress = Math.max(1, (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10));
+            progress = 0;
+            prevProgress = 0;
+            syncStatsToClient();
         } else if (id == 2) {
             energy.setEnergyStored(nbt.getInteger("pwr"));
             this.progress = nbt.getInteger("tik");
