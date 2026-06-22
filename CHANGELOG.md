@@ -5,8 +5,9 @@ Changelog 2.2.11
   - Improved Rocket Assembler stat sync, consistency and flickering GUI preview.
   - Fixed rocket gravity checks. Rockets now use the source dimension gravity.
   - Fixed weight, thrust, acceleration, and fuel display in the assembler GUI.
-  - Fixed fuel-rate display. Configured fuel multipliers are now shown before fueling.
-  - Fixed station launches using planet orbit height for fuel checks.
+  - Fixed launching from spacestation using planet orbit height for fuel checks.
+  - Fixed Building status errorcode not getting overwritten by sync
+    - removed verbose syncing for proper syncinglogic
 
 - Weight Engine
   - Reduced Weight of Fuel by ~0.5x for better scaling
