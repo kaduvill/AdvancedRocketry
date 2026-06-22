@@ -107,6 +107,8 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         try {
             storageChunk = StorageChunk.cutWorldBB(world, rocketBB);
         } catch (Throwable t) { // covers NegativeArraySizeException, etc.
+            status = ErrorCodes.FAIL_CUT;
+            syncStatsToClient();
             return;
         }
 
@@ -388,23 +390,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                 status = ErrorCodes.NOFUEL;
             } else {
                 status = ErrorCodes.SUCCESS;
-            }
-            if (!world.isRemote) {
-                System.out.println("[AR SD Assembler] status=" + status
-                        + " thrust=" + getThrust()
-                        + " dryWeight=" + stats.getWeight_NoFuel()
-                        + " monoCap=" + stats.getFuelCapacity(FuelType.LIQUID_MONOPROPELLANT)
-                        + " monoRate=" + stats.getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT)
-                        + " monoEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_MONOPROPELLANT)
-                        + " biCap=" + stats.getFuelCapacity(FuelType.LIQUID_BIPROPELLANT)
-                        + " biRate=" + stats.getBaseFuelRate(FuelType.LIQUID_BIPROPELLANT)
-                        + " biEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_BIPROPELLANT)
-                        + " oxCap=" + stats.getFuelCapacity(FuelType.LIQUID_OXIDIZER)
-                        + " oxRate=" + stats.getBaseFuelRate(FuelType.LIQUID_OXIDIZER)
-                        + " oxEnough=" + hasEnoughFuelCapacity(FuelType.LIQUID_OXIDIZER)
-                        + " nucCap=" + stats.getFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID)
-                        + " nucRate=" + stats.getBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID)
-                        + " nucEnough=" + hasEnoughFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID));
             }
         }
         // Normalize bounds to avoid inverted AABBs on edge cases

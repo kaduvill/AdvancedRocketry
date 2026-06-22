@@ -37,6 +37,9 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
     }
 
     @Override
+    protected boolean handlesRocketLifecycleEvents() {return false;}
+
+    @Override
     public boolean canScan() {
         if (!super.canScan())
             return false;
@@ -102,60 +105,54 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
     }
 
-
-
     @Override
     public void assembleRocket() {
-        if (!world.isRemote) {
-            if (bbCache == null)
-                return;
-            //Need to scan again b/c something may have changed
-            scanRocket(world, pos, bbCache);
+        if (world.isRemote || bbCache == null) return;
+        //Need to scan again b/c something may have changed
+        scanRocket(world, pos, bbCache);
 
-            if (status != ErrorCodes.SUCCESS_STATION)
-                return;
-            StorageChunk storageChunk;
-            try {
-                storageChunk = StorageChunk.cutWorldBB(world, bbCache);
-            } catch (NegativeArraySizeException e) {
-                status = ErrorCodes.FAIL_CUT;
-                markDirty();
-                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
-                return;
-            }
-
-            ItemStack outputStack;
-            SpaceStationObject spaceStationObject = null;
-            if (storedId == null) {
-                spaceStationObject = new SpaceStationObject();
-                SpaceObjectManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
-
-                outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
-                ItemStationChip.setUUID(outputStack, spaceStationObject.getId());
-
-            } else {
-                outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
-                ItemStationChip.setUUID(outputStack, (int) (long) storedId);
-            }
-
-            ((ItemPackedStructure) outputStack.getItem()).setStructure(outputStack, storageChunk);
-
-            inventory.setInventorySlotContents(2, outputStack);
-
-            if (storedId == null) {
-                ItemStack stack = new ItemStack(AdvancedRocketryItems.itemSpaceStationChip, 1);
-                ItemStationChip.setUUID(stack, spaceStationObject.getId());
-                inventory.setInventorySlotContents(3, stack);
-            }
-
-
-            this.status = ErrorCodes.FINISHED;
-            storedId = null;
-            inventory.decrStackSize(0, 1);
-            inventory.decrStackSize(1, 1);
-            this.markDirty();
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        if (status != ErrorCodes.SUCCESS_STATION) {
+            syncStatsToClient();
+            return;
         }
+        StorageChunk storageChunk;
+        try {
+            storageChunk = StorageChunk.cutWorldBB(world, bbCache);
+        } catch (NegativeArraySizeException e) {
+            status = ErrorCodes.FAIL_CUT;
+            syncStatsToClient();
+            return;
+        }
+
+        ItemStack outputStack;
+        SpaceStationObject spaceStationObject = null;
+        if (storedId == null) {
+            spaceStationObject = new SpaceStationObject();
+            SpaceObjectManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
+
+            outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
+            ItemStationChip.setUUID(outputStack, spaceStationObject.getId());
+
+        } else {
+            outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
+            ItemStationChip.setUUID(outputStack, (int) (long) storedId);
+        }
+
+        ((ItemPackedStructure) outputStack.getItem()).setStructure(outputStack, storageChunk);
+
+        inventory.setInventorySlotContents(2, outputStack);
+
+        if (storedId == null) {
+            ItemStack stack = new ItemStack(AdvancedRocketryItems.itemSpaceStationChip, 1);
+            ItemStationChip.setUUID(stack, spaceStationObject.getId());
+            inventory.setInventorySlotContents(3, stack);
+        }
+
+        this.status = ErrorCodes.FINISHED;
+        storedId = null;
+        inventory.decrStackSize(0, 1);
+        inventory.decrStackSize(1, 1);
+        syncStatsToClient();
     }
 
     @Override
@@ -228,7 +225,6 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
             if (storedId == 0) storedId = null;
         }
     }
-
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {

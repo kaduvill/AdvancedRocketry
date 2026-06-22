@@ -97,38 +97,44 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     private boolean registeredBus = false;
+    protected boolean handlesRocketLifecycleEvents() {return true;}
 
     @Override
     public void onLoad() {
-        if (!world.isRemote && !registeredBus) {
+        if (world == null || world.isRemote) {
+            return;
+        }
+        if (!handlesRocketLifecycleEvents()) {
+            return;
+        }
+        if (!registeredBus) {
             MinecraftForge.EVENT_BUS.register(this);
             registeredBus = true;
         }
-        if (!world.isRemote) {
-            relinkRetries = 15; // give it time
-            nextRelinkAttempt = world.getTotalWorldTime() + 20;
-            tryRelinkNow(); // best-effort first shot
-        }
-        if (world.isRemote) return;
+
+        relinkRetries = 15; // give it time
+        nextRelinkAttempt = world.getTotalWorldTime() + 20;
+        tryRelinkNow();
 
         // Recompute pad bounds and relink infra to any rockets already on the pad
         bbCache = getRocketPadBounds(world, pos);
-        if (bbCache != null) {
-            final AxisAlignedBB box = bbCache.grow(1.0E-4, 1.0E-4, 1.0E-4);
-            List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, box);
-            if (!rockets.isEmpty()) {
-                for (IInfrastructure infra : getConnectedInfrastructure()) {
-                    for (EntityRocketBase r : rockets) {
-                        if (infra instanceof zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) {
-                            ((zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) infra)
-                                    .markRocketFromAssembler(r);
-                        }
-                        r.linkInfrastructure(infra);
-                    }
+        if (bbCache == null) {
+            return;
+        }
+
+        final AxisAlignedBB box = bbCache.grow(1.0E-4, 1.0E-4, 1.0E-4);
+        List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, box);
+        if (rockets.isEmpty()) {return;}
+        for (IInfrastructure infra : getConnectedInfrastructure()) {
+            for (EntityRocketBase r : rockets) {
+                if (infra instanceof zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) {
+                    ((zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) infra)
+                            .markRocketFromAssembler(r);
                 }
+                r.linkInfrastructure(infra);
             }
         }
-    }  
+    }
 
     @Override
     public void invalidate() {
@@ -656,18 +662,18 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         final AxisAlignedBB rocketBB = normalize(scanBB);
         if (isEmptyAABB(rocketBB)) {
             status = ErrorCodes.FAIL_CUT;
+            syncStatsToClient();
             return;
         }
-
         // Remove replaceable/blacklisted blocks *inside the tightened bounds*
         removeReplaceableBlocks(rocketBB);
-
         // Cut the world using the tightened box (avoid pad air)
         final StorageChunk storageChunk;
         try {
             storageChunk = StorageChunk.cutWorldBB(world, rocketBB);
-        } catch (Throwable t) { // cover NegativeArraySizeException & other edge errors
+        } catch (Throwable t) { // covers NegativeArraySizeException, etc.
             status = ErrorCodes.FAIL_CUT;
+            syncStatsToClient();
             return;
         }
 
@@ -960,7 +966,10 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             energy.setEnergyStored(nbt.getInteger("pwr"));
             this.progress = nbt.getInteger("tik");
         } else if (id == 3) {
-            EntityRocket rocket = (EntityRocket) world.getEntityByID(nbt.getInteger("id"));
+            if (!handlesRocketLifecycleEvents() || world == null || world.isRemote) {return;}
+            net.minecraft.entity.Entity entity = world.getEntityByID(nbt.getInteger("id"));
+            if (!(entity instanceof EntityRocketBase)) {return;}
+            EntityRocketBase rocket = (EntityRocketBase) entity;
             for (IInfrastructure infrastructure : getConnectedInfrastructure()) {
                 rocket.linkInfrastructure(infrastructure);
             }
@@ -1446,6 +1455,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     @SubscribeEvent
     public void onRocketLand(RocketLandedEvent e) {
+        if (!handlesRocketLifecycleEvents()) return;
         if (world == null || e.world == null || e.world.isRemote || e.world != this.world) return;
         final net.minecraft.entity.Entity ent = e.getEntity();
         if (!(ent instanceof EntityRocketBase)) return;
@@ -1520,9 +1530,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     @Override
     public void update() {
-        super.update(); 
-        if (world.isRemote) return;
-
+        super.update();
+        if (world == null || world.isRemote) {return;}
+        if (!handlesRocketLifecycleEvents()) {return;}
         if (relinkRetries > 0 && world.getTotalWorldTime() >= nextRelinkAttempt) {
             if (tryRelinkNow()) {
                 relinkRetries = 0;
@@ -1534,6 +1544,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     private boolean tryRelinkNow() {
+        if (!handlesRocketLifecycleEvents()) return false;
+        if (world == null || world.isRemote) return false;
         if (bbCache == null) bbCache = getRocketPadBounds(world, pos);
         if (bbCache == null) return false;
 
