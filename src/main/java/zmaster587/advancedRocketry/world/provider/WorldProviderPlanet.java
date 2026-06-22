@@ -243,7 +243,6 @@ public class WorldProviderPlanet extends WorldProvider implements IPlanetaryProv
                 return getDimension();
             }
         }
-
         return DimensionCompat.getDefaultSpawnDimension();
     }
 
