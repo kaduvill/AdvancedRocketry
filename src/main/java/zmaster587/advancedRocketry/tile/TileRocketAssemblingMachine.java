@@ -1436,19 +1436,24 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return list;
     }
 
+    //horizontal pad scan filter (helper)
+    private static final double ROCKET_LANDING_PREFILTER_RADIUS_SQ = 64.0D * 64.0D;
+    private boolean isRocketCloseEnoughForPadScan(EntityRocketBase rocket) {
+        final double dx = rocket.posX - (pos.getX() + 0.5D);
+        final double dz = rocket.posZ - (pos.getZ() + 0.5D);
+        return (dx * dx + dz * dz) <= ROCKET_LANDING_PREFILTER_RADIUS_SQ;
+    }
+
     @SubscribeEvent
     public void onRocketLand(RocketLandedEvent e) {
-        // Server/world guard
-        if (e.world.isRemote || e.world != this.world) return;
-
-        // Ensure we have pad bounds
-        bbCache = getRocketPadBounds(world, pos);
-        if (bbCache == null) return;
-
-        // Make sure the event entity is a rocket
+        if (world == null || e.world == null || e.world.isRemote || e.world != this.world) return;
         final net.minecraft.entity.Entity ent = e.getEntity();
         if (!(ent instanceof EntityRocketBase)) return;
         final EntityRocketBase landed = (EntityRocketBase) ent;
+        if (!isRocketCloseEnoughForPadScan(landed)) return;
+
+        bbCache = getRocketPadBounds(world, pos);
+        if (bbCache == null) return;
 
         // Quick membership test with tiny epsilon
         final AxisAlignedBB box = bbCache.grow(1.0E-4, 1.0E-4, 1.0E-4);
