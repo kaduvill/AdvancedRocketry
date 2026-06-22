@@ -165,7 +165,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return getFuelCapacity(FuelRegistry.FuelType.LIQUID_OXIDIZER) > 0;
     }
 
-
     public EntityRocket(World p_i1582_1_) {
         super(p_i1582_1_);
 
@@ -213,7 +212,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         planetSelectorProgress.setProps(dimCache);
     }
 
-
     @Override
     public void onSelected(Object sender) {
         if (sender instanceof ModulePlanetSelector) {
@@ -241,8 +239,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     private void clearPlanetSelectorCache() {
         dimCache = null;
         planetSelectorProgress.setProps(null);
-
-        // Optional but nice: drop GUI references so nothing keeps stale state
         container = null;
     }
 
@@ -284,7 +280,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
     }
 
-
     /**
      * @param blockState the blockstate to damage
      * @return the blockstate that the input blockstate turns into
@@ -319,7 +314,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     private void preloadDestinationChunks(int dimId, double x, double z, int radiusChunks, int holdSeconds) {
         if (world.isRemote) return;
-
         // Clean any previous
         releaseDestinationPreload();
 
@@ -360,7 +354,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
     }
 
-
     public void toggleRCS() {
         if (DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).isAsteroid()) {
             rcs_mode = !rcs_mode;
@@ -370,25 +363,20 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             rcs_mode = false;
             setRCS(false);
         }
-
     }
 
     public boolean getRCS() {
         return dataManager.get(RCS_MODE);
     }
-
     private void setRCS(boolean status) {
         dataManager.set(RCS_MODE, status);
     }
-
     public boolean getInSpaceFlight() {
         return dataManager.get(INSPACEFLIGHT);
     }
-
     private void setInSpaceFlight(boolean status) {
         dataManager.set(INSPACEFLIGHT, status);
     }
-
     public int getRCSRotateProgress() {
         return rcs_mode_counter;
     }
@@ -419,13 +407,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     public void disconnectInfrastructure(IInfrastructure infrastructure) {
         infrastructure.unlinkRocket();
         infrastructureCoords.remove(new HashedBlockPosition(((TileEntity) infrastructure).getPos()));
-
         if (!world.isRemote) {
             int[] pos = {((TileEntity) infrastructure).getPos().getX(), ((TileEntity) infrastructure).getPos().getY(), ((TileEntity) infrastructure).getPos().getZ()};
-
             NBTTagCompound nbt = new NBTTagCompound();
             nbt.setIntArray("pos", pos);
-            //PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, (byte)PacketType.DISCONNECTINFRASTRUCTURE.ordinal(), nbt), this);
         }
     }
 
@@ -453,7 +438,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 if (vec != null) {
 
                     ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x, vec.y, vec.z));
-
                     if (spaceObject != null) {
                         displayStr = LibVulpes.proxy.getLocalizedString("msg.entity.rocket.station") + spaceObject.getId();
 
@@ -465,7 +449,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     }
                 }
             } else if (dimid != Constants.INVALID_PLANET && dimid != SpaceObjectManager.WARPDIMID) {
-
                 boolean goingToOrbit = ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer().isEmpty();
 
                 if (goingToOrbit) {
@@ -507,7 +490,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
 
         if (isInOrbit() && !isInFlight()) {
-            //return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.2") + ((DESCENT_TIMER - this.ticksExisted) / 20);
             return super.getTextOverlay();
         }
         else if (!isInFlight())
@@ -530,14 +512,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         List<ItemStack> req = destProps.getRequiredArtifacts();
         if (req == null || req.isEmpty()) return ItemStack.EMPTY;
-
         // Contract: always exactly 1 artifact
         return req.get(0);
     }
 
     private boolean pilotHasArtifact(@Nullable EntityPlayer pilot, @Nonnull ItemStack req) {
         if (pilot == null || req.isEmpty()) return false;
-
         for (ItemStack have : pilot.inventory.mainInventory)  if (matchesRequirement(have, req)) return true;
         for (ItemStack have : pilot.inventory.armorInventory) if (matchesRequirement(have, req)) return true;
         for (ItemStack have : pilot.inventory.offHandInventory) if (matchesRequirement(have, req)) return true;
@@ -553,14 +533,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         int rMeta = req.getItemDamage();
         if (rMeta != OreDictionary.WILDCARD_VALUE && have.getItemDamage() != rMeta) return false;
 
-        // OPTIONAL: require NBT match if your artifact uses NBT (uncomment if needed)
+        // OPTIONAL: require NBT match if artifact uses NBT (uncomment if needed)
         // if (req.hasTagCompound() && !NBTTagCompound.areNBTEquals(req.getTagCompound(), have.getTagCompound())) return false;
 
         return have.getCount() >= req.getCount();
     }
 
-
-    
     private static String packReason(String key, Object... args) {
         if (args == null || args.length == 0) return key;
 
@@ -586,7 +564,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     );
                 }
             }
-
             // send key + args to monitoring station
             String packed = packReason(key, args);
             MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketAbortEvent(this, packed));
@@ -594,7 +571,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             this.dataManager.set(LAUNCH_COUNTER, -1);
         }
     }
-
 
     @Override
     public void setPosition(double x, double y,

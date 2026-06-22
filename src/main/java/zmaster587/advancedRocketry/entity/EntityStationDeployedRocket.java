@@ -57,7 +57,6 @@ public class EntityStationDeployedRocket extends EntityRocket {
     public EnumFacing forwardDirection;
     public HashedBlockPosition launchLocation;
     public Vec3d actualLaunchLocation;
-    boolean coastMode;
     private ModuleText atmText;
     private short gasId;
     private Ticket ticket;
