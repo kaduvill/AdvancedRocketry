@@ -244,11 +244,11 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     private float getPreviewFuelWeight(@Nonnull FuelType type) {
-        int amount = Math.max(stats.getFuelCapacity(type), stats.getFuelAmount(type));
-        if (amount <= 0) {
+        int capacity = stats.getFuelCapacity(type);
+        if (capacity <= 0) {
             return 0f;
         }
-        return WeightEngine.INSTANCE.getRocketPropellantWeight(type, amount);
+        return WeightEngine.INSTANCE.getRocketPropellantWeight(type, capacity);
     }
 
     private float getPreviewWetWeight() {
@@ -390,12 +390,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             if (rockets.size() == 1) {
                 EntityRocket rocket = rockets.get(0);
                 rocket.recalculateStats();
-
-                // Pull current fuel amounts from the rocket data manager into rocket.stats.
-                rocket.getFuelAmount(FuelType.LIQUID_MONOPROPELLANT);
-                rocket.getFuelAmount(FuelType.LIQUID_BIPROPELLANT);
-                rocket.getFuelAmount(FuelType.LIQUID_OXIDIZER);
-                rocket.getFuelAmount(FuelType.NUCLEAR_WORKING_FLUID);
 
                 this.stats = rocket.stats.copy();
                 if (!shouldKeepFinishedStatus()) {
@@ -710,12 +704,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) 0, nbtdata),
                 rocket.world.provider.getDimension(), this.pos, 64);
 
-        // Finish & link as before
-        stats.reset();
-        this.status = ErrorCodes.FINISHED;
-        holdFinishedStatusBriefly();
-        syncStatsToClient();
-
+        // Link existing infrastructure first or after; either is fine for stats
         for (IInfrastructure infrastructure : getConnectedInfrastructure()) {
             if (infrastructure instanceof zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) {
                 ((zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) infrastructure)
@@ -723,8 +712,12 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             }
             rocket.linkInfrastructure(infrastructure);
         }
-        // Rescan so UI immediately reflects the post-build state
-        scanRocket(world, pos, bbCache);
+        // Show the spawned rocket stats
+        rocket.recalculateStats();
+        this.stats = rocket.stats.copy();
+        this.status = ErrorCodes.FINISHED;
+        holdFinishedStatusBriefly();
+        syncStatsToClient();
     }
 
     /**
@@ -1189,12 +1182,23 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-
-        // Automatically set status to unscanned if no rocket is present when opening GUI
-        if (!world.isRemote && status == ErrorCodes.ALREADY_ASSEMBLED) {
-            AxisAlignedBB box = (bbCache != null) ? bbCache : getRocketPadBounds(world, pos);
-            if (box == null || world.getEntitiesWithinAABB(EntityRocket.class, box).isEmpty()) {
-                status = ErrorCodes.UNSCANNED;
+        if (!world.isRemote && (status == ErrorCodes.FINISHED || status == ErrorCodes.ALREADY_ASSEMBLED)) {
+            boolean finishedStillFresh = status == ErrorCodes.FINISHED
+                    && finishedStatusStickUntil > 0L
+                    && world.getTotalWorldTime() < finishedStatusStickUntil;
+            if (!finishedStillFresh) {
+                AxisAlignedBB box = (bbCache != null) ? bbCache : getRocketPadBounds(world, pos);
+                if (box == null) {
+                    status = ErrorCodes.INCOMPLETESTRCUTURE;
+                } else if (world.getEntitiesWithinAABB(
+                        EntityRocket.class,
+                        box.grow(1.0E-4, 1.0E-4, 1.0E-4)
+                ).isEmpty()) {
+                    status = ErrorCodes.UNSCANNED;
+                } else {
+                    status = ErrorCodes.ALREADY_ASSEMBLED;
+                }
+                finishedStatusStickUntil = 0L;
                 syncStatsToClient();
             }
         }
@@ -1602,7 +1606,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         }
         // If fuel is already known or inserted, use the actual synced rate.
         // This handles packs with multiple valid fluids, e.g. water;5 and rocketfuel;10.
-        if (actualRate > 0 && (stats.getFuelAmount(type) > 0 || hasKnownFuelFluid(type) || actualRate != baseRate)) {
+        if (actualRate > 0 && (hasKnownFuelFluid(type) || actualRate != baseRate)) {
             return actualRate;
         }
         // Empty/unselected fuel: use conservative expected burn rate.

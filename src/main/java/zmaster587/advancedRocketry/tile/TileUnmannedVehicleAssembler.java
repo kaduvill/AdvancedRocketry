@@ -161,9 +161,6 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         this.status = ErrorCodes.FINISHED;
         holdFinishedStatusBriefly();
         syncStatsToClient();
-
-        // Rescan to immediately show fresh stats after build
-        scanRocket(world, getPos(), bbCache);
     }
 
     @Override
