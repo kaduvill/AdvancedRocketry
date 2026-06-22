@@ -158,11 +158,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         // Directly stamp tile stats from the entity
         rocket.recalculateStats();
         this.stats = rocket.stats.copy();
-
-        // Now finish up — and DO NOT reset after this
         this.status = ErrorCodes.FINISHED;
-        this.markDirty();
-        world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        holdFinishedStatusBriefly();
+        syncStatsToClient();
 
         // Rescan to immediately show fresh stats after build
         scanRocket(world, getPos(), bbCache);
@@ -189,7 +187,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             EntityStationDeployedRocket r = sdr.get(0);
             r.recalculateStats();
             this.stats = r.stats.copy();
-            this.status = ErrorCodes.ALREADY_ASSEMBLED;
+            if (!shouldKeepFinishedStatus()) {
+                status = ErrorCodes.ALREADY_ASSEMBLED;
+            }
             syncStatsToClient();
             return null;
         }  

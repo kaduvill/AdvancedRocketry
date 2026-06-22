@@ -84,6 +84,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     private List<HashedBlockPosition> blockPos;
     private int relinkRetries = 0;           // how many relinking tries left
     private long nextRelinkAttempt = 0L;     // world time for next try
+    //hold FINNISHED status for 5sec
+    private static final long FINISHED_STATUS_STICK_TICKS = 100L;
+    private long finishedStatusStickUntil = 0L;
 
     public TileRocketAssemblingMachine() {
         super(100000);
@@ -142,6 +145,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         unregisterFromBus();
         relinkRetries = 0;
         nextRelinkAttempt = 0L;
+        finishedStatusStickUntil = 0L;
         // Notify linked multiblocks BEFORE clearing (server only)
         if (world != null && !world.isRemote) {
             for (HashedBlockPosition p : blockPos) {
@@ -164,6 +168,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         unregisterFromBus();
         relinkRetries = 0;
         nextRelinkAttempt = 0L;
+        finishedStatusStickUntil = 0L;
     }
 
     private void unregisterFromBus() {
@@ -292,6 +297,19 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getGravitationalMultiplier();
     }
 
+    protected void holdFinishedStatusBriefly() {
+        if (world != null && !world.isRemote) {
+            finishedStatusStickUntil = world.getTotalWorldTime() + FINISHED_STATUS_STICK_TICKS;
+        }
+    }
+
+    protected boolean shouldKeepFinishedStatus() {
+        return world != null
+                && !world.isRemote
+                && status == ErrorCodes.FINISHED
+                && world.getTotalWorldTime() < finishedStatusStickUntil;
+    }
+
     public boolean isBuilding() {
         return building;
     }
@@ -380,7 +398,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 rocket.getFuelAmount(FuelType.NUCLEAR_WORKING_FLUID);
 
                 this.stats = rocket.stats.copy();
-                status = ErrorCodes.ALREADY_ASSEMBLED;
+                if (!shouldKeepFinishedStatus()) {
+                    status = ErrorCodes.ALREADY_ASSEMBLED;
+                }
                 syncStatsToClient();
                 return null;
             }
@@ -693,8 +713,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         // Finish & link as before
         stats.reset();
         this.status = ErrorCodes.FINISHED;
-        this.markDirty();
-        world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        holdFinishedStatusBriefly();
+        syncStatsToClient();
 
         for (IInfrastructure infrastructure : getConnectedInfrastructure()) {
             if (infrastructure instanceof zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation) {
@@ -1175,7 +1195,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             AxisAlignedBB box = (bbCache != null) ? bbCache : getRocketPadBounds(world, pos);
             if (box == null || world.getEntitiesWithinAABB(EntityRocket.class, box).isEmpty()) {
                 status = ErrorCodes.UNSCANNED;
-                markDirty();
+                syncStatsToClient();
             }
         }
 
@@ -1486,9 +1506,10 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             EntityRocket r = rockets.get(0);
             r.recalculateStats();
             this.stats = r.stats.copy();
-            this.status = ErrorCodes.ALREADY_ASSEMBLED;
-            markDirty();
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+            if (!shouldKeepFinishedStatus()) {
+                status = ErrorCodes.ALREADY_ASSEMBLED;
+            }
+            syncStatsToClient();
         } else {
             // Fallback: rescan if something odd happens
             scanRocket(world, pos, bbCache);
