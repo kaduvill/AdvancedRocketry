@@ -231,9 +231,7 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         inventory.readFromNBT(nbt);
-        if (nbt.hasKey("storedID")) {
-            storedId = nbt.getLong("storedID");
-        }
+        storedId = nbt.hasKey("storedID") ? nbt.getLong("storedID") : null;
     }
 
     @Override
