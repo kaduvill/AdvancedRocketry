@@ -59,7 +59,7 @@ import java.util.List;
  * changed to complete the rocket structure
  * Also will be used to "build" the rocket components from the placed frames, control fuel flow etc
  **/
-public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements ITickable, IButtonInventory, INetworkMachine, IDataSync, IModularInventory, IProgressBar, ILinkableTile {
+public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements ITickable, IButtonInventory, INetworkMachine, IModularInventory, IProgressBar, ILinkableTile {
 
     protected static final ResourceLocation backdrop = new ResourceLocation("advancedrocketry", "textures/gui/rocketBuilder.png");
     protected static final ProgressBarImage verticalProgressBar = new ProgressBarImage(76, 93, 8, 52, 176, 15, 2, 38, 3, 2, EnumFacing.UP, backdrop);
@@ -155,7 +155,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 }
             }
         }
-
         // Clear caches
         bbCache = null;
         stats.reset();
@@ -610,7 +609,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             status = ErrorCodes.SUCCESS;
         }
 
-        
         // Normalize integer mins/maxes first
         int minXi = Math.min(actualMinX, actualMaxX);
         int minYi = Math.min(actualMinY, actualMaxY);
@@ -662,7 +660,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         double maxZ = Math.max(b.minZ, b.maxZ);
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
-
 
     public void assembleRocket() {
         // server only + need a pad cache
@@ -948,7 +945,12 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     public boolean canScan() {
-        return bbCache != null;}
+        if (bbCache == null) {
+            status = ErrorCodes.INCOMPLETESTRCUTURE;
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
@@ -957,8 +959,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             if (world.isRemote || isScanning())
                 return;
             bbCache = getRocketPadBounds(world, pos);
-            if (!canScan())
-                return;
+            if (!canScan()) {
+                syncStatsToClient();
+                return;}
             totalProgress = Math.max(1, (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10));
             progress = 0;
             prevProgress = 0;
@@ -969,8 +972,10 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 return;
             building = true;
             bbCache = getRocketPadBounds(world, pos);
-            if (!canScan())
-                return;
+            if (!canScan()) {
+                building = false;
+                syncStatsToClient();
+                return;}
             totalProgress = Math.max(1, (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier * this.getVolume(world, bbCache) / 10));
             progress = 0;
             prevProgress = 0;
@@ -1267,115 +1272,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             setTotalProgress(progress);
             updateText();
         }
-    }
-
-    @Override
-    public void setData(int id, int value) {
-        switch (id) {
-            case 0:
-                getRocketStats().setWeight(value/1000f);
-                break;
-            case 1:
-                getRocketStats().setThrust(value);
-                break;
-            case 2:
-                setStatus(value);
-                break;
-            case 3:
-                getRocketStats().setBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT, value);
-                break;
-            case 4:
-                getRocketStats().setFuelAmount(FuelType.LIQUID_MONOPROPELLANT, value);
-                break;
-            case 5:
-                getRocketStats().setFuelCapacity(FuelType.LIQUID_MONOPROPELLANT, value);
-                break;
-            case 6:
-                getRocketStats().setFuelRate(FuelType.LIQUID_MONOPROPELLANT, value);
-                break;
-            case 7:
-                getRocketStats().setBaseFuelRate(FuelType.LIQUID_BIPROPELLANT, value);
-                break;
-            case 8:
-                getRocketStats().setFuelAmount(FuelType.LIQUID_BIPROPELLANT, value);
-                break;
-            case 9:
-                getRocketStats().setFuelCapacity(FuelType.LIQUID_BIPROPELLANT, value);
-                break;
-            case 10:
-                getRocketStats().setFuelRate(FuelType.LIQUID_BIPROPELLANT, value);
-                break;
-            case 11:
-                getRocketStats().setBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID, value);
-                break;
-            case 12:
-                getRocketStats().setFuelAmount(FuelType.NUCLEAR_WORKING_FLUID, value);
-                break;
-            case 13:
-                getRocketStats().setFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID, value);
-                break;
-            case 14:
-                getRocketStats().setFuelRate(FuelType.NUCLEAR_WORKING_FLUID, value);
-                break;
-            case 15:
-                getRocketStats().setBaseFuelRate(FuelType.LIQUID_OXIDIZER, value);
-                break;
-            case 16:
-                getRocketStats().setFuelAmount(FuelType.LIQUID_OXIDIZER, value);
-                break;
-            case 17:
-                getRocketStats().setFuelCapacity(FuelType.LIQUID_OXIDIZER, value);
-                break;
-            case 18:
-                getRocketStats().setFuelRate(FuelType.LIQUID_OXIDIZER, value);
-                break;
-        }
-        updateText();
-    }
-
-    @Override
-    public int getData(int id) {
-        switch (id) {
-            case 0:
-                return Math.round(getRocketStats().getWeight_NoFuel() * 1000f);
-            case 1:
-                return getRocketStats().getThrust();
-            case 2:
-                return getStatus().ordinal();
-            case 3:
-                return getRocketStats().getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT);
-            case 4:
-                return getRocketStats().getFuelAmount(FuelType.LIQUID_MONOPROPELLANT);
-            case 5:
-                return getRocketStats().getFuelCapacity(FuelType.LIQUID_MONOPROPELLANT);
-            case 6:
-                return getRocketStats().getFuelRate(FuelType.LIQUID_MONOPROPELLANT);
-            case 7:
-                return getRocketStats().getBaseFuelRate(FuelType.LIQUID_BIPROPELLANT);
-            case 8:
-                return getRocketStats().getFuelAmount(FuelType.LIQUID_BIPROPELLANT);
-            case 9:
-                return getRocketStats().getFuelCapacity(FuelType.LIQUID_BIPROPELLANT);
-            case 10:
-                return getRocketStats().getFuelRate(FuelType.LIQUID_BIPROPELLANT);
-            case 11:
-                return getRocketStats().getBaseFuelRate(FuelType.NUCLEAR_WORKING_FLUID);
-            case 12:
-                return getRocketStats().getFuelAmount(FuelType.NUCLEAR_WORKING_FLUID);
-            case 13:
-                return getRocketStats().getFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID);
-            case 14:
-                return getRocketStats().getFuelRate(FuelType.NUCLEAR_WORKING_FLUID);
-            case 15:
-                return getRocketStats().getBaseFuelRate(FuelType.LIQUID_OXIDIZER);
-            case 16:
-                return getRocketStats().getFuelAmount(FuelType.LIQUID_OXIDIZER);
-            case 17:
-                return getRocketStats().getFuelCapacity(FuelType.LIQUID_OXIDIZER);
-            case 18:
-                return getRocketStats().getFuelRate(FuelType.LIQUID_OXIDIZER);
-        }
-        return 0;
     }
 
     @Override

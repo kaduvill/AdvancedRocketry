@@ -124,29 +124,25 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
             return;
         }
 
-        ItemStack outputStack;
-        SpaceStationObject spaceStationObject = null;
+        ItemStack outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
+        ItemStack outputChip;
         if (storedId == null) {
-            spaceStationObject = new SpaceStationObject();
+            SpaceStationObject spaceStationObject = new SpaceStationObject();
             SpaceObjectManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
-
-            outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
-            ItemStationChip.setUUID(outputStack, spaceStationObject.getId());
-
+            int stationId = spaceStationObject.getId();
+            ItemStationChip.setUUID(outputStack, stationId);
+            outputChip = new ItemStack(AdvancedRocketryItems.itemSpaceStationChip, 1);
+            ItemStationChip.setUUID(outputChip, stationId);
         } else {
-            outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStation, 1);
-            ItemStationChip.setUUID(outputStack, (int) (long) storedId);
+            int stationId = storedId.intValue();
+            ItemStationChip.setUUID(outputStack, stationId);
+            outputChip = inventory.getStackInSlot(1).copy();
+            outputChip.setCount(1);
+            ItemStationChip.setUUID(outputChip, stationId);
         }
-
         ((ItemPackedStructure) outputStack.getItem()).setStructure(outputStack, storageChunk);
-
         inventory.setInventorySlotContents(2, outputStack);
-
-        if (storedId == null) {
-            ItemStack stack = new ItemStack(AdvancedRocketryItems.itemSpaceStationChip, 1);
-            ItemStationChip.setUUID(stack, spaceStationObject.getId());
-            inventory.setInventorySlotContents(3, stack);
-        }
+        inventory.setInventorySlotContents(3, outputChip);
 
         this.status = ErrorCodes.FINISHED;
         storedId = null;
@@ -176,32 +172,29 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
 
         // GUI-open reset errorcode if pad is valid and we're idle
         if (!world.isRemote) {
+            ErrorCodes oldStatus = status;
             AxisAlignedBB bounds = getRocketPadBounds(world, pos);
             if (bounds == null) {
                 setStatus(ErrorCodes.INCOMPLETESTRCUTURE.ordinal());
             } else if (!isScanning()) {
                 ErrorCodes s = getStatus();
                 if (s == ErrorCodes.SUCCESS_STATION || s == ErrorCodes.SUCCESS ||
-                    s == ErrorCodes.FINISHED || s == ErrorCodes.EMPTY ||
-                    s == ErrorCodes.UNSCANNED) {
+                        s == ErrorCodes.FINISHED || s == ErrorCodes.EMPTY ||
+                        s == ErrorCodes.UNSCANNED) {
                     setStatus(ErrorCodes.UNSCANNED_STATION.ordinal());
                 }
             }
+            if (status != oldStatus) {
+                syncStatsToClient();
+            }
         }
-
         modules.add(new ModulePower(160, 30, this));
-
         modules.add(new ModuleProgress(149, 30, 2, verticalProgressBar, this));
-
         modules.add(new ModuleButton(5, 34, 0, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.scan"), this, zmaster587.libVulpes.inventory.TextureResources.buttonScan));
-
         ModuleButton buttonBuild;
         modules.add(buttonBuild = new ModuleButton(5, 60, 1, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.build"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
         buttonBuild.setColor(0xFFFF2222);
         modules.add(errorText = new ModuleText(5, 22, "", 0xFFFFFF22));
-        modules.add(new ModuleSync(4, this));
-        modules.add(new ModuleSync(2, this)); // sync error codes to client (on change)
-
         updateText();
 
         modules.add(new ModuleLimitedSlotArray(90, 40, this, 0, 1));
@@ -211,19 +204,18 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return modules;
     }
 
-
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
+        if (world != null && !world.isRemote && id == 1 && !isScanning()) {
+            ItemStack chipStack = inventory.getStackInSlot(1);
+            if (!chipStack.isEmpty() && chipStack.getItem() == AdvancedRocketryItems.itemSpaceStationChip) {
+                int stationId = ItemStationChip.getUUID(chipStack);
+                storedId = stationId == 0 ? null : (long) stationId;
+            } else {storedId = null;}
+            markDirty();
+        }
 
         super.useNetworkData(player, side, id, nbt);
-
-        // recompute AFTER super
-        boolean isScanningFlag = !isScanning() && canScan();
-
-        if (id == 1 && isScanningFlag) {
-            storedId = (long) ItemStationChip.getUUID(inventory.getStackInSlot(1));
-            if (storedId == 0) storedId = null;
-        }
     }
 
     @Override
@@ -249,13 +241,11 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return inventory.getSizeInventory();
     }
 
-
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot) {
         return inventory.getStackInSlot(slot);
     }
-
 
     @Override
     @Nonnull
@@ -263,30 +253,25 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return inventory.decrStackSize(slot, amt);
     }
 
-
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
         inventory.setInventorySlotContents(slot, stack);
     }
-
 
     @Override
     public String getName() {
         return "tile.stationBuilder.name";
     }
 
-
     @Override
     public boolean hasCustomName() {
         return false;
     }
 
-
     @Override
     public int getInventoryStackLimit() {
         return inventory.getInventoryStackLimit();
     }
-
 
     @Override
     public boolean isUsableByPlayer(@Nonnull EntityPlayer player) {
@@ -311,10 +296,8 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
             ItemStack satelliteHatch =
                     new ItemStack(AdvancedRocketryBlocks.blockLoader, 1, 1);
             return satelliteHatch.isItemEqual(stack);}
-
         if (slot == 1) {
             return stack.getItem() == AdvancedRocketryItems.itemSpaceStationChip;}
-
         return false;
     }
 

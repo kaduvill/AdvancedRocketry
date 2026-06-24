@@ -319,7 +319,6 @@ public class EntityStationDeployedRocket extends EntityRocket {
                 }
                 if (!world.isRemote && this.getDistance(actualLaunchLocation.x, actualLaunchLocation.y, actualLaunchLocation.z) > 128) {
 
-
                     //Release ticket on landing
                     if (ticket != null) {
                         ForgeChunkManager.releaseTicket(ticket);
@@ -329,8 +328,6 @@ public class EntityStationDeployedRocket extends EntityRocket {
                     return;
                 }
             }
-
-
             this.move(MoverType.SELF, motionX, motionY, motionZ);
         }
     }
@@ -349,7 +346,6 @@ public class EntityStationDeployedRocket extends EntityRocket {
                 break;
             }
         }
-
 
         DimensionProperties props = DimensionManager.getEffectiveDimId(world, this.getPosition());
         if (props.isGasGiant()) {
