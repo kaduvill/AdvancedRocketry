@@ -6,6 +6,7 @@ Changelog 2.2.11
   - Fixed rocket gravity checks. Rockets now use the source dimension gravity.
   - Fixed weight, thrust, acceleration, and fuel display in the assembler GUI.
   - Fixed launching from spacestation using planet orbit height for fuel checks.
+  - Fixed assembling a 2nd, 3rd, 4th.... station-module with Station Assembler wronlgy consumning the chip
   - Fixed Building status errorcode not getting overwritten by sync
     - removed verbose syncing for proper syncinglogic
 
