@@ -68,6 +68,7 @@ import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.inventory.modules.ModuleBrokenPart;
 import zmaster587.advancedRocketry.inventory.modules.ModulePlanetSelector;
 import zmaster587.advancedRocketry.inventory.modules.ModuleStellarBackground;
+import zmaster587.advancedRocketry.inventory.modules.ModuleRocketFuelProgress;
 import zmaster587.advancedRocketry.item.ItemAsteroidChip;
 import zmaster587.advancedRocketry.item.ItemPackedStructure;
 import zmaster587.advancedRocketry.item.ItemPlanetIdentificationChip;
@@ -2873,26 +2874,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             modules.add(new ModuleContainerPanYOnly(8, 17, panModules, new LinkedList<>(), null, 65, 45, 0, 0));
 
             //Fuel
-            modules.add(new ModuleProgress(192, 7, 0, new ProgressBarImage(2, 173, 12, 71, 17, 6, 3, 69, 1, 1, EnumFacing.UP, TextureResources.rocketHud), this));
+            modules.add(new ModuleRocketFuelProgress(192, 7, 0, new ProgressBarImage(2, 173, 12, 71, 17, 6, 3, 69, 1, 1, EnumFacing.UP, TextureResources.rocketHud), this, null));
             // Conditional oxidizer bar
             if (shouldShowOxBar()) {
                 // Add a second, distinct bar for oxidizer (reuse the monitoring station’s UVs)
-                modules.add(new ModuleProgress(
-                    198, 7, 6, // position offset to avoid overlap; ID=6 matches monitoring station semantics
-                    new ProgressBarImage(2, 173, 12, 71, 17, 75, 3, 69, 1, 1, EnumFacing.UP, TextureResources.rocketHud),
-                    this
-                ));
+                modules.add(new ModuleRocketFuelProgress(198, 7, 6, new ProgressBarImage(2, 173, 12, 71, 17, 75, 3, 69, 1, 1, EnumFacing.UP, TextureResources.rocketHud), this, FuelRegistry.FuelType.LIQUID_OXIDIZER));
             }
-
 
             //Add buttons
             modules.add(new ModuleButton(180, 140, 0, LibVulpes.proxy.getLocalizedString("msg.entity.rocket.disass"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 64, 20));
-
-            //modules.add(new ModuleButton(180, 95, 1, "", this, TextureResources.buttonLeft, 10, 16));
-            //modules.add(new ModuleButton(202, 95, 2, "", this, TextureResources.buttonRight, 10, 16));
-
             modules.add(new ModuleButton(180, 114, 1, LibVulpes.proxy.getLocalizedString("msg.entity.rocket.seldst"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 64, 20));
-            //modules.add(new ModuleText(180, 114, "Inventories", 0x404040));
         } else {
             ItemStack slot0 = storage.getGuidanceComputer() != null ? storage.getGuidanceComputer().getStackInSlot(0) : ItemStack.EMPTY;
             int uuid;
@@ -2901,7 +2892,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(uuid);
 
                 modules.add(new ModuleStellarBackground(0, 0, zmaster587.libVulpes.inventory.TextureResources.starryBG));
-                //modules.add(new ModuleImage(0, 0, icon));
 
                 if (spaceObject == null)
                     return modules;
