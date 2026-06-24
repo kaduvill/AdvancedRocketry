@@ -12,8 +12,8 @@ Changelog 2.2.11
 
 - Weight Engine
   - Reduced Weight of Fuel by ~0.5x for better scaling
-  - Tuned other rocket components
-  - Satellite Components have different weights, the best satellites will now require bigger rockets to reach orbit
+  - Tuned other rocket components weights
+  - Satellite Components have different weights, the best satellites will now require bigger rockets to reach orbit, while weaker satellites is cheaper
 
 - Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
   - Added slot filtering and tooltip feedback where relevant:
@@ -27,6 +27,7 @@ Changelog 2.2.11
     - Satellite Builder
       - Fixed inconsistencies involving Satellite ID 0
 
+- Fixed seat and passenger placement on built rocket
 - Improved unprogrammed satellite launches:
   - Satellites launched without a destination now deploy to the effective launch dimension (rocket dies, satellite starts ticking normally)
 - Fixed an OpenGL state leak when orbiting black holes
