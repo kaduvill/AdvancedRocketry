@@ -1,5 +1,9 @@
 Changelog 2.2.11
 
+- Rocket
+  - Fixed seat and passenger placement on built rocket
+  - Tooltip for fuelbars in GUI
+  
 - Rocket Assembler GUI overhaul
   - Make GUI actually useful
   - Improved Rocket Assembler stat sync, consistency and flickering GUI preview.
@@ -27,7 +31,7 @@ Changelog 2.2.11
     - Satellite Builder
       - Fixed inconsistencies involving Satellite ID 0
 
-- Fixed seat and passenger placement on built rocket
+
 - Improved unprogrammed satellite launches:
   - Satellites launched without a destination now deploy to the effective launch dimension (rocket dies, satellite starts ticking normally)
 - Fixed an OpenGL state leak when orbiting black holes
