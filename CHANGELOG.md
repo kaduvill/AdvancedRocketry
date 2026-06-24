@@ -1,19 +1,53 @@
-2.2.11
+Changelog 2.2.11
 
-- Satellite Builder:
-  - Feedback when building satellite
-  - Filtered Slots (shift-clicking QoL e.g)
-  - Corrected inconsistencies with Satellite ID 0
+- Rocket
+  - Fixed seat and passenger placement on built rocket
+  - Tooltip for fuelbars in GUI
+  
+- Rocket Assembler GUI overhaul
+  - Make GUI actually useful
+  - Improved Rocket Assembler stat sync, consistency and flickering GUI preview.
+  - Fixed rocket gravity checks. Rockets now use the source dimension gravity.
+  - Fixed weight, thrust, acceleration, and fuel display in the assembler GUI.
+  - Fixed launching from spacestation using planet orbit height for fuel checks.
+  - Fixed assembling a 2nd, 3rd, 4th.... station-module with Station Assembler wronlgy consumning the chip
+  - Fixed Building status errorcode not getting overwritten by sync
+    - removed verbose syncing for proper syncinglogic
 
-- Strenghtened the unProgrammed Satellite launch to make it more intuitive
-  - launching satellite with no destination:
-    - deploys to effective launch-dim
-    - rocket dies, but satellite starts ticking
-- Fixed GL.state.Leak: when orbiting black hole
-- Observatory: Asteroid composition values now render above the rotating block previews.
-- Tooltips polished
+- Weight Engine
+  - Reduced Weight of Fuel by ~0.5x for better scaling
+  - Tuned other rocket components weights
+  - Satellite Components have different weights, the best satellites will now require bigger rockets to reach orbit, while weaker satellites is cheaper
 
-2.2.10
+- Filtered Slots QoL *(requires LibVulpes 0.5.4)*:
+  - Added slot filtering and tooltip feedback where relevant:
+    - Observatory
+    - Landing Pad
+    - Satellite Terminal
+    - Station Assembler
+    - Terraforming Terminal
+    - Orbital Registry
+    - Suit Workstation
+    - Satellite Builder
+      - Fixed inconsistencies involving Satellite ID 0
+
+
+- Improved unprogrammed satellite launches:
+  - Satellites launched without a destination now deploy to the effective launch dimension (rocket dies, satellite starts ticking normally)
+- Fixed an OpenGL state leak when orbiting black holes
+- Upgraded the Biome Scanner:
+  - Now requires power
+  - Improved GUI
+- Observatory asteroid composition values now render above the rotating block previews
+- Centrifuge and Rolling Machine now accepting anyBlock where AIR was required
+- Fuel station:
+  - Increase tank size to 10000mb
+  - Correctly load transfer-rate from config
+  - Increase default to 20mb per tick (up from 10mb)
+- Fixed a Terraforming Terminal NPE
+- Polished tooltips
+
+Changelog 2.2.10
 
 - Fixed rocket destination validation:
   - Unregistered dimensions no longer fall back to Earth (dim 0), preventing invalid custom-dimension and cross-star routes from passing checks.

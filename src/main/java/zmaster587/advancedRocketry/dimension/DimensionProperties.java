@@ -285,6 +285,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void unregisterProtectingBlock(BlockPos p) {
+        if (proxylists == null || proxylists.getProtectingBlocksForDimension(getId()) == null)
+            return;
         for (BlockPos i : proxylists.getProtectingBlocksForDimension(getId())) {
             if (i.equals(p)) {
                 proxylists.getProtectingBlocksForDimension(getId()).remove(i);
@@ -2513,11 +2515,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
             this.resourceLEO = leo;
         }
-
         public ResourceLocation getResource() {
             return resource;
         }
-
         public ResourceLocation getResourceLEO() {
             return resourceLEO;
         }

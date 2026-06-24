@@ -257,10 +257,12 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                             }
                         }
 
+                        // Must use floor, not (int) cast.
+                        // Seat offsets may be negative half-block values for even-sized rockets;
+                        // Java int casts truncate toward zero and shift seats on the negative X/Z side.
                         if (block instanceof BlockSeat && world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
-                            stats.addPassengerSeat((int) (xCurr - (float) this.sizeX / 2 + 0.5f), yCurr, (int) (zCurr - (float) this.sizeZ / 2 + 0.5f));
+                            stats.addPassengerSeat((int) Math.floor(xCurr - ((this.sizeX - 1) / 2f)), yCurr, (int) Math.floor(zCurr - ((this.sizeZ - 1) / 2f)));
                         }
-
                         if (block instanceof IMiningDrill) {
                             drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
                         }

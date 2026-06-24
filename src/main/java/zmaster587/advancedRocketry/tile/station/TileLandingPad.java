@@ -21,6 +21,7 @@ import zmaster587.advancedRocketry.api.RocketEvent.RocketLandedEvent;
 import zmaster587.advancedRocketry.api.RocketEvent.RocketPreLaunchEvent;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.entity.EntityRocket;
+import zmaster587.advancedRocketry.inventory.modules.ModuleLimitedSlotArrayTooltip;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.advancedRocketry.util.StationLandingLocation;
@@ -29,6 +30,7 @@ import zmaster587.libVulpes.api.LibVulpesItems;
 import zmaster587.libVulpes.interfaces.ILinkableTile;
 import zmaster587.libVulpes.inventory.modules.IGuiCallback;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
+import zmaster587.libVulpes.inventory.modules.ModuleLimitedSlotArray;
 import zmaster587.libVulpes.inventory.modules.ModuleText;
 import zmaster587.libVulpes.inventory.modules.ModuleTextBox;
 import zmaster587.libVulpes.items.ItemLinker;
@@ -81,10 +83,10 @@ public class TileLandingPad extends TileInventoryHatch implements ILinkableTile,
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-        List<ModuleBase> modules = super.getModules(ID, player);
-
+        List<ModuleBase> modules = new LinkedList<>();
         modules.add(new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.label.name") + ":", 0x2f2f2f));
         modules.add(moduleNameTextbox);
+        modules.add(new ModuleLimitedSlotArrayTooltip(8, 18, this, 0, 1, LibVulpes.proxy.getLocalizedString("msg.landingpad.linker.tooltip")));
         return modules;
     }
 
@@ -275,7 +277,10 @@ public class TileLandingPad extends TileInventoryHatch implements ILinkableTile,
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        return stack.getItem() == LibVulpesItems.itemLinker;
+        return slot == 0
+                && stack.getItem() == LibVulpesItems.itemLinker
+                && ItemLinker.isSet(stack)
+                && ItemLinker.getDimId(stack) != Constants.INVALID_PLANET;
     }
 
     public List<IInfrastructure> getConnectedInfrastructure() {

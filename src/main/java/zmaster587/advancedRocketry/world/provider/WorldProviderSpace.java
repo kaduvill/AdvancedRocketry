@@ -40,7 +40,6 @@ public class WorldProviderSpace extends WorldProviderPlanet {
         return false;
     }
 
-
     public int getAverageGroundLevel() {
         return 0;
     }
@@ -66,8 +65,6 @@ public class WorldProviderSpace extends WorldProviderPlanet {
                 }
             }
         }
-
-
         if (ARConfiguration.getCurrentConfig().stationSkyOverride)
             return (skyRender == null || !(skyRender instanceof RenderSpaceSky)) ? skyRender = new RenderSpaceSky() : skyRender;
 
@@ -103,9 +100,7 @@ public class WorldProviderSpace extends WorldProviderPlanet {
     protected void init() {
         this.hasSkyLight = true;
         world.getWorldInfo().setTerrainType(AdvancedRocketry.spaceWorldType);
-
         this.biomeProvider = new BiomeProviderSingle(AdvancedRocketryBiomes.spaceBiome);//new ChunkManagerPlanet(worldObj, worldObj.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(worldObj.provider.getDimension()).getBiomes());
-
     }
 
     public ISpaceObject getSpaceObject(BlockPos pos) {

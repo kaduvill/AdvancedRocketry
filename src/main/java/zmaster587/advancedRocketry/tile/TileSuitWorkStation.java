@@ -31,10 +31,10 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
         List<ModuleBase> modules = new LinkedList<>();
 
-        modules.add(new ModuleSlotArray(15, 15, this, 0, 1));
+        modules.add(new ModuleLimitedSlotArray(15, 25, this, 0, 1));
 
         for (int i = 0; i < 6; i++) {
-            slotArray[i] = new ModuleTexturedLimitedSlotArray(15 + i * 18, 35, this, i + 1, i + 2, null);
+            slotArray[i] = new ModuleTexturedLimitedSlotArray(15 + i * 18, 45, this, i + 1, i + 2, null);
             modules.add(slotArray[i]);
         }
 
@@ -79,8 +79,6 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
             return ((IModularArmor) inventory.getStackInSlot(0).getItem()).removeComponent(world, inventory.getStackInSlot(0), slot - 1);
         }
         return ItemStack.EMPTY;
-
-        //return inventory.decrStackSize(i, j);
     }
 
     @Override
@@ -89,8 +87,10 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
             if (!contents.isEmpty() && contents.getItem() instanceof IModularArmor) {
 
                 for (ModuleTexturedLimitedSlotArray slot2 : slotArray) {
-                    slot2.setEnabled(false);
-                    slot2.setResource(null);
+                    if (slot2 != null) {
+                        slot2.setEnabled(false);
+                        slot2.setResource(null);
+                    }
                 }
                 List<ItemStack> list = ((IModularArmor) contents.getItem()).getComponents(contents);
                 for (int i = 0; i < getSizeInventory() - 1; i++) {
@@ -100,9 +100,13 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
                         inventory.setInventorySlotContents(i, list.get(i));
                 }
 
-                for (int i = 0; i < ((IModularArmor) contents.getItem()).getNumSlots(contents); i++) {
-                    slotArray[i].setEnabled(true);
-                    slotArray[i].setResource(((IModularArmor) contents.getItem()).getResourceForSlot(i));
+                IModularArmor armor = (IModularArmor) contents.getItem();
+                int slotCount = Math.min(armor.getNumSlots(contents), slotArray.length);
+                for (int i = 0; i < slotCount; i++) {
+                    if (slotArray[i] != null) {
+                        slotArray[i].setEnabled(true);
+                        slotArray[i].setResource(armor.getResourceForSlot(i));
+                    }
                 }
             } else {
                 for (ModuleTexturedLimitedSlotArray slot2 : slotArray) {
@@ -116,12 +120,10 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
 
         } else if (!inventory.getStackInSlot(0).isEmpty() && inventory.getStackInSlot(0).getItem() instanceof IModularArmor &&
                 slot - 1 < ((IModularArmor) inventory.getStackInSlot(0).getItem()).getNumSlots(inventory.getStackInSlot(0))) {
-            //TODO
             if (!contents.isEmpty() && contents.getItem() instanceof IArmorComponent)
                 ((IModularArmor) inventory.getStackInSlot(0).getItem()).addArmorComponent(world, inventory.getStackInSlot(0), contents, slot - 1);
             else if (!contents.isEmpty()) {
                 //If somehow an item gets forced into the slot
-
             } else
                 ((IModularArmor) inventory.getStackInSlot(0).getItem()).removeComponent(world, inventory.getStackInSlot(0), slot - 1);
         }
@@ -190,10 +192,7 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
 
     @Override
     @Nonnull
-    public ItemStack removeStackFromSlot(int index) {
-        // TODO Auto-generated method stub
-        return ItemStack.EMPTY;
-    }
+    public ItemStack removeStackFromSlot(int index) { return ItemStack.EMPTY;}
 
     @Override
     public int getField(int id) {
@@ -211,9 +210,5 @@ public class TileSuitWorkStation extends TileEntity implements IModularInventory
     }
 
     @Override
-    public void clear() {
-        inventory.clear();
-
-    }
-
+    public void clear() { inventory.clear();}
 }

@@ -83,7 +83,7 @@ public class ARConfiguration {
     @ConfigProperty(needsSync = true)
     public int spaceDimId = -2;
     @ConfigProperty
-    public int fuelPointsPer10Mb = 10;
+    public int fuelingStationTransferRate = 20;
     @ConfigProperty(needsSync = true)
     public int stationSize = 1024;
     @ConfigProperty(needsSync = true)
@@ -436,16 +436,8 @@ public class ARConfiguration {
         arConfig.gasCollectionMult = config.get(MISSION, "gasMissionMultiplier", 1.0, "Multiplier for gas mission time.").getDouble();
         harvestableGasses = config.getStringList("harvestableGasses", MISSION, new String[]{}, "List of fluid names that can be harvested from any gas giant");
         spawnableGasses = config.getStringList("spawnableGasses", MISSION, new String[]{"hydrogen;125;1600;1.0", "helium;125;1600;0.9", "helium3;175;1600;0.2", "oxygen;0;124;1.0", "nitrogen;0;124;1.0", "ammonia;0;124;0.75", "methane;0;124;0.25"}, "List of fluids that can generate on gas giants. Format: fluid;minGravity;maxGravity;chance");
-        arConfig.gasHarvestAmountMultiplier = config.get(
-            MISSION, "gasHarvestAmountMultiplier", 1.0,
-            "Per-mission harvest cap = 64,000 mB × multiplier. Ignored if gasHarvestInfinite=true."
-        ).getDouble();
-
-        arConfig.gasHarvestInfinite = config.get(
-            MISSION, "gasHarvestInfinite", false,
-            "True sets gasHarvestAmount = MaxInt (2,147,483,647 mB), and ignores the 'gasHarvestAmountMultiplier'"
-        ).getBoolean();
-
+        arConfig.gasHarvestAmountMultiplier = config.get(MISSION, "gasHarvestAmountMultiplier", 1.0, "Per-mission harvest cap = 64,000 mB × multiplier. Ignored if gasHarvestInfinite=true.").getDouble();
+        arConfig.gasHarvestInfinite = config.get(MISSION, "gasHarvestInfinite", false, "True sets gasHarvestAmount = MaxInt (2,147,483,647 mB), and ignores the 'gasHarvestAmountMultiplier'").getBoolean();
 
         //Energy Production
         arConfig.solarGeneratorMult = config.get(ENERGY, "solarGeneratorMultiplier", 1, "Power produced per tick by the solar generator.").getInt();
@@ -467,7 +459,7 @@ public class ARConfiguration {
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "Use AR's custom skybox on space stations").getBoolean();
         arConfig.planetSkyOverride = config.get(CLIENT, "PlanetSkyOverride", true, "Use AR's custom skybox on planets").getBoolean();
         arConfig.skyOverride = config.get(CLIENT, "overworldSkyOverride", true, "Use AR's custom skybox in the overworld.").getBoolean();
-       // arConfig.overworldsealevelterraforming = config.get(CLIENT, "overworldSealvlTerraforming", true).getBoolean();
+        // arConfig.overworldsealevelterraforming = config.get(CLIENT, "overworldSealvlTerraforming", true).getBoolean();
         arConfig.advancedVFX = config.get(CLIENT, "advancedVFX", true, "Advanced visual effects").getBoolean();
         arConfig.enableNausea = config.get(CLIENT, "EnableAtmosphericNausea", true, "Allows nausea effects in non-standard atmospheres.").getBoolean();
         arConfig.electricPlantsSpawnLightning = config.get(CLIENT, "electricPlantsSpawnLightning", true, "Should Electric Mushrooms be able to spawn lightning").getBoolean();
@@ -481,10 +473,10 @@ public class ARConfiguration {
         arConfig.canBeFueledByHand = config.get(ROCKET, "canBeFueledByHand", true, "Allow rockets to be fueled by hand.").getBoolean();
         arConfig.nuclearRocketsRespectArtifactGating = config.get(ROCKET, "nuclearRocketsRespectArtifactGating", true, "Nuclear rocket should respect artifact gating for planets").getBoolean();
         arConfig.nuclearRocketsRequireArtifactForGatedStations = config.get(ROCKET, "nuclearRocketsRequireArtifactForGatedStations", false, "If true, nuclear rockets that respect artifact gating also require the artifact when targeting a space station inside a gated planetary system. " + "If false, station destinations are exempt to avoid soft-locking players who left the artifact in the station or warp controller." + "This is meant as a Multiplayer / Server strictness-option").getBoolean();
-        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of fluid names for valid monopropellants").getStringList();
-        liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen;10"}, "List of fluid names for valid bipropellant fuels").getStringList();
-        liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen;10"}, "List of fluid names for valid bipropellant oxidizers").getStringList();
-        liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen;10"}, "List of fluid names for valid nuclear working fluids").getStringList();
+        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of registered fluid names accepted as monopropellant fuel. Format: [fluidName;burnRateMultiplier]. Default: [rocketfuel;10]. burnRateMultiplier scales the engine's fuel consumption rate.").getStringList();
+        liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen;10"}, "List of registered fluid names accepted as bipropellant fuel. Format: [fluidName;burnRateMultiplier]. Default: [hydrogen;10]. burnRateMultiplier scales the engine's fuel consumption rate.").getStringList();
+        liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen;10"}, "List of registered fluid names accepted as bipropellant oxidizer. Format: [fluidName;burnRateMultiplier]. Default: [oxygen;10]. burnRateMultiplier scales the engine's fuel consumption rate.").getStringList();
+        liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen;10"}, "List of registered fluid names accepted as nuclear working fuel. Format: [fluidName;burnRateMultiplier]. Default: [hydrogen;10]. burnRateMultiplier scales the engine's fuel consumption rate.").getStringList();
         arConfig.rocketThrustMultiplier = config.get(ROCKET, "thrustMultiplier", 1f, "Multiplier for engine thrust.").getDouble();
         arConfig.fuelCapacityMultiplier = config.get(ROCKET, "fuelCapacityMultiplier", 1f, "Multiplier for fuel tank capacity.").getDouble();
         arConfig.nuclearCoreThrustRatio = config.get(ROCKET, "nuclearCoreThrustRatio", 1.0, "Multiplier for nuclear core thrust.").getDouble();
@@ -498,10 +490,11 @@ public class ARConfiguration {
         arConfig.gravityAffectsFuel = config.get(ROCKET, "gravityAffectsFuels", true, "Make fuel use depend on gravity.").getBoolean();
         arConfig.launchingDestroysBlocks = config.get(ROCKET, "launchBlockDestruction", false, "Allow launches to damage nearby blocks, plants, glass, soil, turn rock into lava, and more").getBoolean();
         blackListRocketBlocksStr = config.getStringList("rocketBlockBlackList", ROCKET, new String[]{"minecraft:portal", "minecraft:bedrock", "minecraft:snow_layer", "minecraft:water", "minecraft:flowing_water", "minecraft:lava", "minecraft:flowing_lava", "minecraft:fire", "advancedrocketry:rocketfire"}, "Blocks that cannot be part of rocket. Format: modid:block e.g \"minecraft:chest\"");
-        arConfig.advancedWeightSystem = config.get(ROCKET, "advancedWeightSystem", true, "Enable advanced rocket weight calculation, including the handled inventories. Block weights are stored in weights.json").getBoolean();
-        arConfig.advancedWeightSystemInventories = config.get(ROCKET, "advancedWeightSystemInventories", true, "Include inventory contents in rocket weight. Note: may not work with modded inventories (eg IE storage chests)").getBoolean();
+        arConfig.advancedWeightSystem = config.get(ROCKET, "advancedWeightSystem", true, "Enable advanced rocket weight calculation. AR rocket hardware and propellant use built-in balanced weights; non-AR/custom block weights are read from weights.json.").getBoolean();
+        arConfig.advancedWeightSystemInventories = config.get(ROCKET, "advancedWeightSystemInventories", true, "Include item and fluid contents of onboard tile entities in rocket weight. This includes Forge tanks and inventories. Note: may not work with modded inventories (eg IE storage chests)").getBoolean();
         arConfig.partsWearSystem = config.get(ROCKET, "partsWearSystem", true, "Enable rocket part wear and exploding chance.").getBoolean();
         arConfig.increaseWearIntensityProb = config.get(ROCKET, "increaseWearIntensityProb", 0.025, "Chance for each part to gain wear on launch.").getDouble();
+        arConfig.fuelingStationTransferRate = config.getInt("fuelingStationTransferRate", ROCKET, 20, 1, Integer.MAX_VALUE, "Fueling station transfer rate per tick. Actual transfer per operation is this value multiplied by 5");
 
         //Ore configuration
         final boolean masterToggle = arConfig.generateCopper = config.get(WORLDGEN, "EnableOreGen", true).getBoolean();

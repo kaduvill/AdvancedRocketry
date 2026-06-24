@@ -14,6 +14,7 @@ entity.rocket.name=Rocket
 entity.deployedRocket.name=Rocket
 entity.hovercraft.name=Hovercraft
 entity.ARPlanetUIItem.name=Holographic Body
+entity.ARPlanetUIButton.name=Button
 entity.ARStarUIButton.name=Holographic Star
 
 tile.landingPad.name=Landing Pad
@@ -239,7 +240,7 @@ mission.asteroidmining.name=Asteroid Mining
 mission.gascollection.name=Gas Collection
 
 error.rocket.notEnoughMissionFuel=Not enough fuel!
-error.rocket.tooHeavy=Rocket is too heavy to launch (insufficient thrust).
+error.rocket.tooHeavy=Rocket is too heavy to launch (insufficient thrust)
 error.rocket.cannotGetThere=Selected destination cannot be reached. (Are you trying to land on a Gas Giant?)
 error.rocket.destinationNotExist=Selected space station does not exist.
 error.rocket.partsWornOut=Critical parts are worn out — launch aborted.
@@ -437,7 +438,7 @@ msg.spaceElevator.warning.anchored0=This elevator tether has
 msg.spaceElevator.warning.anchored1=the station anchored!
 msg.spaceElevator.warning.unanchored=This elevator has no tether
 msg.spaceElevator.turnedOff=Elevator is turned off
-msg.fuelingStation.link=You program the linker with the fueling station at
+msg.fuelingStation.link=You program the linker with the fueling station at:
 
 msg.monitoringStation.buttonLaunch=Launch!
 msg.monitoringStation.missionProgressNA=Mission Progress: N/A
@@ -452,7 +453,7 @@ msg.monitoringStation.mission.asteroidIdPrefix=Type:
 msg.monitoringStation.mission.plannedAmountPrefix=Amount:
 msg.monitoringStation.mission.plannedAmountPending=Amount: (pending)
 msg.monitoringStation.mission.asteroidType=Asteroid type: (shown on chip / mission)
-msg.monitoringStation.link=You program the linker with the monitoring station at
+msg.monitoringStation.link=You program the linker with the monitoring station at:
 msg.monitoringStation.progress=ETA:
 msg.monitoringStation.prelaunch=Initiating...
 msg.monitoringStation.launching=Launching!
@@ -469,7 +470,7 @@ msg.guidanceComputerHatch.ejectonlanding=Auto Eject Upon Landing
 msg.guidanceComputerHatch.ejectonsatlanding=Allow Ejection of Satellite Chips
 msg.guidanceComputerHatch.ejectonplanetlanding=Allow Ejection of Planet Chips
 msg.guidanceComputerHatch.ejectonstationlanding=Allow Ejection of Station Chips
-msg.guidanceComputerHatch.link=You program the linker with the fluid loader at
+msg.guidanceComputerHatch.link=You program the linker with the fluid loader at:
 msg.fluidLoader.loadingState=Loading State:
 msg.fluidLoader.allowLoading=Allow Loading:
 msg.fluidLoader.allowredstoneinput=Redstone Input (Red)
@@ -510,8 +511,6 @@ msg.terraformingterminal.needredstone.line2=to start the process
 msg.terraformingterminal.insertchip.line1=Place a Biome Changer Remote
 msg.terraformingterminal.insertchip.line2=here to make the Satellite
 msg.terraformingterminal.insertchip.line3=terraform the entire planet
-msg.biomescanner.gas=nyehhh, Gassy, ain't it?
-msg.biomescanner.star=If i only had sunshades...
 msg.gravitycontroller.radius=Radius:
 msg.gravitycontroller.targetgrav=Target Gravity:
 msg.gravitycontroller.none=No Force
@@ -614,6 +613,14 @@ msg.itemplanetidchip.stationid=Station ID:
 msg.itemplanetidchip.artifacts=Artifacts:
 msg.vent.trace=Oxygen Trace
 
+msg.biomescanner.scan.button=Scan
+msg.biomescanner.scan.tooltip=Scan planet below
+msg.biomescanner.scan.required=Scan to detect biomes
+msg.biomescanner.scan.nopower=Insufficient power
+msg.biomescanner.scan.invalid=No valid planet
+msg.biomescanner.gas=Gassy, ain't it?
+msg.biomescanner.star=If i only had sunshades...
+
 msg.serviceStation.destroyProbNA=Destroy probability: N/A
 msg.serviceStation.destroyProb=Destroy probability
 msg.serviceStation.serviceProgress=Service progress
@@ -622,7 +629,7 @@ msg.serviceStation.wornMotorsText=Engines
 msg.serviceStation.wornSeatsText=Seats
 msg.serviceStation.wornTanksText=Tanks
 msg.serviceStation.assemblerScan=Scan for assemblers
-msg.serviceStation.link=You program the linker with the service station at
+msg.serviceStation.link=You program the linker with the service station at:
 
 msg.itemsatellite.pwr=Power Storage:
 msg.itemsatellite.nopwr=No Power Storage
@@ -667,6 +674,12 @@ msg.entity.rocket.rcs=RCS Mode
 msg.entity.rocket.none=None Selected
 msg.entity.rocket.openGuiHint=Press %s to open Rocket GUI
 msg.entity.rocket.unchartedDimension=No Galactic Data
+msg.entity.rocket.fuel.main=Fuel
+msg.entity.rocket.fuel.none=No fuel tank
+msg.entity.rocket.fuel.monopropellant=Monopropellant
+msg.entity.rocket.fuel.bipropellant=Bipropellant
+msg.entity.rocket.fuel.oxidizer=Oxidizer
+msg.entity.rocket.fuel.nuclearWorkingFluid=Working Fluid
 msg.wirelessTransceiver.extract=extract
 msg.wirelessTransceiver.insert=insert
 msg.wirelessTransceiver.type=Type: %s
@@ -688,7 +701,6 @@ msg.advancedrocketry.planetselector.star.tooltip.name=Name: %s
 msg.advancedrocketry.planetselector.star.tooltip.number.of.planets=Number of Planets: %d
 msg.advancedrocketry.planetselector.planet.tooltip.name=%s
 msg.advancedrocketry.planetselector.planet.tooltip.moons.count=Moons: %d
-
 
 
 msg.powerunit.rfpertick=RF/t
@@ -772,11 +784,9 @@ msg.orbitalregistry.writechip.hint.select=Select an entry from the list
 msg.orbitalregistry.writechip.hint.output=Clear the output slot first
 msg.orbitalregistry.writechip.hint.sat.or.stationchip=Insert a Station Chip
 msg.orbitalregistry.writechip.hint.sat.or.idchip=Insert a Satellite ID Chip or Controller
-msg.orbitalregistry.writechip.hint.sat.badcontroller=This satellite does not accept this chip, use correct controller instead!
+msg.orbitalregistry.writechip.hint.sat.badcontroller=Satellite does not accept this chip
 msg.orbitalregistry.writechip.hint.sat.orescanner.only=Ore Scanner can only link to Ore Mapping satellites
 msg.orbitalregistry.writechip.hint.station.unlaunched=This station is not in orbit yet
-
-
 
 commands.weather.always_not_clear=This planet is always not clear...
 commands.weather.cannot_rain=Cannot start a rain here
@@ -797,8 +807,8 @@ jei.advancedrocketry.gasgiants.orbiting=Orbiting %s
 jei.advancedrocketry.gasgiants.harvestcap=Harvest cap: %s mB/mission
 jei.advancedrocketry.gasgiants.harvestcap.infinite=Harvest cap: Infinite
 
-jei.ar.fuel.role.monopropellant=Monopropellant Fuel
-jei.ar.fuel.role.biprop_fuel=Bipropellant Fuel
+jei.ar.fuel.role.monopropellant=Monopropellant
+jei.ar.fuel.role.biprop_fuel=Bipropellant
 jei.ar.fuel.role.oxidizer=Oxidizer
 jei.ar.fuel.role.working_fluid=Working Fluid
 jei.ar.stationAssembler.newStationChipHint=§cThis points to the new Station!
@@ -873,10 +883,8 @@ tooltip.advancedrocketry.monopropmotor.alt.1=Check Fueling Station JEI-page
 # Nuclear Core
 tooltip.advancedrocketry.nuclearcore=§cPart of Rocket
 tooltip.advancedrocketry.nuclearcore.1=§6Allows planetary travel!
-tooltip.advancedrocketry.nuclearcore.shift.1=Needs to be directly on top of a
-tooltip.advancedrocketry.nuclearcore.shift.2=Nuclear Engine or another Nuclear Core.
-tooltip.advancedrocketry.nuclearcore.alt.1=Vertical placement rules don't apply
-tooltip.advancedrocketry.nuclearcore.alt.2=for Unmanned Vehicles (Gas Mission rockets)
+tooltip.advancedrocketry.nuclearcore.shift.1=§fNeeds to be directly on top of a Nuclear Engine or another Nuclear Core.
+tooltip.advancedrocketry.nuclearcore.alt.1=Vertical placement rules don't apply for Unmanned Vehicles (Gas Mission rockets)
 
 # Nuclear rocketengine
 tooltip.advancedrocketry.nuclearmotor=§cPart of Rocket
@@ -920,10 +928,10 @@ tooltip.advancedrocketry.servicemonitor.alt.1=WIP
 # Docking Pad (landingPad)
 tooltip.advancedrocketry.landingpad=Replace the launchpad’s center block with this
 tooltip.advancedrocketry.landingpad.shift.1=§cLinker§f can store this block's exact position (dimension-aware).
-tooltip.advancedrocketry.landingpad.shift.2=§fUse in §4Guidance Computer§7
-tooltip.advancedrocketry.landingpad.alt.1=Insert a Chip or programmed Linker
-tooltip.advancedrocketry.landingpad.alt.2=Rockets launched from this pad will fly to the Linker’s saved coordinates (used for automation).
+tooltip.advancedrocketry.landingpad.alt.1=§fInsert programmed §cLinker
+tooltip.advancedrocketry.landingpad.alt.2=§fRockets launched from this pad flies to the stored coordinates (used for automation).
 tooltip.advancedrocketry.landingpad.alt.3=§o(Overridden by guidance computer destination)
+msg.landingpad.linker.tooltip=Insert a Linker programmed to a Docking Pad
 
 # Launch Pad
 tooltip.advancedrocketry.launchpad=Base for Launch Pad platform.
@@ -937,7 +945,7 @@ tooltip.advancedrocketry.structuretower=Vertical support for the Launch Pad plat
 tooltip.advancedrocketry.structuretower.shift.1=§bTower must be minimum 4 blocks.
 tooltip.advancedrocketry.structuretower.shift.2=§fBottom block must touch the Launch Pad.
 tooltip.advancedrocketry.structuretower.alt.1=Main block for Unmanned Vehicle Assembler structure
-tooltip.advancedrocketry.structuretower.alt.2=Check wiki for more info.
+tooltip.advancedrocketry.structuretower.alt.2=§oCheck wiki for more info.
 
 # Terraformer
 tooltip.advancedrocketry.terraformer=Terraform the entire planet!
@@ -1042,7 +1050,7 @@ tooltip.advancedrocketry.servicestation.shift.2=§o(WIP)
 tooltip.advancedrocketry.fluidtank.empty=Empty
 tooltip.advancedrocketry.fluidtank.fluid=Fluid:
 tooltip.advancedrocketry.fluidtank.level=Level:
-tooltip.advancedrocketry.fluidtank.shift.1=§cConnects to tanks above or below to make a bigger tank
+tooltip.advancedrocketry.fluidtank.shift.1=§cConnects to tanks above or below
 
 # Wireless Transceiver
 tooltip.advancedrocketry.transceiver=Transfers §6Data
@@ -1053,20 +1061,17 @@ tooltip.advancedrocketry.transceiver.alt.2=§o(reinsert chip if stale)
 
 # Atmosphere Detector
 tooltip.advancedrocketry.atmosphereDetector=Emits redstone based on Atmosphere
-tooltip.advancedrocketry.atmosphereDetector.shift.1=Select wanted Atmosphere
-tooltip.advancedrocketry.atmosphereDetector.shift.2=emits if the condition is true
-tooltip.advancedrocketry.atmosphereDetector.alt.1=Can detect: air, vacuum,
-tooltip.advancedrocketry.atmosphereDetector.alt.2=low O₂, No O₂, very hot and more.
+tooltip.advancedrocketry.atmosphereDetector.shift.1=§fSelect wanted Atmosphere, emits redstone if true
+tooltip.advancedrocketry.atmosphereDetector.alt.1=Can detect: air, vacuum, low O₂, No O₂, very hot and more.
 
 # Station Light
-tooltip.advancedrocketry.circlelight=Always on
-tooltip.advancedrocketry.circlelight.shift.1=Does not require
-tooltip.advancedrocketry.circlelight.shift.2=Power or Redstone
+tooltip.advancedrocketry.circlelight=§cAlways on
+tooltip.advancedrocketry.circlelight.shift.1=§fDoes not require Power or Redstone
 
 # Gas Charge Pad
 tooltip.advancedrocketry.oxygencharger=Charges Space Suit O₂ and H₂
-tooltip.advancedrocketry.oxygencharger.shift.1=Stand on pad to refill
-tooltip.advancedrocketry.oxygencharger.alt.1=Does not require Power
+tooltip.advancedrocketry.oxygencharger.shift.1=§bStand on pad to refill
+tooltip.advancedrocketry.oxygencharger.alt.1=§fDoes not require Power
 
 # Docking Port
 tooltip.advancedrocketry.dockingport=Marks a station module docking point
@@ -1103,19 +1108,19 @@ tooltip.advancedrocketry.orientationctrl.alt.1=§dCosmetic only§7
 # Gravity Controller
 tooltip.advancedrocketry.gravityctrl=§cSpace Station Controller
 tooltip.advancedrocketry.gravityctrl.shift.1=§bArtificial gravity!
-tooltip.advancedrocketry.gravityctrl.alt.1=Redstone control
+tooltip.advancedrocketry.gravityctrl.alt.1=§fRedstone control
 
 # Altitude Controller
 tooltip.advancedrocketry.altitudectrl=§cSpace Station Controller
 tooltip.advancedrocketry.altitudectrl.shift.1=§bCustomize orbital height
-tooltip.advancedrocketry.altitudectrl.alt.1=§dCosmetic only§7
-tooltip.advancedrocketry.altitudectrl.alt.2=Redstone control
+tooltip.advancedrocketry.altitudectrl.alt.1=§dCosmetic only
+tooltip.advancedrocketry.altitudectrl.alt.2=§fRedstone control
 
 # Co2Scrubber
 tooltip.advancedrocketry.scrubber=Place next to Oxygen Vent
-tooltip.advancedrocketry.scrubber.shift.1=Reduces Oxygen use (max 2)
-tooltip.advancedrocketry.scrubber.alt.1=Each scrubber halves O₂ use, increases Power use.
-tooltip.advancedrocketry.scrubber.alt.2=With 2 Scrubbers, Oxygen Vent won't use Oxygen.
+tooltip.advancedrocketry.scrubber.shift.1=§fReduces Oxygen use (max 2)
+tooltip.advancedrocketry.scrubber.alt.1=§fEach scrubber halves O₂ use, increases Power use.
+tooltip.advancedrocketry.scrubber.alt.2=§fWith 2 Scrubbers, Oxygen Vent won't use Oxygen.
 
 # Oxygen Vent
 tooltip.advancedrocketry.oxygenvent=Creates breathable air in sealed rooms.
@@ -1135,7 +1140,7 @@ tooltip.advancedrocketry.warpcontroller=Turns the station into a §6Starship
 tooltip.advancedrocketry.warpcontroller.shift.1=§fPlace §4Warp Controller§f + §4Warp Core§f on a space station
 tooltip.advancedrocketry.warpcontroller.shift.2=§fWarp between planets and solar systems
 tooltip.advancedrocketry.warpcontroller.alt.1=§fUI shows location, destinations, and warp fuel
-tooltip.advancedrocketry.warpcontroller.alt.2=(You made it this far! check wiki bro)
+tooltip.advancedrocketry.warpcontroller.alt.2=§o(You made it this far! check wiki bro)
 
 # CarbonScrubberCartridge
 tooltip.advancedrocketry.scrubbercart=Used in CO₂ Scrubber
@@ -1280,11 +1285,11 @@ tooltip.advancedrocketry.orescanner.alt.1=§fScan range depends on the satellite
 # Power Sources
 tooltip.advancedrocketry.satpower.0=§5Satellite Component
 tooltip.advancedrocketry.satpower.0.shift.1=§fGenerates §c4 §fRF/t§7
-tooltip.advancedrocketry.satpower.0.shift.2=§oSatellites requires atleast 1 powergen
+tooltip.advancedrocketry.satpower.0.shift.2=§oSatellites requires at least 1 power-gen
 
 tooltip.advancedrocketry.satpower.1=§5Satellite Component
 tooltip.advancedrocketry.satpower.1.shift.1=§fGenerates §c40 §fRF/t§7
-tooltip.advancedrocketry.satpower.1.shift.2=§oSatellites requires atleast 1 powergen
+tooltip.advancedrocketry.satpower.1.shift.2=§oSatellites requires at least 1 power-gen
 
 # LibVulpes Batteries
 tooltip.libvulpes.battery.0=§5Satellite Component§7
@@ -1310,10 +1315,10 @@ tooltip.advancedrocketry.asteroidchip.alt.1=§4Insert programmed Chip in Guidanc
 tooltip.advancedrocketry.asteroidchip.alt.2=§fYou get the chip back after Mission
 
 # Station Chip
-tooltip.advancedrocketry.stationchip=§bProgram in Space Station Assembler
+tooltip.advancedrocketry.stationchip=§bSelect Landing Pad in Rocket
 tooltip.advancedrocketry.stationchip.shift.1=§fPrintable with Orbital Registry
 tooltip.advancedrocketry.stationchip.shift.2=§cCopied in Satellite Builder
-tooltip.advancedrocketry.stationchip.alt.1=§4Insert programmed Chip in Guidance Computer§7
+tooltip.advancedrocketry.stationchip.alt.1=§4Insert programmed Chip in Guidance Computer§f
 tooltip.advancedrocketry.stationchip.namelabel=Name:
 
 # Planet Chip
@@ -1419,9 +1424,9 @@ tooltip.advancedrocketry.libvulpes.creativepowerbattery=§dInfinite Power
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.1=§cPart of Multiblock
 tooltip.advancedrocketry.libvulpes.creativepowerbattery.shift.2=§bUse Holo-Projector!
 tooltip.advancedrocketry.libvulpes.coalgenerator=§cBurns solid fuels
-tooltip.advancedrocketry.libvulpes.linker.shift.1=§fSneak+Right-click to link, (Use in air to reset.)
-tooltip.advancedrocketry.libvulpes.linker.alt.1=§fLinks §cinfrastructure§f to rockets.
-tooltip.advancedrocketry.libvulpes.linker.alt.2=§fTo use as Guidance Chip, link to §eDocking Pad§f, then place in §eGuidance Computer§f
+tooltip.advancedrocketry.libvulpes.linker.shift.1=§bLinks infrastructure to rocket!
+tooltip.advancedrocketry.libvulpes.linker.shift.2=§fSneak+Right-click to link, (Use in air to reset)
+tooltip.advancedrocketry.libvulpes.linker.alt.1=§fTo use as Guidance Chip, link to §cDocking Pad§f, then place in §cGuidance Computer§f or §cDocking Pad
 
 
 # Planet Analyser
@@ -1514,15 +1519,15 @@ tooltip.advancedrocketry.stationassembler.shift.1=§bRequires Launch Pad + Struc
 tooltip.advancedrocketry.stationassembler.alt.1=§fPlace this 1 block higher than Launch Pad, connecting lower corners and facing opposite of the Launch Pad square
 
 # Packet Station
-tooltip.advancedrocketry.packedstructure=Insert in §cSatellite Bay§7 to put in Orbit!
-tooltip.advancedrocketry.packedstructure.shift.1=§eSet the rocket's target planet before launch!
+tooltip.advancedrocketry.packedstructure=§fInsert in §cSatellite Bay§f to put in Orbit!
+tooltip.advancedrocketry.packedstructure.shift.1=§eSet the rocket's target planet before launch
 
 # Deployable Rocket Assembler
 tooltip.advancedrocketry.deployablerocketassembler=§cBuilds Rockets on Space Stations
 tooltip.advancedrocketry.deployablerocketassembler.shift.1=§bRequires Structure Tower blocks
 tooltip.advancedrocketry.deployablerocketassembler.shift.2=§fUsed for §6Gas Missions§7
 tooltip.advancedrocketry.deployablerocketassembler.alt.1=§fPlace this in the middle of an upside-down T facing outward in space, then add horizontal support from the tower top.
-tooltip.advancedrocketry.deployablerocketassembler.alt.2=Check wiki if unsure!
+tooltip.advancedrocketry.deployablerocketassembler.alt.2=§oCheck wiki if unsure!
 
 # Hovercraft
 tooltip.advancedrocketry.hovercraft=Long-lasting dilithium power source. It'll probably outlive you.

@@ -3,8 +3,6 @@ package zmaster587.advancedRocketry.api;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.util.WeightEngine;
@@ -84,14 +82,6 @@ public class StatsRocket {
         statTags = new HashMap<>();
     }
 
-	/*public StatsRocket(int thrust, int weight, int fuelRate, int fuel) {
-		this.thrust = thrust;
-		this.weight = weight;
-		this.fuelLiquid = fuel;
-		lastSeatX = -1;
-		engineLoc = new ArrayList<Vector3F>();
-	}*/
-
     public static StatsRocket createFromNBT(NBTTagCompound nbt) {
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
@@ -133,24 +123,23 @@ public class StatsRocket {
 
     public float getWeight_NoFuel() {return weight;}
 
+    public float getNeededThrust(float gravitationalMultiplier) {
+        return getWeight() * (ARConfiguration.getCurrentConfig().gravityAffectsFuel ? gravitationalMultiplier : 1f);
+    }
+
+    private float getPropellantWeight(FuelType fuelType) {
+        return WeightEngine.INSTANCE.getRocketPropellantWeight(fuelType, getFuelAmount(fuelType));
+    }
+
     public float getWeight() {
-        float fluidWeight = 0;
-        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-            if (FluidRegistry.isFluidRegistered(getFuelFluid())) {
-                Fluid f = FluidRegistry.getFluid(getFuelFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_MONOPROPELLANT));
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_BIPROPELLANT));
-            }
-            if (FluidRegistry.isFluidRegistered(getOxidizerFluid())) {
-                Fluid f = FluidRegistry.getFluid(getOxidizerFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.LIQUID_OXIDIZER));
-            }
-            if (FluidRegistry.isFluidRegistered(getWorkingFluid())) {
-                Fluid f = FluidRegistry.getFluid(getWorkingFluid());
-                fluidWeight += WeightEngine.INSTANCE.getWeight(f, getFuelAmount(FuelType.NUCLEAR_WORKING_FLUID));
-            }            
+        if (!ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+            return weight;
         }
-        return weight + fluidWeight;
+        return weight
+                + getPropellantWeight(FuelType.LIQUID_MONOPROPELLANT)
+                + getPropellantWeight(FuelType.LIQUID_BIPROPELLANT)
+                + getPropellantWeight(FuelType.LIQUID_OXIDIZER)
+                + getPropellantWeight(FuelType.NUCLEAR_WORKING_FLUID);
     }
 
     public void setWeight(float weight) {
@@ -190,8 +179,12 @@ public class StatsRocket {
     }
 
     public float getAcceleration(float gravitationalMultiplier) {
-        float N = getThrust() - (getWeight()  * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1));
-        return N/getWeight() /20f;
+        float weight = getWeight();
+        if (weight <= 0) {
+            return 0f;
+        }
+        float netThrust = getThrust() - getNeededThrust(gravitationalMultiplier);
+        return netThrust / weight / 20f;
     }
 
     public List<Vector3F<Float>> getEngineLocations() {
@@ -224,7 +217,6 @@ public class StatsRocket {
      */
     public void addEngineLocation(float x, float y, float z) {
         //We want to be in the center of the block
-        //System.out.println("ADD engine at "+x+":"+y+":"+z);
         engineLoc.add(new Vector3F<>(x, y, z));
     }
 
@@ -254,7 +246,6 @@ public class StatsRocket {
             stat.setFuelCapacity(type, this.getFuelCapacity(type));
             stat.setBaseFuelRate(type, this.getBaseFuelRate(type));
         }
-
         stat.pilotSeatPos = new HashedBlockPosition(this.pilotSeatPos.x, this.pilotSeatPos.y, this.pilotSeatPos.z);
         stat.passengerSeats.addAll(passengerSeats);
         stat.engineLoc = new ArrayList<>(engineLoc);
@@ -285,7 +276,6 @@ public class StatsRocket {
                     return fuelNuclearWorkingFluid;
             }
         }
-
         return 0;
     }
 
@@ -312,7 +302,6 @@ public class StatsRocket {
                     return fuelCapacityNuclearWorkingFluid;
             }
         }
-
         return 0;
     }
 
@@ -340,7 +329,6 @@ public class StatsRocket {
             case NUCLEAR_WORKING_FLUID:
                 return fuelRateNuclearWorkingFluid;
         }
-
         return 0;
     }
 
@@ -563,6 +551,7 @@ public class StatsRocket {
         for (FuelType type : FuelType.values()) {
             setFuelAmount(type, 0);
             setFuelRate(type, 0);
+            setBaseFuelRate(type, 0);
             setFuelCapacity(type, 0);
         }
 
@@ -636,13 +625,13 @@ public class StatsRocket {
         stats.setInteger("fuelRateNuclearWorkingFluid", this.fuelRateNuclearWorkingFluid);
         stats.setInteger("fuelRateWarp", this.fuelRateWarp);
 
-        stats.setFloat("fuelBaseRateMonopropellant", this.fuelBaseRateMonopropellant);
-        stats.setFloat("fuelBaseRateBipropellant", this.fuelBaseRateBipropellant);
-        stats.setFloat("fuelBaseRateOxidizer", this.fuelBaseRateOxidizer);
-        stats.setFloat("fuelBaseRateImpulse", this.fuelBaseRateImpulse);
-        stats.setFloat("fuelBaseRateIon", this.fuelBaseRateIon);
-        stats.setFloat("fuelBaseRateNuclearWorkingFluid", this.fuelBaseRateNuclearWorkingFluid);
-        stats.setFloat("fuelBaseRateWarp", this.fuelBaseRateWarp);
+        stats.setInteger("fuelBaseRateMonopropellant", this.fuelBaseRateMonopropellant);
+        stats.setInteger("fuelBaseRateBipropellant", this.fuelBaseRateBipropellant);
+        stats.setInteger("fuelBaseRateOxidizer", this.fuelBaseRateOxidizer);
+        stats.setInteger("fuelBaseRateImpulse", this.fuelBaseRateImpulse);
+        stats.setInteger("fuelBaseRateIon", this.fuelBaseRateIon);
+        stats.setInteger("fuelBaseRateNuclearWorkingFluid", this.fuelBaseRateNuclearWorkingFluid);
+        stats.setInteger("fuelBaseRateWarp", this.fuelBaseRateWarp);
 
         NBTTagCompound dynStats = new NBTTagCompound();
         for (String key : statTags.keySet()) {
@@ -681,16 +670,14 @@ public class StatsRocket {
                 locs[i] = vec.x;
                 locs[i + 1] = vec.y;
                 locs[i + 2] = vec.z;
-
             }
             stats.setIntArray("passengerSeats", locs);
         }
-
         nbt.setTag(TAGNAME, stats);
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
-this.reset();
+        this.reset();
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
             this.thrust = stats.getInteger("thrust");
@@ -724,14 +711,13 @@ this.reset();
             this.fuelRateNuclearWorkingFluid = stats.getInteger("fuelRateNuclearWorkingFluid");
             this.fuelRateWarp = stats.getInteger("fuelRateWarp");
 
-            this.fuelBaseRateMonopropellant = (int)stats.getFloat("fuelBaseRateMonopropellant");
-            this.fuelBaseRateBipropellant = (int)stats.getFloat("fuelBaseRateBipropellant");
-            this.fuelBaseRateOxidizer = (int)stats.getFloat("fuelBaseRateOxidizer");
+            this.fuelBaseRateMonopropellant = stats.getInteger("fuelBaseRateMonopropellant");
+            this.fuelBaseRateBipropellant = stats.getInteger("fuelBaseRateBipropellant");
+            this.fuelBaseRateOxidizer = stats.getInteger("fuelBaseRateOxidizer");
             this.fuelBaseRateImpulse = stats.getInteger("fuelBaseRateImpulse");
             this.fuelBaseRateIon = stats.getInteger("fuelBaseRateIon");
-            this.fuelBaseRateNuclearWorkingFluid = (int)stats.getFloat("fuelBaseRateNuclearWorkingFluid");
+            this.fuelBaseRateNuclearWorkingFluid = stats.getInteger("fuelBaseRateNuclearWorkingFluid");
             this.fuelBaseRateWarp = stats.getInteger("fuelBaseRateWarp");
-
 
             if (stats.hasKey("dynStats")) {
                 NBTTagCompound dynStats = stats.getCompoundTag("dynStats");

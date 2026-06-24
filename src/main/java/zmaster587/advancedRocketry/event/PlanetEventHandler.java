@@ -183,11 +183,6 @@ public class PlanetEventHandler {
     //Handle gravity
     @SubscribeEvent
     public void playerTick(LivingUpdateEvent event) {
-/*
-        if (event.getEntity().world.isRemote && event.getEntity().posY > 260 && event.getEntity().posY < 270 && event.getEntity().motionY < -.1) {
-            RocketEventHandler.destroyOrbitalTextures(event.getEntity().world);
-        }
- */
         if (event.getEntity().isInWater()) {
             if (AtmosphereType.LOWOXYGEN.isImmune(event.getEntityLiving()))
                 event.getEntity().setAir(300);
@@ -223,8 +218,6 @@ public class PlanetEventHandler {
             }
 
         }
-
-        //GravityHandler.applyGravity(event.getEntity());
     }
 
     @SubscribeEvent
@@ -240,18 +233,6 @@ public class PlanetEventHandler {
             }
         }
     }
-
-
-    //TODO: more robust way of inv checking
-	/*@SubscribeEvent
-	public void containerOpen(PlayerContainerEvent event) {
-		//event.getEntity()Player.openContainer
-		if(RocketInventoryHelper.canPlayerBypassInvChecks(event.getEntityPlayer()) && event instanceof PlayerContainerEvent.Close)
-			RocketInventoryHelper.removePlayerFromInventoryBypass(event.getEntityPlayer());
-		if(event instanceof PlayerContainerEvent.Open) {
-
-		}
-	}*/
 
     @SubscribeEvent
     public void blockPlacedEvent(@Nonnull PlaceEvent event) {
@@ -370,7 +351,6 @@ public class PlanetEventHandler {
         for (ISpaceObject spaceObject : SpaceObjectManager.getSpaceManager().getSpaceObjects()) {
             PacketHandler.sendToDispatcher(new PacketSpaceStationInfo(spaceObject.getId(), spaceObject), event.getManager());
         }
-
         PacketHandler.sendToDispatcher(new PacketDimInfo(0, DimensionManager.getInstance().getDimensionProperties(0)), event.getManager());
     }
 
@@ -443,48 +423,11 @@ public class PlanetEventHandler {
             if (i.pos.equals(hp))
                 event.setResult(Result.DENY);
         }
-        /*
-        int target_sea_lvl = DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).getTargetSeaLevel();
-        IBlockState state = event.getState();
-        if (event.getPos().getY() >= target_sea_lvl)
-            event.setResult(Result.DENY);
-
-         */
     }
 
     @SubscribeEvent
     public void serverTickEvent(TickEvent.WorldTickEvent event) {
-
-        /*
-        World world = event.world;
-        int target_sea_lvl = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTargetSeaLevel();
-
-        if (world.provider instanceof IPlanetaryProvider) {
-
-            Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(world.provider.getDimension())).getChunkProvider().getLoadedChunks();
-
-            for (Chunk chunk : list) {
-                int randomx = world.rand.nextInt(16) + chunk.x*16;
-                int randomz = world.rand.nextInt(16) + chunk.z*16;
-                BlockPos topblock = world.getHeight(new BlockPos(randomx, 0, randomz)).down();
-                if (topblock.getY() >= target_sea_lvl && (world.getBlockState(topblock).getBlock() == Blocks.WATER ||world.getBlockState(topblock).getBlock() == Blocks.FLOWING_WATER)) {
-
-                    if (!(world.getBlockState(topblock).getValue(BlockLiquid.LEVEL).intValue() == 0))
-                        continue;
-
-                        world.setBlockState(topblock, Blocks.AIR.getDefaultState());
-                        //world.notifyBlockUpdate(topblock, world.getBlockState(topblock), world.getBlockState(topblock), 3);
-
-                }
-
-            }
-        }
-
-         */
     }
-
-
-
 
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event) {
@@ -541,17 +484,11 @@ public class PlanetEventHandler {
                 near = 0.75f * f1 * (2.00f - atmosphere / 100f);
                 far = f1 * (2.002f - atmosphere / 100f);
             }
-
             GlStateManager.setFogStart(near);
             GlStateManager.setFogEnd(far);
             GlStateManager.setFogDensity(0);
-
-
-            //event.setCanceled(false);
         }
-
     }
-
 
     //Saves NBT data
     @SubscribeEvent
@@ -566,8 +503,7 @@ public class PlanetEventHandler {
             }
     }
 
-
-    //Make sure the player doesnt die on low gravity worlds
+    //Make sure the player doesn't die on low gravity worlds
     @SubscribeEvent
     public void fallEvent(LivingFallEvent event) {
         if (event.getEntity().world.provider instanceof IPlanetaryProvider) {
