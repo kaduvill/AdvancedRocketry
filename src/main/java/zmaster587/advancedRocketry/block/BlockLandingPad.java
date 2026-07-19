@@ -1,9 +1,5 @@
 package zmaster587.advancedRocketry.block;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,6 +18,9 @@ import zmaster587.advancedRocketry.client.TooltipInjector;
 import zmaster587.advancedRocketry.tile.station.TileLandingPad;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class BlockLandingPad extends Block {
 
