@@ -1,6 +1,6 @@
 Changelog 2.2.12
 
-- .
+- Fixed Dockingpad correctly drop inventory when broken
 
 Changelog 2.2.11
 

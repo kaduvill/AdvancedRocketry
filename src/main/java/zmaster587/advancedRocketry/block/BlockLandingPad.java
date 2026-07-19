@@ -7,16 +7,14 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,7 +38,6 @@ public class BlockLandingPad extends Block {
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileLandingPad();
     }
-
 
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
@@ -71,7 +68,9 @@ public class BlockLandingPad extends Block {
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileLandingPad) {
-            ((TileLandingPad) tile).unregisterTileWithStation(world, pos);
+            TileLandingPad landingPad = (TileLandingPad) tile;
+            landingPad.unregisterTileWithStation(world, pos);
+            InventoryHelper.dropInventoryItems(world, pos, landingPad);
         }
         super.breakBlock(world, pos, state);
     }
