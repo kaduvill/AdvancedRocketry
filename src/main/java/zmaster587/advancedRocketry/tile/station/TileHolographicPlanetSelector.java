@@ -430,12 +430,14 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     @Override
-    public void useNetworkData(EntityPlayer player, Side side, byte id,
-                               NBTTagCompound nbt) {
+    public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
         if (id == SCALEPACKET) {
-            size = nbt.getFloat("scale");
+            size = MathHelper.clamp(nbt.getFloat("scale"), 0.0F, 1.0F);
+            markDirty();
         } else if (id == STATEUPDATE) {
             state = RedstoneState.values()[nbt.getByte("state")];
+            redstoneControl.setRedstoneState(state);
+            markDirty();
         }
     }
 
@@ -457,7 +459,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
         state.writeToNBT(compound);
-
+        compound.setFloat("hologramSize", size);
         return compound;
     }
 
@@ -466,5 +468,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         super.readFromNBT(compound);
         state = RedstoneState.createFromNBT(compound);
         redstoneControl.setRedstoneState(state);
+        if (compound.hasKey("hologramSize"))
+            size = MathHelper.clamp(compound.getFloat("hologramSize"), 0.0F, 1.0F);
     }
 }
