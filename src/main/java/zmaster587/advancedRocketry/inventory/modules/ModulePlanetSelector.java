@@ -338,7 +338,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         int offsetY = (int) (1 * posY) - displaySize / 2;
 
         ModuleButton button;
-        planetList.add(button = new ModuleButtonPlanet(offsetX, offsetY, planet.getId(), "", this, planet, planet.getName(), displaySize, displaySize));
+        planetList.add(button = new ModuleButtonPlanet(offsetX, offsetY, planet.getId(), "", this, planet, I18n.translateToLocalFormatted("msg.advancedrocketry.planetselector.planet.tooltip.name", planet.getName()) + "\n" + I18n.translateToLocalFormatted("msg.advancedrocketry.planetselector.planet.tooltip.moons.count", planet.getChildPlanets().size()), displaySize, displaySize));
         button.setSound("buttonBlipA");
 
         renderPropertiesMap.put(planet.getId(), new PlanetRenderProperties(displaySize, offsetX, offsetY));
@@ -681,7 +681,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                     if (planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
                         continue;
 
-                    ModuleButton button = new ModuleButton(0, i * 12, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
+                    ModuleButton button = new PlanetListButton(0, i * 12, properties.getId(), properties.getName(), properties.hasChildren());
                     list2.add(button);
 
                     if (properties.getId() == selectedPlanet)
@@ -699,7 +699,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                         continue;
 
                     if (!properties.isMoon() && properties.getId() != ARConfiguration.getCurrentConfig().spaceDimId) {
-                        ModuleButton button = new ModuleButton(0, i * 12, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
+                        ModuleButton button = new PlanetListButton(0, i * 12, properties.getId(), properties.getName(), properties.hasChildren());
                         list2.add(button);
 
                         if (properties.getId() == selectedPlanet)
@@ -715,7 +715,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 if (planetDefiner != null && !planetDefiner.isStarKnown(properties))
                     continue;
 
-                ModuleButton button = new ModuleButton(0, i * 12, properties.getId() + Constants.STAR_ID_OFFSET, properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
+                ModuleButton button = new PlanetListButton(0, i * 12, properties.getId() + Constants.STAR_ID_OFFSET, properties.getName(), properties.getNumPlanets() > 0);
                 list2.add(button);
 
                 if (properties.getId() + Constants.STAR_ID_OFFSET == selectedPlanet)
@@ -745,7 +745,6 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
             clickablePlanetList.setOffset2(0, 64);
 
         clickablePlanetList.setEnabled(enabled);
-        //bgTexture.setEnabled(enabled);
     }
 
     @Override
@@ -767,7 +766,6 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 module.sendChanges(container, crafter, variableId, localId);
                 return;
             }
-
             localId -= module.numberOfChangesToSend();
         }
     }
@@ -779,7 +777,6 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 module.onChangeRecieved(slot, value);
                 return;
             }
-
             slot -= module.numberOfChangesToSend();
         }
     }
@@ -790,8 +787,38 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         for (ModuleBase module : staticModuleList) {
             numChanges += module.numberOfChangesToSend();
         }
-
         return numChanges;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private final class PlanetListButton extends ModuleButton {
+
+        private static final String CHILD_MARKER = ">";
+        private static final int HORIZONTAL_PADDING = 4;
+        private static final int MARKER_GAP = 4;
+
+        private final boolean hasChildren;
+
+        private PlanetListButton(int offsetX, int offsetY, int buttonId, String text, boolean hasChildren) {
+            super(offsetX, offsetY, buttonId, text, ModulePlanetSelector.this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
+            this.hasChildren = hasChildren;
+        }
+
+        @Override
+        public void renderForeground(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel, GuiContainer gui, FontRenderer font) {
+            int textY = offsetY + sizeY / 2 - font.FONT_HEIGHT / 2;
+            int markerWidth = font.getStringWidth(CHILD_MARKER);
+            int markerX = offsetX + sizeX - HORIZONTAL_PADDING - markerWidth;
+            int textAreaLeft = offsetX + HORIZONTAL_PADDING;
+            int textAreaRight = markerX - MARKER_GAP;
+            int textAreaWidth = Math.max(0, textAreaRight - textAreaLeft);
+            String displayText = font.trimStringToWidth(getText(), textAreaWidth);
+
+            gui.drawCenteredString(font, displayText, textAreaLeft + textAreaWidth / 2, textY, getColor());
+
+            if (hasChildren)
+                font.drawString(CHILD_MARKER, markerX, textY, getColor());
+        }
     }
 
     //Closest thing i can get to a struct :/

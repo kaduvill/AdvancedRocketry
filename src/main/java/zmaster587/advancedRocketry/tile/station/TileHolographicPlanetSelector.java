@@ -46,6 +46,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     private int selectedId;
     private float onTime;
     private ModuleText targetGrav;
+    private ModuleText navigationHint;
     private float size;
     private boolean allowUpdate = true;  //Hack to get around the delay in entity position
     private boolean stellarMode;
@@ -54,6 +55,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         entities = new LinkedList<>();
         starEntities = new LinkedList<>();
         targetGrav = new ModuleText(6, 45, LibVulpes.proxy.getLocalizedString("msg.planetholo.size"), 0x202020);
+        navigationHint = new ModuleText(8, 25, LibVulpes.proxy.getLocalizedString("msg.planetholo.navigation"), 0x404040);
         selectedPlanet = null;
         stellarMode = false;
         selectedId = Constants.INVALID_PLANET;
@@ -331,7 +333,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
         List<ModuleBase> modules = new LinkedList<>();
-
+        modules.add(navigationHint);
         modules.add(targetGrav);
         modules.add(new ModuleSlider(6, 60, 0, TextureResources.doubleWarningSideBarIndicator, this));
         modules.add(redstoneControl);

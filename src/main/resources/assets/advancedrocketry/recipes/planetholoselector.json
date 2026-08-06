@@ -2,7 +2,7 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-	"cpc",
+	"kpk",
 	"lbl",
 	"coc"
     ],
@@ -13,7 +13,13 @@
             "item": "advancedrocketry:ic",
             "data": 1
         },
-	"o":
+      "k":
+      {
+        "item": "minecraft:diamond",
+        "data": 1
+      },
+
+      "o":
         {
             "item": "advancedrocketry:satelliteprimaryfunction",
             "data": 1
@@ -24,7 +30,7 @@
         },
 	"b":
         {
-            "item": "advancedrocketry:guidancecomputer"
+            "item": "advancedrocketry:planetselector"
         },
 	"p":
         {

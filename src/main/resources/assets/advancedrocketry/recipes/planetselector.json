@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "cpc",
+    "pbp",
+    "csc"
+  ],
+  "key":
+  {
+    "c":
+    {
+      "item": "advancedrocketry:ic",
+      "data": 1
+    },
+    "p":
+    {
+      "item": "minecraft:diamond"
+    },
+    "b":
+    {
+      "item": "advancedrocketry:guidancecomputer"
+    },
+    "s":
+    {
+      "item": "libvulpes:structuremachine"
+    }
+  },
+  "result":
+  {
+    "item": "advancedrocketry:planetselector",
+    "count": 1
+  }
+}

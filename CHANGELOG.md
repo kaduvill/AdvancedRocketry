@@ -1,7 +1,17 @@
 Changelog 2.2.12
 
 - Fixed Dockingpad correctly drop inventory when broken
-
+- "Planet Selector" renamed and got recipe
+  - name: "Starmap Console"
+  - Fullscreen view:
+    - added ">" to planet list if body has children (UX)
+    - added to map: 2nd line tooltip when parent is planet
+- "Holographic Planet Selector" renamed and new recipe
+  - name: "Holographic Starmap Console"
+  - TOP integration
+  - hint in GUI on how to navigate
+  - 
+  
 Changelog 2.2.11
 
 - Rocket
