@@ -22,6 +22,11 @@ public class EntityUIButton extends EntityUIPlanet {
     }
 
     @Override
+    public float getCollisionBorderSize() {
+        return 0.1F;
+    }
+
+    @Override
     protected void entityInit() {
         this.dataManager.register(planetID, id);
         this.dataManager.register(scale, 1f);

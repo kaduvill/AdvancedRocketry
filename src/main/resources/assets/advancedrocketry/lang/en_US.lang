@@ -540,6 +540,7 @@ msg.dockingport.target=Target ID
 msg.dockingport.me=My ID
 msg.planetholo.size=Hologram Size:
 msg.planetholo.navigation=Right-click to navigate
+msg.planetholo..uplevel=Up a level
 msg.stationaltctrl.maxaltrate=Max Altitude Change Rate:
 msg.stationaltctrl.tgtalt=Target Altitude:
 msg.stationaltctrl.alt=Altitude:
