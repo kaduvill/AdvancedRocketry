@@ -46,6 +46,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     private int selectedId;
     private float onTime;
     private ModuleText targetGrav;
+    private ModuleText navigationHint;
     private float size;
     private boolean allowUpdate = true;  //Hack to get around the delay in entity position
     private boolean stellarMode;
@@ -54,6 +55,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         entities = new LinkedList<>();
         starEntities = new LinkedList<>();
         targetGrav = new ModuleText(6, 45, LibVulpes.proxy.getLocalizedString("msg.planetholo.size"), 0x202020);
+        navigationHint = new ModuleText(8, 25, LibVulpes.proxy.getLocalizedString("msg.planetholo.navigation"), 0x404040);
         selectedPlanet = null;
         stellarMode = false;
         selectedId = Constants.INVALID_PLANET;
@@ -331,7 +333,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
         List<ModuleBase> modules = new LinkedList<>();
-
+        modules.add(navigationHint);
         modules.add(targetGrav);
         modules.add(new ModuleSlider(6, 60, 0, TextureResources.doubleWarningSideBarIndicator, this));
         modules.add(redstoneControl);
@@ -428,12 +430,14 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     @Override
-    public void useNetworkData(EntityPlayer player, Side side, byte id,
-                               NBTTagCompound nbt) {
+    public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
         if (id == SCALEPACKET) {
-            size = nbt.getFloat("scale");
+            size = MathHelper.clamp(nbt.getFloat("scale"), 0.0F, 1.0F);
+            markDirty();
         } else if (id == STATEUPDATE) {
             state = RedstoneState.values()[nbt.getByte("state")];
+            redstoneControl.setRedstoneState(state);
+            markDirty();
         }
     }
 
@@ -455,7 +459,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
         state.writeToNBT(compound);
-
+        compound.setFloat("hologramSize", size);
         return compound;
     }
 
@@ -464,5 +468,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         super.readFromNBT(compound);
         state = RedstoneState.createFromNBT(compound);
         redstoneControl.setRedstoneState(state);
+        if (compound.hasKey("hologramSize"))
+            size = MathHelper.clamp(compound.getFloat("hologramSize"), 0.0F, 1.0F);
     }
 }

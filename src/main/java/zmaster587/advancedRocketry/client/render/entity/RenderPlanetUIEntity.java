@@ -59,35 +59,42 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
 
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y + sizeScale * 0.03f, (float) z);
-        //Max because moon was too small to be visible
 
-        GL11.glScalef(.1f * sizeScale, .1f * sizeScale, .1f * sizeScale);
+        GL11.glScalef(0.1F * sizeScale, 0.1F * sizeScale, 0.1F * sizeScale);
         GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         Minecraft.getMinecraft().renderEngine.bindTexture(properties.getPlanetIconLEO());
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_SRC_ALPHA);
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0);
 
-        GlStateManager.color(1f, 1, 1f, .5f);
-
+        //Render the actual planet as solid geometry.
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPushMatrix();
-        GL11.glRotatef(entity.world.getTotalWorldTime() & 0xFF, 0, 1, 0);
+        GL11.glRotatef((entity.world.getTotalWorldTime() + partialTicks) % 360.0F, 0.0F, 1.0F, 0.0F);
         sphere.renderAll();
         GL11.glPopMatrix();
 
+        //Everything after the planet core may use transparency.
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         //Render shadow
         GL11.glPushMatrix();
-        GL11.glScalef(1.1f, 1.1f, 1.1f);
-        GL11.glRotatef(90, 0, 0, 1);
-        GL11.glRotated(-(properties.orbitTheta * 180 / Math.PI), 1, 0, 0);
+        GL11.glScalef(1.1F, 1.1F, 1.1F);
+        GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
+        GL11.glRotated(-(properties.orbitTheta * 180.0D / Math.PI), 1.0D, 0.0D, 0.0D);
+        GlStateManager.depthMask(false);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.shadow3);
-        GlStateManager.color(.1f, .1f, .1f, 0.75f);
-        sphere.renderAll();
 
+        GlStateManager.color(0.1F, 0.1F, 0.1F, 0.75F);
+        sphere.renderAll();
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
+        //Restore before rendering rings.
+        GlStateManager.depthMask(true);
         if (properties.hasRings) {
             //Rotate for rings
             GL11.glRotatef(90, 1, 0, 0);
@@ -109,65 +116,43 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
             RenderHelper.renderBottomFaceWithUV(buffer, 0, -1, -1, 1, 1, 0, 1, 0, 1);
             Tessellator.getInstance().draw();
         }
-
         GL11.glPopMatrix();
 
-        //Render ATM
+        //Decorative effects: depth-tested, but do not modify the depth buffer.
+        GlStateManager.depthMask(false);
+
+        // Atmosphere
         if (properties.hasAtmosphere()) {
             GL11.glPushMatrix();
             GlStateManager.disableTexture2D();
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.color(properties.skyColor[0], properties.skyColor[1], properties.skyColor[2], .1f);
-
-            for (int i = 0; i < 5; i++) {
-                GL11.glScalef(1.02f, 1.02f, 1.02f);
-                sphere.renderAll();
-            }
-
+            GlStateManager.color(properties.skyColor[0], properties.skyColor[1], properties.skyColor[2], 0.04F);
+            GL11.glScalef(1.012F, 1.012F, 1.012F);
+            sphere.renderAll();
             GlStateManager.enableTexture2D();
             GL11.glPopMatrix();
         }
 
-        //Render hololines
-        GL11.glPushMatrix();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        BufferBuilder buf = Tessellator.getInstance().getBuffer();
-        GlStateManager.disableTexture2D();
-
-        float myTime;
-
-        for (int i = 0; i < 4; i++) {
-            myTime = ((i * 4 + entity.world.getTotalWorldTime() & 0xF) / 16f);
-
-            GlStateManager.color(0, 1f, 1f, .2f * (1 - myTime));
-            buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
-            RenderHelper.renderTopFace(buf, myTime - 0.5, -.5f, -.5f, .5f, .5f);
-            RenderHelper.renderBottomFace(buf, myTime - 0.5, -.5f, -.5f, .5f, .5f);
-            Tessellator.getInstance().draw();
-        }
-        GlStateManager.alphaFunc(GL11.GL_GREATER, .1f);
-        GlStateManager.enableTexture2D();
-        GL11.glPopMatrix();
-
-        //RenderSelection
+        // Selection indicator
         if (entity.isSelected()) {
-            GlStateManager.disableTexture2D();
-            double speedRotate = 0.025d;
-            GlStateManager.color(0.4f, 0.4f, 1f, 0.6f);
-            GL11.glTranslated(0, -1.25, 0);
             GL11.glPushMatrix();
-            GL11.glRotated(speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
+            GlStateManager.disableTexture2D();
+            double speedRotate = 0.025D;
+            double rotation = speedRotate * System.currentTimeMillis() % 360.0D;
+            GlStateManager.color(0.4F, 0.4F, 1.0F, 0.6F);
+            GL11.glTranslated(0.0D, -1.25D, 0.0D);
+            GL11.glPushMatrix();
+            GL11.glRotated(rotation, 0.0D, 1.0D, 0.0D);
             RendererWarpCore.model.renderOnly("Rotate1");
             GL11.glPopMatrix();
-
             GL11.glPushMatrix();
-            GL11.glRotated(180 + speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
+            GL11.glRotated(180.0D + rotation, 0.0D, 1.0D, 0.0D);
             RendererWarpCore.model.renderOnly("Rotate1");
             GL11.glPopMatrix();
             GlStateManager.enableTexture2D();
+            GL11.glPopMatrix();
         }
-
+        GlStateManager.depthMask(true);
         GL11.glPopMatrix();
 
         RayTraceResult hitObj = Minecraft.getMinecraft().objectMouseOver;
@@ -210,12 +195,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
 
             GL11.glPopMatrix();
         }
-
-        //Clean up and make player not transparent
-        GlStateManager.color(1, 1, 1);
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        restoreRenderState();
     }
 
     protected void renderMassIndicator(BufferBuilder buffer, float percent) {
@@ -243,5 +223,17 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         //Offset by 15 for Y
         RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f, maxUV);
         Tessellator.getInstance().draw();
+    }
+
+    private static void restoreRenderState() {
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
     }
 }

@@ -28,6 +28,7 @@ public class TopIntegration {
         @Override
         public Void apply(ITheOneProbe top) {
             top.registerEntityDisplayOverride(new RocketEntityDisplayOverride());
+            top.registerEntityDisplayOverride(new HolographicBodyDisplayOverride());
             top.registerEntityProvider(new RocketEntityProbeProvider());
             top.registerProvider(new DataBlockProbeProvider());
             return null;

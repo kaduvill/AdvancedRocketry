@@ -69,7 +69,7 @@ tile.hotDryturf.name=Oxidized Ferric Sand
 tile.concrete.name=Concrete
 tile.lathe.name=Lathe
 tile.rollingMachine.name=Rolling Machine
-tile.planetSelector.name=Planet Selector
+tile.planetSelector.name=Starmap Console
 tile.platepress.name=Small Plate Press
 tile.placeHolder.name=Machine
 tile.stationAssembler.name=Space Station Assembler
@@ -119,7 +119,7 @@ tile.altitudeController.name=Altitude Controller
 tile.railgun.name=Railgun
 tile.advRocket.name=Advanced Monopropellant Rocket Engine
 tile.advbipropellantRocket.name=Advanced Bipropellant Rocket Engine
-tile.planetHoloSelector.name=Holographic Planet Selector
+tile.planetHoloSelector.name=Holographic Starmap Console
 tile.lens.name=Lens
 tile.forceField.name=Force Field
 tile.forceFieldProjector.name=Force Field Projector
@@ -539,6 +539,8 @@ msg.satbuilder.writesecondchip=Write to Secondary Chip
 msg.dockingport.target=Target ID
 msg.dockingport.me=My ID
 msg.planetholo.size=Hologram Size:
+msg.planetholo.navigation=Right-click to navigate
+msg.planetholo..uplevel=Up a level
 msg.stationaltctrl.maxaltrate=Max Altitude Change Rate:
 msg.stationaltctrl.tgtalt=Target Altitude:
 msg.stationaltctrl.alt=Altitude:
@@ -813,7 +815,9 @@ jei.ar.fuel.role.oxidizer=Oxidizer
 jei.ar.fuel.role.working_fluid=Working Fluid
 jei.ar.stationAssembler.newStationChipHint=§cThis points to the new Station!
 
-# TOP-integration
+###################################
+# TOP integration . The One Probe #
+###################################
 
 msg.top.advancedrocketry.guidance.noComputer=No Guidance Computer
 msg.top.advancedrocketry.guidance.noDestination=No Destination
@@ -846,6 +850,17 @@ msg.top.advancedrocketry.data.mode.insert=Insert
 msg.top.advancedrocketry.data.mode.extract=Extract
 msg.top.advancedrocketry.data.link.linked=Linked
 msg.top.advancedrocketry.data.link.unlinked=Unlinked
+
+msg.top.advancedrocketry.hologram.upLevel=Up a level
+msg.top.advancedrocketry.hologram.type=Type
+msg.top.advancedrocketry.hologram.type.planet=Planet
+msg.top.advancedrocketry.hologram.type.moon=Moon
+msg.top.advancedrocketry.hologram.type.star=Star
+msg.top.advancedrocketry.hologram.surface=Surface
+msg.top.advancedrocketry.hologram.surface.yes=Yes
+msg.top.advancedrocketry.hologram.surface.gasGiant=No (Gas giant)
+msg.top.advancedrocketry.hologram.planets=Planets
+msg.top.advancedrocketry.hologram.moons=Moons
 
 #########################
 ##### TOOLTIP STUFF #####
@@ -1087,18 +1102,15 @@ tooltip.advancedrocketry.pipeseal.shift.2=§bRequires 4 blocks per hole
 tooltip.advancedrocketry.pipeseal.alt.1=Allows pipes through while keeping O₂ in
 tooltip.advancedrocketry.pipeseal.alt.2=Entities can pass through the opening
 
-# Planet Selector (full-screen)
-tooltip.advancedrocketry.planetselector=Browse Spacebodies
-tooltip.advancedrocketry.planetselector.shift.1=Opens full-screen planet UI.
-tooltip.advancedrocketry.planetselector.shift.2=Browse systems, planets and moons
-tooltip.advancedrocketry.planetselector.alt.1=Allows you to remotely set a
-tooltip.advancedrocketry.planetselector.alt.2=planet destination for warp controller.
+# Starmap Console(Planet Selector)
+tooltip.advancedrocketry.planetselector=Map of the known Universe
+tooltip.advancedrocketry.planetselector.shift.1=§fOpens full-screen map
+tooltip.advancedrocketry.planetselector.alt.2=§fBrowse systems, planets and moons
 
-# Holographic Planet Selector
-tooltip.advancedrocketry.planetholoselector=Holographic Spacebody Display
-tooltip.advancedrocketry.planetholoselector.shift.1=Makes holographs in-world
-tooltip.advancedrocketry.planetholoselector.alt.1="Functions the as planet selector
-tooltip.advancedrocketry.planetholoselector.alt.2=but with a 3D holographic display"
+# Holographic Starmap Console
+tooltip.advancedrocketry.planetholoselector=3D-Holographic Starmap
+tooltip.advancedrocketry.planetholoselector.shift.1=§fMakes in-world holograms
+tooltip.advancedrocketry.planetholoselector.alt.1=§bRight-click holograms to navigate
 
 # Orientation Controller
 tooltip.advancedrocketry.orientationctrl=§cSpace Station Controller

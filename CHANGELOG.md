@@ -1,3 +1,19 @@
+Changelog 2.2.13
+
+- .
+
+Changelog 2.2.12
+
+USE WITH: LibVulpes 0.5.7
+
+- Fixed Docking Pad inventories not dropping when broken.
+- Renamed Planet Selector to Starmap Console and added a recipe.
+  - Improved fullscreen navigation, tooltips, scrolling, and GUI scaling.
+- Renamed Holographic Planet Selector to Holographic Starmap Console and new recipe.
+  - Added TOP integration and navigation hints.
+  - Reduced allocations and GC churn.
+  - Proper GL.state cleanup
+  
 Changelog 2.2.11
 
 - Rocket

@@ -47,69 +47,75 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         GL11.glTranslated(x, y, z);
         GL11.glScalef(sizeScale, sizeScale, sizeScale);
 
-        RenderHelper.setupPlayerFacingMatrix(Minecraft.getMinecraft().player.getDistanceSq(entity), 0, -.45, 0);
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.locationSunNew);
-
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-
         GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        GL11.glColor3d(body.getColor()[0], body.getColor()[1], body.getColor()[2]);
-        //GL11.glColor3ub((byte)(body.getColorRGB8() & 0xff), (byte)((body.getColorRGB8() >>> 8) & 0xff), (byte)((body.getColorRGB8() >>> 16) & 0xff));
-        //GlStateManager.color();
+        //Render the translucent star at its actual depth.
+        RenderHelper.setupPlayerFacingMatrix(Minecraft.getMinecraft().player.getDistanceSq(entity), 0.0D, -0.45D, 0.0D);
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.locationSunNew);
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        RenderHelper.renderNorthFaceWithUV(buffer, 0, -5, -5, 5, 5, 0, 1, 0, 1);
-        Tessellator.getInstance().draw();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        int starColor = body.getColorRGB8();
+        GlStateManager.color((starColor & 0xFF) / 255.0F, ((starColor >>> 8) & 0xFF) / 255.0F, ((starColor >>> 16) & 0xFF) / 255.0F, 1.0F);
 
+        //Depth-only star core.
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.25F);
+        GlStateManager.depthMask(true);
+        GlStateManager.colorMask(false, false, false, false);
+        renderStarQuad(buffer);
+        GlStateManager.colorMask(true, true, true, true);
 
-        RenderHelper.cleanupPlayerFacingMatrix();
-
-
-        //Render hololines
-        GL11.glPushMatrix();
-        GL11.glScaled(.1, .1, .1);
+        //Visible star and non-blocking glow.
+        GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.12F);
+        GlStateManager.depthMask(false);
+        renderStarQuad(buffer);
 
-        BufferBuilder buf = Tessellator.getInstance().getBuffer();
-        GlStateManager.disableTexture2D();
-
-        float myTime;
-
-        for (int i = 0; i < 4; i++) {
-            myTime = ((i * 4 + entity.world.getTotalWorldTime() & 0xF) / 16f);
-
-            GlStateManager.color(0, 1f, 1f, .2f * (1 - myTime));
-            buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
-            RenderHelper.renderTopFace(buf, myTime, -.5f, -.5f, .5f, .5f);
-            RenderHelper.renderBottomFace(buf, myTime - 0.5, -.5f, -.5f, .5f, .5f);
-            Tessellator.getInstance().draw();
-        }
-        GlStateManager.alphaFunc(GL11.GL_GREATER, .1f);
-        GlStateManager.enableTexture2D();
-
-
-        //RenderSelection
+        /*
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.depthMask(true);
+        renderStarQuad(buffer);
+*/
+        RenderHelper.cleanupPlayerFacingMatrix();
+        //GlStateManager.depthMask(false);
+        //Selection effect remains translucent and shares the star's depthMask(false) state.
         if (entity.isSelected()) {
-            GlStateManager.disableTexture2D();
-            double speedRotate = 0.025d;
-            GlStateManager.color(0.4f, 0.4f, 1f, 0.6f);
-            GL11.glTranslated(0, -.75f, 0);
             GL11.glPushMatrix();
-            GL11.glRotated(speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
+            GL11.glScaled(0.1D, 0.1D, 0.1D);
+
+            GlStateManager.disableTexture2D();
+
+            double speedRotate = 0.025D;
+            double rotation = speedRotate * System.currentTimeMillis() % 360.0D;
+
+            GlStateManager.color(0.4F, 0.4F, 1.0F, 0.6F);
+            GL11.glTranslated(0.0D, -0.75D, 0.0D);
+            GL11.glPushMatrix();
+            GL11.glRotated(rotation, 0.0D, 1.0D, 0.0D);
             RendererWarpCore.model.renderOnly("Rotate1");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
-            GL11.glRotated(180 + speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
+            GL11.glRotated(180.0D + rotation, 0.0D, 1.0D, 0.0D);
             RendererWarpCore.model.renderOnly("Rotate1");
             GL11.glPopMatrix();
             GlStateManager.enableTexture2D();
+            GL11.glPopMatrix();
         }
 
-        GL11.glPopMatrix();
+
+        //Restore ordinary depth writes before leaving the main star
+        //matrix and before rendering the hover-information panel.
+        GlStateManager.depthMask(true);
         GL11.glPopMatrix();
 
         RayTraceResult hitObj = Minecraft.getMinecraft().objectMouseOver;
@@ -122,7 +128,6 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
             GL11.glScaled(sizeScale, sizeScale, sizeScale);
 
             //Render atmosphere UI/planet info
-
             RenderHelper.setupPlayerFacingMatrix(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), 0, 0, 0);
             buffer = Tessellator.getInstance().getBuffer();
 
@@ -137,20 +142,13 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             RenderHelper.renderNorthFaceWithUV(buffer, 1, -40, -25, 40, 55, 1, 0, 1, 0);
             Tessellator.getInstance().draw();
-
-            //Render planet name
             RenderHelper.cleanupPlayerFacingMatrix();
             RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), body.getName(), 0, .9, 0, 5);
             RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), "Num Planets: " + body.getNumPlanets(), 0, .6, 0, 5);
 
             GL11.glPopMatrix();
         }
-
-        //Clean up and make player not transparent
-        GlStateManager.enableLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        restoreRenderState();
     }
 
     protected void renderMassIndicator(BufferBuilder buffer, float percent) {
@@ -178,5 +176,25 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         //Offset by 15 for Y
         RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f, maxUV);
         Tessellator.getInstance().draw();
+    }
+
+    private static void renderStarQuad(BufferBuilder buffer) {
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        RenderHelper.renderNorthFaceWithUV(buffer, 0, -5, -5, 5, 5, 0, 1, 0, 1);
+        Tessellator.getInstance().draw();
+    }
+
+
+    private static void restoreRenderState() {
+        GlStateManager.colorMask(true, true, true, true);
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.enableTexture2D();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
     }
 }
