@@ -1,6 +1,6 @@
 Changelog 2.2.13
-
-- .
+- Fixed misaligned mass/distance/atmosphere bars in Warp Controller fullscreen planetselector
+- Updated Chinese (ZY)
 
 Changelog 2.2.12
 

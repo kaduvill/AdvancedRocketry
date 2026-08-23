@@ -608,7 +608,8 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
             setPlanetModuleInfo();
         }
 
-        return getProgress(id) / (float) getTotalProgress(id);
+        int total = getTotalProgress(id);
+        return total <= 0 ? 0f : getProgress(id) / (float) total;
     }
 
     @Override
@@ -628,15 +629,11 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 return getSpaceObject().getFuelAmount();
         }
 
-        if (id == 0)
-            return 30;
-        else if (id == 1)
-            return 30;
-        else if (id == 2)
-            return 30;
-        else if (id == 3) {
+        if (id == 0 || id == 1 || id == 2)
+            return 25;
+        else if (id == 3)
             return progress == -1 ? 0 : progress;
-        }
+
         return 0;
     }
 
@@ -645,18 +642,20 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
         if (id == 10) {
             if (getSpaceObject() != null)
                 return getSpaceObject().getMaxFuelAmount();
-        }
-        if (dimCache == null)
             return 0;
-        if (id == 0)
-            return dimCache.getAtmosphereDensity() / 2;
-        else if (id == 1)
-            return dimCache.orbitalDist / 2;
-        else if (id == 2)
-            return (int) (dimCache.gravitationalMultiplier * 50);
-        else if (id == 3) {
+        } else if (id == 3) {
             return MAX_PROGRESS;
         }
+
+        if (dimCache == null)
+            return 50;
+
+        if (id == 0)
+            return dimCache.getAtmosphereDensity() / 16;
+        else if (id == 1)
+            return dimCache.orbitalDist / 16;
+        else if (id == 2)
+            return (int) (dimCache.gravitationalMultiplier * 50);
 
         return 0;
     }
