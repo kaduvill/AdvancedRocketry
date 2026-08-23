@@ -2416,11 +2416,32 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             WorldServer worldserver1 = minecraftserver.getWorld(dimensionIn);
             this.setPosition(posX, y, posZ);
 
+            long preloadTicksRemaining = destPreloadTicket == null ? 0L :
+                    Math.max(0L, destPreloadExpire - worldserver.getTotalWorldTime());
             ITeleporter teleporter = new BasicTeleporter(getPosition());
             Entity entity = changeDimension(dimensionIn, teleporter);
 
-            if (entity == null)
+            if (entity == null) {
+                releaseDestinationPreload();
                 return null;
+            }
+
+            // Forge creates a replacement entity, so move ownership of the transient ticket.
+            if (destPreloadTicket != null) {
+                if (preloadTicksRemaining > 0L && entity instanceof EntityRocket) {
+                    EntityRocket replacement = (EntityRocket) entity;
+                    replacement.destPreloadTicket = destPreloadTicket;
+                    replacement.destPreloadDim = destPreloadDim;
+                    replacement.destPreloadExpire =
+                            replacement.world.getTotalWorldTime() + preloadTicksRemaining;
+
+                    destPreloadTicket = null;
+                    destPreloadDim = Integer.MIN_VALUE;
+                    destPreloadExpire = Long.MIN_VALUE;
+                } else {
+                    releaseDestinationPreload();
+                }
+            }
 
             entity.moveToBlockPosAndAngles(new BlockPos(posX, y, posZ), 0, 0);
 
