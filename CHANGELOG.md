@@ -1,5 +1,7 @@
 Changelog 2.2.13
 - Fixed misaligned mass/distance/atmosphere bars in Warp Controller fullscreen planetselector
+  Fixed destination chunk preload ticket leak during rocket dimension changes
+- Prevent Landing Pads from handling rocket events from other worlds
 - Updated Chinese (ZY)
 
 Changelog 2.2.12
