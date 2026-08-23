@@ -145,6 +145,7 @@ public class TileLandingPad extends TileInventoryHatch implements ILinkableTile,
 
     @SubscribeEvent
     public void onRocketLand(RocketLandedEvent event) {
+        if (world == null || world != event.world || !(event.getEntity() instanceof EntityRocketBase)) return;
         EntityRocketBase rocket = (EntityRocketBase) event.getEntity();
 
         AxisAlignedBB bbCache = new AxisAlignedBB(this.getPos().add(-1, 0, -1), this.getPos().add(1, 2, 1));
@@ -163,7 +164,7 @@ public class TileLandingPad extends TileInventoryHatch implements ILinkableTile,
 
     @SubscribeEvent
     public void onRocketLaunch(RocketPreLaunchEvent event) {
-
+        if (world == null || world != event.world || !(event.getEntity() instanceof EntityRocketBase)) return;
         ItemStack stack = getStackInSlot(0);
         if (stack.getItem() == LibVulpesItems.itemLinker && ItemLinker.getDimId(stack) != Constants.INVALID_PLANET) {
 
@@ -181,7 +182,7 @@ public class TileLandingPad extends TileInventoryHatch implements ILinkableTile,
 
     @SubscribeEvent
     public void onRocketDismantle(RocketDismantleEvent event) {
-        if (world == null || world.isRemote || world.provider == null) return;
+        if (world == null || world != event.world || world.isRemote || world.provider == null) return;
         if (world.provider.getDimension() != ARConfiguration.getCurrentConfig().spaceDimId) return;
 
         // Make sure this is actually a rocket
