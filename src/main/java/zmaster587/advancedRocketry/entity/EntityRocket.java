@@ -1539,22 +1539,23 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
 
 
-                double lastPosY = this.posY;
-                double prevMotion = this.motionY;
-                this.move(MoverType.SELF, 0, prevMotion * deltaTime, 0);
+                double attemptedY = this.motionY * deltaTime;
+                this.move(MoverType.SELF, 0, attemptedY, 0);
+                boolean landedInSpace = DimensionManager.getInstance()
+                                .getDimensionProperties(this.world.provider.getDimension())
+                                .isAsteroid() && this.posY < 64.0D;
 
+                boolean landedOnGround = attemptedY < 0.0D && this.onGround && this.posY < 256.0D;
 
-                boolean landedInSpace = DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).isAsteroid() && this.posY < 64;
-                boolean landedOnGround = lastPosY + prevMotion != this.posY && this.posY < 256;
-                //Check to see if it's landed
+                // Check to see if it landed
                 if ((isInOrbit() || !burningFuel) && isInFlight() && (landedOnGround || landedInSpace)) {
-                    //Did  sending this packet cause problems?
-                    PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, (byte) PacketType.ROCKETLANDEVENT.ordinal()), this);
-                    MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketLandedEvent(this));
-                    this.motionY = 0;
+                    this.motionY = 0.0D;
                     this.setInFlight(false);
                     this.setInOrbit(false);
+                    this.postedLandedAfterLoad = true;
                     releaseDestinationPreload();
+                    PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, (byte) PacketType.ROCKETLANDEVENT.ordinal()), this);
+                    MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketLandedEvent(this));
                 }
 
 
