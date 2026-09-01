@@ -11,6 +11,7 @@ import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.client.ClientProxy;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.util.IBrokenPartBlock;
+import zmaster587.advancedRocketry.world.util.WorldDummy;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 
 public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart> {
@@ -29,7 +30,10 @@ public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart
 
             if (tile.getBlockType() instanceof BlockFullyRotatable) {
                 IBlockState state = tile.getWorld().getBlockState(tile.getPos());
-                EnumFacing facing = state.getBlock().getActualState(state, tile.getWorld(), tile.getPos()).getValue(BlockFullyRotatable.FACING);
+                if (!(tile.getWorld() instanceof WorldDummy)) {
+                    state = state.getBlock().getActualState(state, tile.getWorld(), tile.getPos());
+                }
+                EnumFacing facing = state.getValue(BlockFullyRotatable.FACING);
                 Vec3i dir = facing.getDirectionVec();
                 GlStateManager.translate(0.5F, 0.5F, 0.5F);
                 if (dir.getY() > 0) {

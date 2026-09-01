@@ -18,7 +18,6 @@ import zmaster587.advancedRocketry.entity.EntityStationDeployedRocket;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.advancedRocketry.util.WeightEngine;
-import zmaster587.libVulpes.block.BlockFullyRotatable;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
@@ -123,25 +122,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         // Orientations for SD rockets
         rocket.forwardDirection = RotatableBlock.getFront(world.getBlockState(getPos())).getOpposite();
         rocket.launchDirection = EnumFacing.DOWN;
-
-        // Rotate *all* engine types to match forwardDirection
-        for (int x = 0; x < storageChunk.getSizeX(); x++) {
-            for (int y = 0; y < storageChunk.getSizeY(); y++) {
-                for (int z = 0; z < storageChunk.getSizeZ(); z++) {
-                    BlockPos bp = new BlockPos(x, y, z);
-                    IBlockState st = storageChunk.getBlockState(bp);
-                    Block b = st.getBlock();
-
-                    boolean isEngine = (b instanceof BlockRocketMotor)
-                                    || (b instanceof BlockBipropellantRocketMotor)
-                                    || (b instanceof BlockNuclearRocketMotor);
-
-                    if (isEngine && st.getPropertyKeys().contains(BlockFullyRotatable.FACING)) {
-                        storageChunk.setBlockState(bp, st.withProperty(BlockFullyRotatable.FACING, rocket.forwardDirection));
-                    }
-                }
-            }
-        }
+        setEngineFacing(storageChunk, rocket.forwardDirection);
 
         // Spawn + sync
         world.spawnEntity(rocket);

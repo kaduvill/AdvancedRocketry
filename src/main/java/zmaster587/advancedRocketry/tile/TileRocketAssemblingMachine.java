@@ -35,6 +35,7 @@ import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.advancedRocketry.util.WeightEngine;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.block.RotatableBlock;
+import zmaster587.libVulpes.block.BlockFullyRotatable;
 import zmaster587.libVulpes.client.util.ProgressBarImage;
 import zmaster587.libVulpes.interfaces.ILinkableTile;
 import zmaster587.libVulpes.inventory.modules.*;
@@ -660,7 +661,23 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         double maxZ = Math.max(b.minZ, b.maxZ);
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
-
+    protected static void setEngineFacing(StorageChunk storageChunk, EnumFacing facing) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int x = 0; x < storageChunk.getSizeX(); x++) {
+            for (int y = 0; y < storageChunk.getSizeY(); y++) {
+                for (int z = 0; z < storageChunk.getSizeZ(); z++) {
+                    pos.setPos(x, y, z);
+                    IBlockState state = storageChunk.getBlockState(pos);
+                    Block block = state.getBlock();
+                    if (block instanceof IRocketEngine
+                            && state.getPropertyKeys().contains(BlockFullyRotatable.FACING)
+                            && state.getValue(BlockFullyRotatable.FACING) != facing) {
+                        storageChunk.setBlockState(pos, state.withProperty(BlockFullyRotatable.FACING, facing));
+                    }
+                }
+            }
+        }
+    }
     public void assembleRocket() {
         // server only + need a pad cache
         if (world.isRemote || bbCache == null) return;
@@ -687,7 +704,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             syncStatsToClient();
             return;
         }
-
+        setEngineFacing(storageChunk, EnumFacing.DOWN);
         // Center spawn on tightened AABB
         final double cx = rocketBB.minX + (rocketBB.maxX - rocketBB.minX) / 2.0 + 0.5;
         final double cz = rocketBB.minZ + (rocketBB.maxZ - rocketBB.minZ) / 2.0 + 0.5;
