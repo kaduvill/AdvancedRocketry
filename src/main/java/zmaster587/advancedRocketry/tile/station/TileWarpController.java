@@ -80,8 +80,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
         data.setMaxData(10000);
         inv = new EmbeddedInventory(9);
         programmingProgress = new ModuleProgress(35, 80, 3, TextureResources.terraformProgressBar, this);
-        warpDirectionButton = new ModuleButton(174, 4, WARP_DIRECTION, "N", this, TextureResources.buttonGreen, 24, 24);
-
+        warpDirectionButton = new ModuleButton(174, 4, WARP_DIRECTION, LibVulpes.proxy.getLocalizedString("msg.warpmon.direction.short.north"), this, TextureResources.buttonGreen, 24, 24);
         progress = -1;
     }
 
