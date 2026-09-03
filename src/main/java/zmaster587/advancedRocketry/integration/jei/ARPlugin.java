@@ -39,6 +39,7 @@ import zmaster587.advancedRocketry.integration.jei.gasgiants.GasGiantRecipeMaker
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheCategory;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.orbitalLaserDrill.OrbitalLaserDrillWrapper;
 import zmaster587.advancedRocketry.integration.jei.orbitalLaserDrill.OrbitalLaserDrillCategory;
 import zmaster587.advancedRocketry.integration.jei.orbitalLaserDrill.OrbitalLaserDrillRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.orbitalLaserDrill.OrbitalLaserDrillRecipeMaker;
@@ -102,98 +103,95 @@ public class ARPlugin implements IModPlugin {
     public static IJeiHelpers jeiHelpers;
 
     private static IJeiRuntime jeiRuntime;
+    private static OrbitalLaserDrillCategory orbitalLaserCategory;
     private static final List<GasGiantWrapper> currentGasGiantRecipes = new ArrayList<>();
-    private static boolean gasRefreshQueued = false;
-
+    private static final List<OrbitalLaserDrillWrapper> currentOrbitalLaserRecipes = new ArrayList<>();
+    private static int dimensionRecipeRefreshDelay = -1;
 
 
     @Override
-    public void onRuntimeAvailable(IJeiRuntime runtime) {
-        jeiRuntime = runtime;
-        //debug
-        //AdvancedRocketry.logger.info("[JEI][GasGiants] onRuntimeAvailable");
-    }
+    public void onRuntimeAvailable(IJeiRuntime runtime) {jeiRuntime = runtime;}
+    public static void requestDimensionRecipeRefresh() {dimensionRecipeRefreshDelay = 2;}
+    public static boolean hasQueuedDimensionRecipeRefresh() {return dimensionRecipeRefreshDelay >= 0;}
+    public static void tryApplyQueuedDimensionRecipeRefresh() {
+        if (dimensionRecipeRefreshDelay < 0) return;
 
-    public static void requestGasGiantRefresh() {
-        gasRefreshQueued = true;
-    }
-    public static boolean hasQueuedGasGiantRefresh() {
-        return gasRefreshQueued;
-    }
-    public static void tryApplyQueuedGasGiantRefresh() {
-        if (!gasRefreshQueued) return;
-
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc == null || mc.world == null) return;
-        if (jeiRuntime == null) return;
+        if (dimensionRecipeRefreshDelay > 0) {
+            dimensionRecipeRefreshDelay--;
+            return;
+        }
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft == null || minecraft.world == null || jeiRuntime == null) return;
 
         IRecipeRegistry recipeRegistry = jeiRuntime.getRecipeRegistry();
         if (recipeRegistry == null) return;
-
-        //AdvancedRocketry.logger.info("[JEI][GasGiants] removing old recipes count=" + currentGasGiantRecipes.size());
         for (GasGiantWrapper recipe : currentGasGiantRecipes) {
             recipeRegistry.removeRecipe(recipe, gasGiantsUUID);
         }
         currentGasGiantRecipes.clear();
-
-        List<GasGiantWrapper> rebuilt = GasGiantRecipeMaker.getRecipes(jeiHelpers);
-        //AdvancedRocketry.logger.info("[JEI][GasGiants] rebuilt recipe count=" + rebuilt.size());
-
-        for (GasGiantWrapper recipe : rebuilt) {
-            //AdvancedRocketry.logger.info("[JEI][GasGiants] adding recipe dim=" + recipe.getDimId() + " planet=" + recipe.getPlanetName());
+        List<GasGiantWrapper> rebuiltGasRecipes = GasGiantRecipeMaker.getRecipes(jeiHelpers);
+        for (GasGiantWrapper recipe : rebuiltGasRecipes) {
             recipeRegistry.addRecipe(recipe, gasGiantsUUID);
         }
-        currentGasGiantRecipes.addAll(rebuilt);
 
-        gasRefreshQueued = false;
-        //AdvancedRocketry.logger.info("[JEI][GasGiants] applied runtime recipe refresh, count=" + currentGasGiantRecipes.size());
+        currentGasGiantRecipes.addAll(rebuiltGasRecipes);
+        for (OrbitalLaserDrillWrapper recipe : currentOrbitalLaserRecipes) {
+            recipeRegistry.removeRecipe(recipe, orbitalLaserDrillUUID);
+        }
+
+        currentOrbitalLaserRecipes.clear();
+        if (orbitalLaserCategory != null && isVoidDrillJeiEnabled()) {
+            List<OrbitalLaserDrillWrapper> rebuiltLaserRecipes =
+                    OrbitalLaserDrillRecipeMaker.getRecipes(orbitalLaserCategory.getPageSize());
+
+            orbitalLaserCategory.initializeLayout(rebuiltLaserRecipes);
+            for (OrbitalLaserDrillWrapper recipe : rebuiltLaserRecipes) {
+                recipeRegistry.addRecipe(recipe, orbitalLaserDrillUUID);
+            }
+            currentOrbitalLaserRecipes.addAll(rebuiltLaserRecipes);
+        }
+        dimensionRecipeRefreshDelay = -1;
     }
 
-    /* newer JEI doesnt have this
-    //AR machines can reload recipes. We still need this for JEI to be up-to-date
-    @SuppressWarnings("deprecation")
-    public static void reload() {
-        jeiHelpers.reload();
+    public static void resetDimensionRecipeRefresh() {
+        dimensionRecipeRefreshDelay = -1;
+        if (orbitalLaserCategory != null) {
+            orbitalLaserCategory.resetLayout();
+        }
     }
-    */
+
     private static boolean isVoidDrillJeiEnabled() {
         ARConfiguration cfg = ARConfiguration.getCurrentConfig();
         return cfg.enableLaserDrill && !cfg.laserDrillPlanet;
     }
 
-
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
         jeiHelpers = registry.getJeiHelpers();
         IGuiHelper guiHelper = jeiHelpers.getGuiHelper();
-        //debug
-        //zmaster587.advancedRocketry.AdvancedRocketry.logger.info("[JEI][GasGiants] registerCategories called");
-        registry.addRecipeCategories(
-            new RollingMachineCategory(guiHelper),
-            new LatheCategory(guiHelper),
-            new PrecisionAssemblerCategory(guiHelper),
-            new SawMillCategory(guiHelper),
-            new ChemicalReactorCategory(guiHelper),
-            new CrystallizerCategory(guiHelper),
-            new ElectrolyzerCategory(guiHelper),
-            new ArcFurnaceCategory(guiHelper),
-            new PlatePressCategory(guiHelper),
-            new CentrifugeCategory(guiHelper),
-            new PrecisionLaserEtcherCategory(guiHelper),
-            new SatelliteBuilderCategory(guiHelper),
-            new FuelingStationCategory(guiHelper),
-            new Co2ScrubberCategory(guiHelper),
-            new StationAssemblerCategory(guiHelper),
-            new AsteroidCategory(guiHelper),
-            new GasGiantCategory(guiHelper)
-        );
-        // ---- Orbital Laser Drill (VoidDrill mode only) ----
-        final boolean voidDrillJei = isVoidDrillJeiEnabled();
-        if (voidDrillJei) {
-            registry.addRecipeCategories(new OrbitalLaserDrillCategory(guiHelper));
-        }
-    }
+        orbitalLaserCategory = new OrbitalLaserDrillCategory(guiHelper);
 
+        registry.addRecipeCategories(
+                new RollingMachineCategory(guiHelper),
+                new LatheCategory(guiHelper),
+                new PrecisionAssemblerCategory(guiHelper),
+                new SawMillCategory(guiHelper),
+                new ChemicalReactorCategory(guiHelper),
+                new CrystallizerCategory(guiHelper),
+                new ElectrolyzerCategory(guiHelper),
+                new ArcFurnaceCategory(guiHelper),
+                new PlatePressCategory(guiHelper),
+                new CentrifugeCategory(guiHelper),
+                new PrecisionLaserEtcherCategory(guiHelper),
+                new SatelliteBuilderCategory(guiHelper),
+                new FuelingStationCategory(guiHelper),
+                new Co2ScrubberCategory(guiHelper),
+                new StationAssemblerCategory(guiHelper),
+                new AsteroidCategory(guiHelper),
+                new GasGiantCategory(guiHelper),
+                orbitalLaserCategory
+        );
+    }
 
 
     @Override
@@ -228,7 +226,8 @@ public class ARPlugin implements IModPlugin {
         blacklist.addIngredientToBlacklist(new ItemStack(AdvancedRocketryItems.itemSpaceStation));
 
 
-        registry.addRecipeHandlers(new RollingMachineRecipeHandler(),
+        registry.addRecipeHandlers(
+                new RollingMachineRecipeHandler(),
                 new LatheRecipeHandler(),
                 new PrecisionAssemblerRecipeHandler(),
                 new SawMillRecipeHandler(),
@@ -244,7 +243,8 @@ public class ARPlugin implements IModPlugin {
                 new Co2ScrubberRecipeHandler(),
                 new StationAssemblerRecipeHandler(),
                 new AsteroidRecipeHandler(),
-                new GasGiantRecipeHandler()
+                new GasGiantRecipeHandler(),
+                new OrbitalLaserDrillRecipeHandler()
             );
 
         registry.addRecipes(RollingMachineRecipeMaker.getMachineRecipes(jeiHelpers, TileRollingMachine.class), rollingMachineUUID);
@@ -306,9 +306,7 @@ public class ARPlugin implements IModPlugin {
         // ---- Orbital Laser Drill (VoidDrill mode only) ----
         // Voiddrill means laserdrillPlanet is false
         final boolean voidDrillJei = isVoidDrillJeiEnabled();
-        if (voidDrillJei) {
-            registry.addRecipeHandlers(new OrbitalLaserDrillRecipeHandler());
-            registry.addRecipes(OrbitalLaserDrillRecipeMaker.getRecipes(jeiHelpers), orbitalLaserDrillUUID);
+        if (isVoidDrillJeiEnabled()) {
             registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockSpaceLaser), orbitalLaserDrillUUID);
         }
     }

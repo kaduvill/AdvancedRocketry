@@ -138,7 +138,7 @@ public class PacketDimInfo extends BasePacket {
             }
         }
         if (Loader.isModLoaded("jei")) {
-            zmaster587.advancedRocketry.integration.jei.ARPlugin.requestGasGiantRefresh();
+            zmaster587.advancedRocketry.integration.jei.ARPlugin.requestDimensionRecipeRefresh();
         }
     }
 

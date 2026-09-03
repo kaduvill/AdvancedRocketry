@@ -34,6 +34,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -274,9 +275,10 @@ public class PlanetEventHandler {
 
     @SubscribeEvent
     public void disconnected(ClientDisconnectionFromServerEvent event) {
-        // Reload configs from disk
         ARConfiguration.useClientDiskConfig();
-        //zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().unregisterAllDimensions();
+        if (Loader.isModLoaded("jei")) {
+            zmaster587.advancedRocketry.integration.jei.ARPlugin.resetDimensionRecipeRefresh();
+        }
     }
 
     //Tick dimensions, needed for satellites, and GUIs

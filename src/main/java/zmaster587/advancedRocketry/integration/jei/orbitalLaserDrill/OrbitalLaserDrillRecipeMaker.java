@@ -1,52 +1,110 @@
 package zmaster587.advancedRocketry.integration.jei.orbitalLaserDrill;
 
-import mezz.jei.api.IJeiHelpers;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.util.LaserDrillOreTable;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class OrbitalLaserDrillRecipeMaker {
 
-    public static List<OrbitalLaserDrillWrapper> getRecipes(IJeiHelpers helpers) {
+    public static List<OrbitalLaserDrillWrapper> getRecipes(int pageSize) {
+        List<OrbitalLaserDrillWrapper> recipes = new ArrayList<>();
+        ARConfiguration config = ARConfiguration.getCurrentConfig();
 
-        // Only show this page if VoidDrill is active
-        if (ARConfiguration.getCurrentConfig().laserDrillPlanet) {
-            return Collections.emptyList();
+        if (!config.enableLaserDrill || config.laserDrillPlanet || pageSize < 1) {
+            return recipes;
         }
 
-        World w = Minecraft.getMinecraft() != null ? Minecraft.getMinecraft().world : null;
-        DimensionProperties props = null;
+        DimensionManager manager = DimensionManager.getInstance();
+        if (manager == null) return recipes;
 
-        if (w != null && w.provider != null) {
-            props = DimensionManager.getInstance().getDimensionProperties(w.provider.getDimension());
+        Integer[] dimensionIds = manager.getRegisteredDimensions();
+        if (dimensionIds == null || dimensionIds.length == 0) return recipes;
+
+        Arrays.sort(dimensionIds, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer first, Integer second) {
+                DimensionProperties firstProperties = manager.getDimensionProperties(first);
+                DimensionProperties secondProperties = manager.getDimensionProperties(second);
+                String firstName = firstProperties != null && firstProperties.getName() != null
+                        ? firstProperties.getName()
+                        : "";
+                String secondName = secondProperties != null && secondProperties.getName() != null
+                        ? secondProperties.getName()
+                        : "";
+
+                int byName = String.CASE_INSENSITIVE_ORDER.compare(firstName, secondName);
+                return byName != 0 ? byName : Integer.compare(first, second);
+            }
+        });
+
+        List<ItemStack> baseline = LaserDrillOreTable.getEffectiveOres(null);
+        List<OrbitalLaserDrillWrapper> planetRecipes = new ArrayList<>();
+        int baselinePlanetCount = 0;
+        boolean hasDifferentPlanet = false;
+
+        for (Integer dimensionId : dimensionIds) {
+            if (dimensionId == null) continue;
+
+            DimensionProperties properties = manager.getDimensionProperties(dimensionId);
+
+            if (properties == null || !manager.canTravelTo(dimensionId)) continue;
+            if (config.laserBlackListDims != null && config.laserBlackListDims.contains(dimensionId)) continue;
+
+            List<ItemStack> effective = LaserDrillOreTable.getEffectiveOres(properties, baseline);
+
+            if (LaserDrillOreTable.sameOreTable(baseline, effective)) {
+                baselinePlanetCount++;
+                continue;
+            }
+
+            hasDifferentPlanet = true;
+
+            if (effective.isEmpty()) continue;
+
+            String planetName = properties.getName() == null || properties.getName().isEmpty()
+                    ? "DIM " + dimensionId
+                    : properties.getName();
+
+            addPages(planetRecipes, planetName, properties.getPlanetIcon(), effective, pageSize);
         }
 
-        List<ItemStack> all = OrbitalLaserDrillWrapper.buildVoidDrillActivationList(props);
-        int total = all.size();
+        if (baselinePlanetCount > 0 && !baseline.isEmpty()) {
+            String contextName = I18n.format(hasDifferentPlanet
+                    ? "jei.advancedrocketry.orbitallaser.all_other_planets"
+                    : "jei.advancedrocketry.orbitallaser.all_planets");
 
-        int pages = Math.max(1, (total + OrbitalLaserDrillWrapper.PAGE_SIZE - 1) / OrbitalLaserDrillWrapper.PAGE_SIZE);
-
-        List<OrbitalLaserDrillWrapper> out = new ArrayList<>(pages);
-
-        for (int page = 0; page < pages; page++) {
-            int from = page * OrbitalLaserDrillWrapper.PAGE_SIZE;
-            int to = Math.min(total, from + OrbitalLaserDrillWrapper.PAGE_SIZE);
-
-            List<ItemStack> slice = (from < to) ? all.subList(from, to) : Collections.emptyList();
-            out.add(new OrbitalLaserDrillWrapper(page, pages, slice));
+            addPages(recipes, contextName, DimensionProperties.PlanetIcons.EARTHLIKE.getResource(),
+                    baseline, pageSize);
         }
 
-        return out;
+        recipes.addAll(planetRecipes);
+        return recipes;
     }
 
-    public static List<OrbitalLaserDrillWrapper> getMachineRecipes(IJeiHelpers helpers, Class<?> ignored) {
-        return getRecipes(helpers);
+    private static void addPages(List<OrbitalLaserDrillWrapper> recipes, String contextName,
+                                 ResourceLocation planetIcon, List<ItemStack> ores, int pageSize) {
+        int pageCount = (ores.size() + pageSize - 1) / pageSize;
+
+        for (int page = 0; page < pageCount; page++) {
+            int from = page * pageSize;
+            int to = Math.min(ores.size(), from + pageSize);
+
+            recipes.add(new OrbitalLaserDrillWrapper(
+                    contextName,
+                    planetIcon,
+                    page,
+                    pageCount,
+                    ores.subList(from, to)
+            ));
+        }
     }
 }

@@ -163,7 +163,7 @@ public class ARConfiguration {
     public boolean automaticRetroRockets;
     @ConfigProperty
     public boolean advancedVFX;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public boolean enableLaserDrill;
     @ConfigProperty
     public boolean enableOrbitalRegistry;
@@ -205,11 +205,11 @@ public class ARConfiguration {
     public float blockEnergyHatchCapacityMultiplier;
     @ConfigProperty
     public float blockLiquidHatchCapacityMultiplier;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true, internalType = Integer.class)
     public LinkedList<Integer> laserBlackListDims = new LinkedList<>();
-    @ConfigProperty
+    @ConfigProperty(needsSync = true, internalType = String.class)
     public LinkedList<String> standardLaserDrillOres = new LinkedList<>();
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public boolean laserDrillPlanet;
     /**
      * list of entities of which atmospheric effects should not be applied
@@ -518,7 +518,7 @@ public class ARConfiguration {
         arConfig.IridiumClumpSize = config.get(WORLDGEN, "IridiumPerClump", 16).getInt();
         arConfig.IridiumPerChunk = config.get(WORLDGEN, "IridiumPerChunk", 1).getInt();
         //Orbital laser
-        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", true, "Treat laserDrillOres as a blacklist. Note: false + empty ore list = every registered OreDictionary name beginning with ore").getBoolean();
+        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", true, "Treat laserDrillOres as a blacklist. true + empty includes every registered OreDictionary name beginning with ore; false + empty leaves the Void Drill ore table empty.").getBoolean();
         orbitalLaserOres = config.get(WORLDGEN, "laserDrillOres", new String[]{}, "List of ores allowed to be mined by the laser drill if surface drilling is disabled.  Ores can be specified by just the oreName:<size> (oredict) or by modid:block:meta:<size> where size is stacksize and optional").getStringList();
         //Geode
         arConfig.geodeOresBlackList = config.get(WORLDGEN, "geodeOres_blacklist", false, "Treat geodeOres as a blacklist.").getBoolean();

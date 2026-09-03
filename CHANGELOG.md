@@ -2,6 +2,8 @@ Changelog 2.2.14
 - Added customocion="obsidian" for obsidian worlds
 - Added configurable warpship direction to Warp Controller
 - Fixed Warp Controller status messages for insufficient fuel and false artifact warnings
+- Added `replace`attribute to be used in planetdefs. example: `<laserdrillores replace="true">oreRedstone</laserdrillores>` makes this planet laserdrill loottable only contain redstone ore. see more: https://github.com/kaduvill/AdvancedRocketry/blob/1.12/docs/README_PLANETDEFS.md
+- Added proper JEI pages for Orbital Laser Drill
 
 Changelog 2.2.13
 - Fixed misaligned mass/distance/atmosphere bars in Warp Controller fullscreen planetselector

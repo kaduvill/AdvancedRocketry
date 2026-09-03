@@ -2,14 +2,11 @@ package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
-import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.util.LaserDrillOreTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,107 +43,13 @@ class VoidDrill extends AbstractDrill {
             }
         }
     }
-    private static boolean sameOreEntry(ItemStack a, ItemStack b) {
-        if (a == null || b == null) return false;
-        if (a.isEmpty() || b.isEmpty()) return false;
-        if (a.getItem() != b.getItem()) return false;
-        if (a.getMetadata() != b.getMetadata()) return false;
-        if (a.getCount() != b.getCount()) return false;
-
-        if (a.getTagCompound() == null) {
-            return b.getTagCompound() == null;
-        }
-
-        return a.getTagCompound().equals(b.getTagCompound());
-    }
-
-    private boolean containsOreEntry(ItemStack stack) {
-        for (ItemStack existing : ores) {
-            if (sameOreEntry(existing, stack)) {
-                return true;
-            }
-        }
-        return false;
-    }
     private void rebuildOreList(int dimId) {
+        DimensionProperties properties = dimId == Integer.MIN_VALUE
+                ? null
+                : DimensionManager.getInstance().getDimensionProperties(dimId);
+
         ores.clear();
-
-        DimensionProperties dimProperties = dimId == Integer.MIN_VALUE ? null :
-                DimensionManager.getInstance().getDimensionProperties(dimId);
-        List<String> configOres = dimProperties != null && dimProperties.laserDrillOresReplace ? null :
-                ARConfiguration.getCurrentConfig().standardLaserDrillOres;
-        if (configOres != null) {
-            for (String oreDictName : configOres) {
-                if (oreDictName == null || oreDictName.isEmpty()) {
-                    continue;
-                }
-
-                String[] args = oreDictName.split(":");
-
-                List<ItemStack> globalOres = OreDictionary.getOres(args[0]);
-                if (globalOres != null && !globalOres.isEmpty()) {
-                    int amt = 1;
-                    if (args.length > 1) {
-                        try {
-                            amt = Integer.parseInt(args[1]);
-                        } catch (NumberFormatException ignored) {
-                        }
-                    }
-
-                    ItemStack base = globalOres.get(0);
-                    ores.add(new ItemStack(base.getItem(), amt, base.getItemDamage()));
-                    continue;
-                }
-
-                String[] splitStr = oreDictName.split(":");
-                String name;
-                try {
-                    name = splitStr[0] + ":" + splitStr[1];
-                } catch (IndexOutOfBoundsException e) {
-                    AdvancedRocketry.logger.warn("Unexpected ore name: \"{}\" during laser drill harvesting", oreDictName);
-                    continue;
-                }
-
-                int meta = 0;
-                int size = 1;
-                if (splitStr.length > 2) {
-                    try {
-                        meta = Integer.parseInt(splitStr[2]);
-                    } catch (NumberFormatException ignored) {
-                    }
-                }
-                if (splitStr.length > 3) {
-                    try {
-                        size = Integer.parseInt(splitStr[3]);
-                    } catch (NumberFormatException ignored) {
-                    }
-                }
-
-                ItemStack stack = ItemStack.EMPTY;
-                Block block = Block.getBlockFromName(name);
-                if (block == null) {
-                    Item item = Item.getByNameOrId(name);
-                    if (item != null) {
-                        stack = new ItemStack(item, size, meta);
-                    }
-                } else {
-                    stack = new ItemStack(block, size, meta);
-                }
-
-                if (!stack.isEmpty()) {
-                    ores.add(stack);
-                }
-            }
-        }
-
-        if (dimProperties != null && dimProperties.laserDrillOres != null) {
-            for (ItemStack s : dimProperties.laserDrillOres) {
-                if (s != null && !s.isEmpty() && !containsOreEntry(s)) {
-                    ores.add(s.copy());
-                }
-            }
-        }
-
+        ores.addAll(LaserDrillOreTable.getEffectiveOres(properties));
         cachedDimId = dimId;
         oreCacheValid = true;
     }

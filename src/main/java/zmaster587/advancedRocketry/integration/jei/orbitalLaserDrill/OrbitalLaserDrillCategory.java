@@ -5,98 +5,106 @@ import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.integration.jei.ARPlugin;
 
-public class OrbitalLaserDrillCategory implements IRecipeCategory<OrbitalLaserDrillWrapper> {
+import java.util.List;
 
-    private final IDrawable background;
+public final class OrbitalLaserDrillCategory implements IRecipeCategory<OrbitalLaserDrillWrapper> {
+
+    public static final int COLUMNS = 9;
+    public static final int SLOT_SIZE = 18;
+    public static final int MAX_ROWS = 9;
+    public static final int MAX_OUTPUTS_PER_PAGE = COLUMNS * MAX_ROWS;
+
+    private static final int WIDTH = 166;
+    private static final int GRID_X = 2;
+    private static final int GRID_Y = 24;
+
+    private final IGuiHelper guiHelper;
     private final IDrawable icon;
     private final IDrawable slotFrame;
+    private IDrawable background;
+    private int pageSize;
+    private boolean layoutInitialized;
 
-    private static final int SLOT = 18;
-    private static final int GRID = OrbitalLaserDrillWrapper.GRID;
-    private static final int PAD = 6;
-    private static final int GAP = 10;
-
-    private static final int BG_W = PAD + SLOT + GAP + (GRID * SLOT) + PAD;
-    private static final int BG_H = PAD + (GRID * SLOT) + PAD;
-
-    private static final int MACHINE_X = PAD;
-    private static final int MACHINE_Y = (BG_H - SLOT) / 2;
-
-    private static final int GRID_X0 = PAD + SLOT + GAP;
-    private static final int GRID_Y0 = PAD;
-
-    private String header = "";
-
-    public OrbitalLaserDrillCategory(IGuiHelper gui) {
-        this.background = gui.createBlankDrawable(BG_W, BG_H);
-        this.icon = gui.createDrawableIngredient(new ItemStack(AdvancedRocketryBlocks.blockSpaceLaser));
-        this.slotFrame = gui.getSlotDrawable();
+    public OrbitalLaserDrillCategory(IGuiHelper guiHelper) {
+        this.guiHelper = guiHelper;
+        this.icon = guiHelper.createDrawableIngredient(new ItemStack(AdvancedRocketryBlocks.blockSpaceLaser));
+        this.slotFrame = guiHelper.getSlotDrawable();
+        this.pageSize = MAX_OUTPUTS_PER_PAGE;
+        this.background = guiHelper.createBlankDrawable(WIDTH, GRID_Y + MAX_ROWS * SLOT_SIZE);
     }
 
-    @Override public String getUid() { return ARPlugin.orbitalLaserDrillUUID; }
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void initializeLayout(List<OrbitalLaserDrillWrapper> recipes) {
+        if (layoutInitialized || recipes == null || recipes.isEmpty()) return;
+
+        int maxOutputs = 0;
+
+        for (OrbitalLaserDrillWrapper recipe : recipes) {
+            maxOutputs = Math.max(maxOutputs, recipe.getOutputCount());
+        }
+
+        int rows = Math.max(1, Math.min(MAX_ROWS, (maxOutputs + COLUMNS - 1) / COLUMNS));
+        this.pageSize = rows * COLUMNS;
+        this.background = guiHelper.createBlankDrawable(WIDTH, GRID_Y + rows * SLOT_SIZE);
+        this.layoutInitialized = true;
+    }
+
+    public void resetLayout() {
+        this.pageSize = MAX_OUTPUTS_PER_PAGE;
+        this.background = guiHelper.createBlankDrawable(WIDTH, GRID_Y + MAX_ROWS * SLOT_SIZE);
+        this.layoutInitialized = false;
+    }
+
+    @Override
+    public String getUid() {
+        return ARPlugin.orbitalLaserDrillUUID;
+    }
 
     @Override
     public String getTitle() {
         return new ItemStack(AdvancedRocketryBlocks.blockSpaceLaser).getDisplayName();
     }
 
-    @Override public String getModName() { return "Advanced Rocketry"; }
-    @Override public IDrawable getBackground() { return background; }
-    @Override public IDrawable getIcon() { return icon; }
-
     @Override
-    public void setRecipe(IRecipeLayout layout, OrbitalLaserDrillWrapper wrapper, IIngredients ing) {
-        this.header = (wrapper != null) ? wrapper.getHeaderText() : "";
-
-        IGuiItemStackGroup items = layout.getItemStacks();
-
-        items.init(0, true, MACHINE_X, MACHINE_Y);
-
-        int slot = 1;
-        for (int row = 0; row < GRID; row++) {
-            for (int col = 0; col < GRID; col++) {
-                items.init(slot, false, GRID_X0 + col * SLOT, GRID_Y0 + row * SLOT);
-                slot++;
-            }
-        }
-
-        java.util.List<java.util.List<ItemStack>> inLists =
-                ing.getInputs(mezz.jei.api.ingredients.VanillaTypes.ITEM);
-        if (!inLists.isEmpty()) {
-            items.set(0, inLists.get(0));
-        }
-
-        java.util.List<java.util.List<ItemStack>> outLists =
-                ing.getOutputs(mezz.jei.api.ingredients.VanillaTypes.ITEM);
-
-        if (!outLists.isEmpty() && !outLists.get(0).isEmpty()) {
-            java.util.List<ItemStack> outs = outLists.get(0);
-            for (int i = 0; i < (GRID * GRID); i++) {
-                int jeiSlot = 1 + i;
-                if (i < outs.size()) {
-                    items.set(jeiSlot, outs.get(i));
-                }
-            }
-        }
+    public String getModName() {
+        return "Advanced Rocketry";
     }
 
     @Override
-    public void drawExtras(Minecraft mc) {
-        // Slot frame for machine
-        slotFrame.draw(mc, MACHINE_X, MACHINE_Y);
+    public IDrawable getBackground() {
+        return background;
+    }
 
-        // Slot frames for grid
-        for (int row = 0; row < GRID; row++) {
-            for (int col = 0; col < GRID; col++) {
-                slotFrame.draw(mc, GRID_X0 + col * SLOT, GRID_Y0 + row * SLOT);
-            }
+    @Override
+    public IDrawable getIcon() {
+        return icon;
+    }
+
+    @Override
+    public void setRecipe(IRecipeLayout layout, OrbitalLaserDrillWrapper wrapper, IIngredients ingredients) {
+        IGuiItemStackGroup items = layout.getItemStacks();
+        List<List<ItemStack>> outputs = ingredients.getOutputs(VanillaTypes.ITEM);
+        int slotCount = Math.min(outputs.size(), pageSize);
+
+        for (int index = 0; index < slotCount; index++) {
+            items.init(
+                    index,
+                    false,
+                    GRID_X + index % COLUMNS * SLOT_SIZE,
+                    GRID_Y + index / COLUMNS * SLOT_SIZE
+            );
+            items.setBackground(index, slotFrame);
         }
+
+        items.set(ingredients);
     }
 }

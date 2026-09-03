@@ -8,8 +8,8 @@ public class JeiClientTickHandler {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (!ARPlugin.hasQueuedGasGiantRefresh()) return;
+        if (!ARPlugin.hasQueuedDimensionRecipeRefresh()) return;
 
-        ARPlugin.tryApplyQueuedGasGiantRefresh();
+        ARPlugin.tryApplyQueuedDimensionRecipeRefresh();
     }
 }
