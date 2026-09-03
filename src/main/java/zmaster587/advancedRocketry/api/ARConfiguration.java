@@ -518,7 +518,7 @@ public class ARConfiguration {
         arConfig.IridiumClumpSize = config.get(WORLDGEN, "IridiumPerClump", 16).getInt();
         arConfig.IridiumPerChunk = config.get(WORLDGEN, "IridiumPerChunk", 1).getInt();
         //Orbital laser
-        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", true, "Treat laserDrillOres as a blacklist. Note: false + empty ore list will crash the game").getBoolean();
+        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", true, "Treat laserDrillOres as a blacklist. Note: false + empty ore list = every registered OreDictionary name beginning with ore").getBoolean();
         orbitalLaserOres = config.get(WORLDGEN, "laserDrillOres", new String[]{}, "List of ores allowed to be mined by the laser drill if surface drilling is disabled.  Ores can be specified by just the oreName:<size> (oredict) or by modid:block:meta:<size> where size is stacksize and optional").getStringList();
         //Geode
         arConfig.geodeOresBlackList = config.get(WORLDGEN, "geodeOres_blacklist", false, "Treat geodeOres as a blacklist.").getBoolean();

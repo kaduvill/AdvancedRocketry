@@ -39,7 +39,11 @@ class VoidDrill extends AbstractDrill {
     void setSourceDimId(int dimId) {
         if (this.sourceDimId != dimId) {
             this.sourceDimId = dimId;
-            this.oreCacheValid = false;
+            if (oreCacheValid && dimId != Integer.MIN_VALUE) {
+                rebuildOreList(dimId);
+            } else {
+                oreCacheValid = false;
+            }
         }
     }
     private static boolean sameOreEntry(ItemStack a, ItemStack b) {
@@ -67,7 +71,10 @@ class VoidDrill extends AbstractDrill {
     private void rebuildOreList(int dimId) {
         ores.clear();
 
-        List<String> configOres = ARConfiguration.getCurrentConfig().standardLaserDrillOres;
+        DimensionProperties dimProperties = dimId == Integer.MIN_VALUE ? null :
+                DimensionManager.getInstance().getDimensionProperties(dimId);
+        List<String> configOres = dimProperties != null && dimProperties.laserDrillOresReplace ? null :
+                ARConfiguration.getCurrentConfig().standardLaserDrillOres;
         if (configOres != null) {
             for (String oreDictName : configOres) {
                 if (oreDictName == null || oreDictName.isEmpty()) {
@@ -132,15 +139,10 @@ class VoidDrill extends AbstractDrill {
             }
         }
 
-        if (dimId != Integer.MIN_VALUE) {
-            DimensionProperties dimProperties =
-                    DimensionManager.getInstance().getDimensionProperties(dimId);
-
-            if (dimProperties != null && dimProperties.laserDrillOres != null) {
-                for (ItemStack s : dimProperties.laserDrillOres) {
-                    if (s != null && !s.isEmpty() && !containsOreEntry(s)) {
-                        ores.add(s.copy());
-                    }
+        if (dimProperties != null && dimProperties.laserDrillOres != null) {
+            for (ItemStack s : dimProperties.laserDrillOres) {
+                if (s != null && !s.isEmpty() && !containsOreEntry(s)) {
+                    ores.add(s.copy());
                 }
             }
         }

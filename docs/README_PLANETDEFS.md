@@ -1018,37 +1018,48 @@ Notes:
 - `<fillerBlock>` does not disable AR custom ore generation from `<oreGen>`
 
 #### `<laserDrillOres>`
-Laser drill ore list.
 
-Accepted entry formats:
-- OreDictionary name, optionally with count
-- item registry name, optionally with count and damage
+Defines planet-specific Void Drill ores.
 
-Examples:
+##### Additive table
+
+When `replace` is omitted or set to `false`, the planet's ores are added to the global Void Drill table. Exact duplicate additions are ignored.
 
 ```xml
-<laserDrillOres>oreIron;3,oreGold;1</laserDrillOres>
-or
-<laserDrillOres>minecraft:diamond;1;0,minecraft:redstone;8;0</laserDrillOres>
+<laserDrillOres>oreDilithium,oreTitanium</laserDrillOres>
 ```
 
-Rules:
-- Entries are comma-separated
-- Each entry uses semicolon-separated parts
+```xml
+<laserDrillOres replace="false">oreDilithium,oreTitanium</laserDrillOres>
+```
 
-For OreDictionary entries:
+If `<laserDrillOres>` is omitted entirely, the planet uses only the global table.
+
+##### Replacement table
+
+When `replace="true"`, only the planet's ores are used. The global Void Drill table is not inherited.
+
+```xml
+<laserDrillOres replace="true">oreDilithium,oreTitanium,oreIridium</laserDrillOres>
+```
+
+An empty replacement table is valid and gives the planet no Void Drill ores.
+
+```xml
+<laserDrillOres replace="true"></laserDrillOres>
+```
+
+##### Entry formats
+
+Entries are comma-separated. Each entry may use one of these formats:
+
 - `oreName`
 - `oreName;count`
-
-For item entries:
 - `modid:item`
 - `modid:item;count`
 - `modid:item;count;damage`
 
-Notes:
-- Invalid ore names or item ids are ignored with warnings
-- The raw string is preserved internally as `laserDrillOresRaw`
-- This is not tested vs JEI-integration
+Invalid ore names and item IDs are ignored with a warning.
 
 #### `<geodeOres>`
 Geode ore whitelist.

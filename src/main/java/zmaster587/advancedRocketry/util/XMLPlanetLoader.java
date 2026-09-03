@@ -62,6 +62,7 @@ public class XMLPlanetLoader {
     private static final String ATTR_DIMID = "DIMID";
     private static final String ATTR_NATIVEDIM = "dimMapping";
     private static final String ATTR_ICON = "customIcon";
+    private static final String ATTR_REPLACE = "replace";
     private static final String ELEMENT_ISKNOWN = "isKnown";
     private static final String ELEMENT_HASRINGS = "hasRings";
     private static final String ELEMENT_RING_ANGLE = "ringAngle";
@@ -302,7 +303,11 @@ public class XMLPlanetLoader {
             nodePlanet.appendChild(XMLOreLoader.writeOreEntryXML(doc, properties.oreProperties));
         }
         if (properties.laserDrillOresRaw != null) {
-            nodePlanet.appendChild(createTextNode(doc, ELEMENT_LASER_DRILL_ORES, properties.laserDrillOresRaw));
+            Element laserDrillOres = doc.createElement(ELEMENT_LASER_DRILL_ORES);
+            if (properties.laserDrillOresReplace)
+                laserDrillOres.setAttribute(ATTR_REPLACE, "true");
+            laserDrillOres.appendChild(doc.createTextNode(properties.laserDrillOresRaw));
+            nodePlanet.appendChild(laserDrillOres);
         }
         if (!properties.geodeOres.isEmpty()) {
             StringJoiner joiner = new StringJoiner(",");
@@ -842,14 +847,20 @@ public class XMLPlanetLoader {
             } else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_LASER_DRILL_ORES) && !properties.isGasGiant()) {
 
                 properties.laserDrillOresRaw = planetPropertyNode.getTextContent();
+                Node replaceNode = planetPropertyNode.getAttributes().getNamedItem(ATTR_REPLACE);
+                properties.laserDrillOresReplace = replaceNode != null && Boolean.parseBoolean(replaceNode.getNodeValue());
 
                 String[] entries = properties.laserDrillOresRaw.split(",");
                 for (String entry : entries) {
 
                     String[] parts = entry.split(";");
+                    String oreName = parts[0].trim();
 
-                    if (OreDictionary.doesOreNameExist(parts[0].trim())) {
-                        ItemStack item = OreDictionary.getOres(parts[0]).get(0);
+                    if (oreName.isEmpty())
+                        continue;
+
+                    if (OreDictionary.doesOreNameExist(oreName)) {
+                        ItemStack item = OreDictionary.getOres(oreName).get(0);
                         if (parts.length > 1) {
                             try {
                                 item.setCount(Integer.parseInt(parts[1]));
@@ -857,7 +868,7 @@ public class XMLPlanetLoader {
                             }
                         }
                         properties.laserDrillOres.add(item);
-                    } else if (Item.getByNameOrId(parts[0].trim()) != null) {
+                    } else if (Item.getByNameOrId(oreName) != null) {
                         int quantity = 1;
                         int damage = 0;
                         if (parts.length > 1) {
@@ -872,9 +883,9 @@ public class XMLPlanetLoader {
                                 }
                             }
                         }
-                        properties.laserDrillOres.add(new ItemStack(Objects.requireNonNull(Item.getByNameOrId(parts[0].trim())), quantity, damage));
+                        properties.laserDrillOres.add(new ItemStack(Objects.requireNonNull(Item.getByNameOrId(oreName)), quantity, damage));
                     } else {
-                        AdvancedRocketry.logger.warn(parts[0] + " is not a valid OreDictionary name or item ID");
+                        AdvancedRocketry.logger.warn(oreName + " is not a valid OreDictionary name or item ID");
                     }
                 }
             } else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_GEODE_ORES)) {
