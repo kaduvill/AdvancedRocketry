@@ -1,5 +1,7 @@
 Changelog 2.2.14
-- Added customocion="obsidian" for obsidianworlds
+- Added customocion="obsidian" for obsidian worlds
+- Added configurable warpship direction to Warp Controller
+- Fixed Warp Controller status messages for insufficient fuel and false artifact warnings
 
 Changelog 2.2.13
 - Fixed misaligned mass/distance/atmosphere bars in Warp Controller fullscreen planetselector
