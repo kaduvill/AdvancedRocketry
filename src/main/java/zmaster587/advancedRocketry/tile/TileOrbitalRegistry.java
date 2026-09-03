@@ -1007,7 +1007,7 @@ public class TileOrbitalRegistry extends TileMultiPowerConsumer
 
         // Short type text (localized)
         String typeShort = st.hasWarpCore
-                ? LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.starshiplist")
+                ? LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.warpshiplist")
                 : LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.station");
 
         // "ID" label from lang, then "ID <id> <Type>"
@@ -1077,10 +1077,10 @@ public class TileOrbitalRegistry extends TileMultiPowerConsumer
         modules.add(new ModuleText(x, y, idLine, 0x2d2d2d));
         y += 10;
 
-        // ----- Type: <Starship/Station> -----
+        // ----- Type: <Warpship/Station> -----
         String typeLabel = LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type"); // e.g. "Type:"
         String typeKey   = selected.hasWarpCore
-                ? LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.starship")
+                ? LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.warpship")
                 : LibVulpes.proxy.getLocalizedString("msg.orbitalregistry.text.type.station");
         String typeLine  = typeLabel + " " + typeKey;
         modules.add(new ModuleText(x, y, typeLine, 0x2d2d2d));

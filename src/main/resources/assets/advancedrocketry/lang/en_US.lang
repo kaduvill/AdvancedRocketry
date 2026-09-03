@@ -247,7 +247,7 @@ error.rocket.partsWornOut=Critical parts are worn out — launch aborted.
 error.rocket.aborted=Launch aborted.
 error.rocket.gatedArtifactMissing=Missing Artifact. (Player Inventory)
 error.rocket.gatedArtifactMissingWithItem=Missing required artifact: %sx %s (Player Inventory)
-error.rocket.outsideStarSystem=Interstellar travel requires a Starship.
+error.rocket.outsideStarSystem=Interstellar travel requires a Warpship.
 error.rocket.outsidePlanetarySystem=Planetary travel requires a Nuclear Rocket.
 error.rocket.unmappedDimension=Navigation failure: dimension not found in the galactic database
 
@@ -750,8 +750,8 @@ msg.orbitalregistry.writechip=Program chip
 msg.orbitalregistry.text.listentry=ID
 
 # StationDetails
-msg.orbitalregistry.text.type.starshiplist=§6Starship
-msg.orbitalregistry.text.type.starship=Starship
+msg.orbitalregistry.text.type.warpshiplist=§6Warpship
+msg.orbitalregistry.text.type.warpship=Warpship
 msg.orbitalregistry.text.type.station=Station
 msg.orbitalregistry.text.id=ID:
 msg.orbitalregistry.text.type=Type:
@@ -1149,7 +1149,7 @@ tooltip.advancedrocketry.smallairlock.alt.1=§fBuild a proper airlock
 tooltip.advancedrocketry.smallairlock.alt.2=§fusing 2 doors
 
 # Warp Controller
-tooltip.advancedrocketry.warpcontroller=Turns the station into a §6Starship
+tooltip.advancedrocketry.warpcontroller=Turns the station into a §6Warpship
 tooltip.advancedrocketry.warpcontroller.shift.1=§fPlace §4Warp Controller§f + §4Warp Core§f on a space station
 tooltip.advancedrocketry.warpcontroller.shift.2=§fWarp between planets and solar systems
 tooltip.advancedrocketry.warpcontroller.alt.1=§fUI shows location, destinations, and warp fuel
@@ -1451,9 +1451,9 @@ tooltip.advancedrocketry.centrifuge=Separates by density
 tooltip.advancedrocketry.centrifuge.shift.1=§bUse Holo-Projector!
 
 # Warp Core
-tooltip.advancedrocketry.warpcore=Core for §6Starship
+tooltip.advancedrocketry.warpcore=Core for §6Warpship
 tooltip.advancedrocketry.warpcore.shift.1=§bUse Holo-Projector!
-tooltip.advancedrocketry.warpcore.alt.1=§6Starship §fneeds §4Warp Controller§f + §4Warp Core§f
+tooltip.advancedrocketry.warpcore.alt.1=§6Warpship §fneeds §4Warp Controller§f + §4Warp Core§f
 
 # Beacon
 tooltip.advancedrocketry.beacon=Long-range signal beacon
