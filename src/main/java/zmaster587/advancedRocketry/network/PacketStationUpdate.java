@@ -21,7 +21,7 @@ public class PacketStationUpdate extends BasePacket {
     ISpaceObject spaceObject;
     int stationNumber;
     Type type;
-
+    int direction;
     int destOrbitingBody;
     int fuel;
     double rx, ry, rz, drx, dry, drz;
@@ -76,6 +76,10 @@ public class PacketStationUpdate extends BasePacket {
                     DimensionManager.getInstance().deleteDimension(stationNumber);
                 }
                 break;
+            case FORWARD_DIRECTION_UPDATE:
+                if (spaceObject instanceof SpaceStationObject)
+                    out.writeByte(((SpaceStationObject) spaceObject).getForwardDirection().ordinal());
+                break;
             default:
         }
     }
@@ -118,6 +122,9 @@ public class PacketStationUpdate extends BasePacket {
                     return;
                 }
                 break;
+            case FORWARD_DIRECTION_UPDATE:
+                direction = in.readUnsignedByte();
+                break;
         }
     }
 
@@ -158,6 +165,10 @@ public class PacketStationUpdate extends BasePacket {
                 if (nbt != null)
                     spaceObject.getProperties().readFromNBT(nbt);
                 break;
+            case FORWARD_DIRECTION_UPDATE:
+                if (spaceObject instanceof SpaceStationObject && direction < EnumFacing.values().length)
+                    ((SpaceStationObject) spaceObject).setForwardDirection(EnumFacing.values()[direction]);
+                break;
         }
     }
 
@@ -172,6 +183,7 @@ public class PacketStationUpdate extends BasePacket {
         FUEL_UPDATE,
         ROTANGLE_UPDATE,
         DIM_PROPERTY_UPDATE,
-        ALTITUDE_UPDATE
+        ALTITUDE_UPDATE,
+        FORWARD_DIRECTION_UPDATE
     }
 }
