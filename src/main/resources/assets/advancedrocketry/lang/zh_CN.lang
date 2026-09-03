@@ -247,7 +247,7 @@ error.rocket.partsWornOut=关键部件损坏，发射中止。
 error.rocket.aborted=发射中止。
 error.rocket.gatedArtifactMissing=缺失工件。（玩家物品栏中）
 error.rocket.gatedArtifactMissingWithItem=缺失所需工件：%sx %s（玩家物品栏中）
-error.rocket.outsideStarSystem=星际航行需要星际飞船。
+error.rocket.outsideStarSystem=星际航行需要跃迁飞船。
 error.rocket.outsidePlanetarySystem=行星航行需要核动力火箭。
 error.rocket.unmappedDimension=导航失败：星系数据库中未找到该维度
 
@@ -538,7 +538,7 @@ msg.satctrlcenter.autodl_hint=无线收发器自动下载（提取）
 msg.satbuilder.writesecondchip=写入第二芯片
 msg.dockingport.target=目标ID
 msg.dockingport.me=本端ID
-msg.planetholo.size=全息图尺寸:
+msg.planetholo.size=全息图尺寸：
 msg.planetholo.navigation=右键点击进行导航
 msg.planetholo..uplevel=返回上一级
 msg.stationaltctrl.maxaltrate=最大海拔变化率：
@@ -560,6 +560,7 @@ msg.warpmon.nowhere=无可用目的地
 msg.warpmon.missingart=缺少工件
 msg.warpmon.ready=就绪！
 msg.warpmon.notready=未就绪
+msg.warpmon.nofuel=需要更多燃料
 msg.warpmon.warp=跃迁！
 msg.warpmon.fuelcost=燃料消耗：
 msg.warpmon.fuel=燃料：
@@ -570,6 +571,15 @@ msg.warpmon.search=搜索星球
 msg.warpmon.chip=从芯片载入程序
 msg.warpmon.datareq=需各类数据各100
 msg.warpmon.artifact=工件
+msg.warpmon.direction.short.north=北
+msg.warpmon.direction.short.east=东
+msg.warpmon.direction.short.south=南
+msg.warpmon.direction.short.west=西
+msg.warpmon.direction.north=跃迁方向：北
+msg.warpmon.direction.east=跃迁方向：东
+msg.warpmon.direction.south=跃迁方向：南
+msg.warpmon.direction.west=跃迁方向：西
+msg.warpmon.direction.desc=设置跃迁飞船的前进方向
 msg.rocketbuilder.success=可以发射！
 msg.rocketbuilder.nofuel=燃料容量不足！
 msg.rocketbuilder.noseat=缺少座位或卫星仓！
@@ -749,8 +759,8 @@ msg.orbitalregistry.writechip=编程芯片
 msg.orbitalregistry.text.listentry=ID
 
 # StationDetails
-msg.orbitalregistry.text.type.starshiplist=§6星际飞船
-msg.orbitalregistry.text.type.starship=星际飞船
+msg.orbitalregistry.text.type.warpshiplist=§6跃迁飞船
+msg.orbitalregistry.text.type.warpship=跃迁飞船
 msg.orbitalregistry.text.type.station=空间站
 msg.orbitalregistry.text.id=ID：
 msg.orbitalregistry.text.type=类型：
@@ -1148,7 +1158,7 @@ tooltip.advancedrocketry.smallairlock.alt.1=§f使用两扇门
 tooltip.advancedrocketry.smallairlock.alt.2=§f建造一个合适的气闸
 
 # Warp Controller
-tooltip.advancedrocketry.warpcontroller=将空间站转变为§6星际飞船
+tooltip.advancedrocketry.warpcontroller=将空间站转变为§6跃迁飞船
 tooltip.advancedrocketry.warpcontroller.shift.1=§f在空间站上放置§4跃迁控制器§f和§4跃迁核心§f
 tooltip.advancedrocketry.warpcontroller.shift.2=§f在行星和恒星系之间进行跃迁旅行
 tooltip.advancedrocketry.warpcontroller.alt.1=§f界面中会显示位置、目的地和跃迁燃料
@@ -1450,9 +1460,9 @@ tooltip.advancedrocketry.centrifuge=按密度分离物质
 tooltip.advancedrocketry.centrifuge.shift.1=§b使用全息投影器！
 
 # Warp Core
-tooltip.advancedrocketry.warpcore=§6星际飞船§f的核心
+tooltip.advancedrocketry.warpcore=§6跃迁飞船§f的核心
 tooltip.advancedrocketry.warpcore.shift.1=§b使用全息投影器！
-tooltip.advancedrocketry.warpcore.alt.1=§6星际飞船§f需要§4跃迁控制器§f+§4跃迁核心§f
+tooltip.advancedrocketry.warpcore.alt.1=§6跃迁飞船§f需要§4跃迁控制器§f+§4跃迁核心§f
 
 # Beacon
 tooltip.advancedrocketry.beacon=远程信标
