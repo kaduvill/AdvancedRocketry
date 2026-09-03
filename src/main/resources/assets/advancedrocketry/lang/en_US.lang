@@ -560,6 +560,7 @@ msg.warpmon.nowhere=Nowhere to go
 msg.warpmon.missingart=Missing Artifact
 msg.warpmon.ready=Ready!
 msg.warpmon.notready=Not Ready
+msg.warpmon.nofuel=Need More Fuel
 msg.warpmon.warp=Warp!
 msg.warpmon.fuelcost=Fuel Cost:
 msg.warpmon.fuel=Fuel:

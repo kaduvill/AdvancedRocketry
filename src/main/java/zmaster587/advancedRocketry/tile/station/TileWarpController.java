@@ -238,14 +238,17 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 modules.add(new ModuleText(baseX, baseY + sizeY + 20, LibVulpes.proxy.getLocalizedString("msg.warpmon.corestatus"), 0x1b1b1b));
                 boolean flag = isOnStation && getSpaceObject().getFuelAmount() >= getTravelCost() && getSpaceObject().hasUsableWarpCore();
                 flag = flag && !(getSpaceObject().getDestOrbitingBody() == Constants.INVALID_PLANET || getSpaceObject().getOrbitingPlanetId() == getSpaceObject().getDestOrbitingBody());
-                boolean artifactFlag = (dimCache != null && meetsArtifactReq(dimCache));
+                boolean artifactFlag = dimCache == null || meetsArtifactReq(dimCache);
 
                 canWarp = new ModuleText(baseX, baseY + sizeY + 30,
                         (isOnStation && getSpaceObject().isAnchored()) ? LibVulpes.proxy.getLocalizedString("msg.warpmon.anchored") :
                                 ((isOnStation && (getSpaceObject().getDestOrbitingBody() == Constants.INVALID_PLANET || getSpaceObject().getOrbitingPlanetId() == getSpaceObject().getDestOrbitingBody())) ? LibVulpes.proxy.getLocalizedString("msg.warpmon.nowhere") :
                                         (!artifactFlag ? LibVulpes.proxy.getLocalizedString("msg.warpmon.missingart") :
                                                 (flag ? LibVulpes.proxy.getLocalizedString("msg.warpmon.ready") :
-                                                        LibVulpes.proxy.getLocalizedString("msg.warpmon.notready")))), flag && artifactFlag && !getSpaceObject().isAnchored() ? 0x1baa1b : 0xFF1b1b);
+                                                        (isOnStation && getSpaceObject().hasUsableWarpCore() && getSpaceObject().getFuelAmount() < getTravelCost() ?
+                                                                LibVulpes.proxy.getLocalizedString("msg.warpmon.nofuel") :
+                                                                LibVulpes.proxy.getLocalizedString("msg.warpmon.notready"))))),
+                        flag && artifactFlag && !getSpaceObject().isAnchored() ? 0x1baa1b : 0xFF1b1b);
                 modules.add(canWarp);
                 modules.add(new ModuleProgress(baseX, baseY + sizeY + 40, 10, new IndicatorBarImage(70, 58, 53, 8, 122, 58, 5, 8, EnumFacing.EAST, TextureResources.progressBars), this));
                 //modules.add(new ModuleText(baseX + 82, baseY + sizeY + 20, "Fuel Cost:", 0x1b1b1b));
@@ -356,13 +359,16 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
 
         if (canWarp != null) {
             flag = flag && !(getSpaceObject().getDestOrbitingBody() == Constants.INVALID_PLANET || getSpaceObject().getOrbitingPlanetId() == getSpaceObject().getDestOrbitingBody());
-            boolean artifactFlag = (dimCache != null && meetsArtifactReq(dimCache));
+            boolean artifactFlag = dimCache == null || meetsArtifactReq(dimCache);
 
             canWarp.setText(
                     (isOnStation && getSpaceObject().isAnchored()) ? LibVulpes.proxy.getLocalizedString("msg.warpmon.anchored") :
                             (isOnStation && (getSpaceObject().getDestOrbitingBody() == Constants.INVALID_PLANET || getSpaceObject().getOrbitingPlanetId() == getSpaceObject().getDestOrbitingBody()) ? LibVulpes.proxy.getLocalizedString("msg.warpmon.nowhere") :
                                     (!artifactFlag ? LibVulpes.proxy.getLocalizedString("msg.warpmon.missingart") :
-                                            (flag ? LibVulpes.proxy.getLocalizedString("msg.warpmon.ready") : LibVulpes.proxy.getLocalizedString("msg.warpmon.notready")))));
+                                            (flag ? LibVulpes.proxy.getLocalizedString("msg.warpmon.ready") :
+                                                    (isOnStation && getSpaceObject().hasUsableWarpCore() && getSpaceObject().getFuelAmount() < warpCost ?
+                                                            LibVulpes.proxy.getLocalizedString("msg.warpmon.nofuel") :
+                                                            LibVulpes.proxy.getLocalizedString("msg.warpmon.notready"))))));
             canWarp.setColor(flag && artifactFlag && !getSpaceObject().isAnchored() ? 0x1baa1b : 0xFF1b1b);
         }
 
