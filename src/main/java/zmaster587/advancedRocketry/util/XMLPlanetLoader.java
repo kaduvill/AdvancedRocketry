@@ -860,7 +860,7 @@ public class XMLPlanetLoader {
                         continue;
 
                     if (OreDictionary.doesOreNameExist(oreName)) {
-                        ItemStack item = OreDictionary.getOres(oreName).get(0);
+                        ItemStack item = OreDictionary.getOres(oreName).get(0).copy();
                         if (parts.length > 1) {
                             try {
                                 item.setCount(Integer.parseInt(parts[1]));
