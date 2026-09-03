@@ -13,7 +13,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import zmaster587.advancedRocketry.advancements.ARAdvancements;
 import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
@@ -27,9 +26,9 @@ import zmaster587.advancedRocketry.inventory.modules.ModuleData;
 import zmaster587.advancedRocketry.inventory.modules.ModulePlanetImage;
 import zmaster587.advancedRocketry.inventory.modules.ModulePlanetSelector;
 import zmaster587.advancedRocketry.item.IDataItem;
-import zmaster587.advancedRocketry.item.ItemData;
 import zmaster587.advancedRocketry.item.ItemPlanetIdentificationChip;
 import zmaster587.advancedRocketry.network.PacketSpaceStationInfo;
+import zmaster587.advancedRocketry.network.PacketStationUpdate;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.advancedRocketry.tile.multiblock.TileWarpCore;
@@ -53,10 +52,12 @@ import java.util.List;
 public class TileWarpController extends TileEntity implements ITickable, IModularInventory, ISelectionNotify, INetworkMachine, IButtonInventory, IProgressBar, IDataSync, IGuiCallback, IDataInventory, IPlanetDefiner {
 
     private static final int ARTIFACT_BEGIN_RANGE = 4, ARTIFACT_END_RANGE = 8;
-    private static final byte TAB_SWITCH = 4, STORE_DATA = 10, LOAD_DATA = 20, SEARCH = 5, PROGRAMFROMCHIP = 6;
+    private static final byte TAB_SWITCH = 4, STORE_DATA = 10, LOAD_DATA = 20, SEARCH = 5, PROGRAMFROMCHIP = 6, WARP_DIRECTION = 7;
     private static final int DISTANCESLOT = 0, MASSSLOT = 1, COMPOSITION = 2, PLANETSLOT = 3, MAX_PROGRESS = 1000;
     protected ModulePlanetSelector container;
     private ModuleText canWarp;
+    private ModuleButton warpDirectionButton;
+    private EnumFacing displayedWarpDirection;
     private DimensionProperties dimCache;
     private SpaceStationObject station;
     private ModulePlanetImage srcPlanetImg, dstPlanetImg;
@@ -79,6 +80,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
         data.setMaxData(10000);
         inv = new EmbeddedInventory(9);
         programmingProgress = new ModuleProgress(35, 80, 3, TextureResources.terraformProgressBar, this);
+        warpDirectionButton = new ModuleButton(174, 4, WARP_DIRECTION, LibVulpes.proxy.getLocalizedString("msg.warpmon.direction.short.north"), this, TextureResources.buttonGreen, 24, 24);
         progress = -1;
     }
 
@@ -186,6 +188,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
             //Front page
             if (tabModule.getTab() == 0) {
                 modules.add(tabModule);
+                modules.add(warpDirectionButton);
                 //Don't keep recreating it otherwise data is stale
                 if (sync1 == null) {
                     sync1 = new ModuleSync(0, this);
@@ -340,6 +343,17 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
 
         SpaceStationObject station = getSpaceObject();
         boolean isOnStation = station != null;
+        warpDirectionButton.setEnabled(isOnStation && !station.isWarping());
+        if (isOnStation) {
+            EnumFacing direction = station.getForwardDirection();
+            if (direction != displayedWarpDirection) {
+                warpDirectionButton.setText(LibVulpes.proxy.getLocalizedString("msg.warpmon.direction.short." + direction.getName()));
+                warpDirectionButton.setToolTipText(
+                        LibVulpes.proxy.getLocalizedString("msg.warpmon.direction." + direction.getName()) + "\n" +
+                                LibVulpes.proxy.getLocalizedString("msg.warpmon.direction.desc"));
+                displayedWarpDirection = direction;
+            }
+        }
         DimensionProperties location;
         String planetName;
 
@@ -448,6 +462,8 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 PacketHandler.sendToServer(new PacketMachine(this, SEARCH));
             } else if (buttonId == 4) {
                 PacketHandler.sendToServer(new PacketMachine(this, PROGRAMFROMCHIP));
+            } else if (buttonId == WARP_DIRECTION) {
+                PacketHandler.sendToServer(new PacketMachine(this, WARP_DIRECTION));
             }
         }
     }
@@ -516,6 +532,13 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                         ((TileWarpCore) tile).onInventoryUpdated();
                     }
                 }
+            }
+        } else if (id == WARP_DIRECTION && !world.isRemote) {
+            SpaceStationObject station = getSpaceObject();
+            if (station != null && !station.isWarping()) {
+                EnumFacing direction = station.getForwardDirection();
+                station.setForwardDirection(direction.getAxis() == EnumFacing.Axis.Y ? EnumFacing.NORTH : direction.rotateY());
+                PacketHandler.sendToAll(new PacketStationUpdate(station, PacketStationUpdate.Type.FORWARD_DIRECTION_UPDATE));
             }
         } else if (id == TAB_SWITCH && !world.isRemote) {
             tabModule.setTab(nbt.getShort("tab"));
