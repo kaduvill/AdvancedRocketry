@@ -1,46 +1,37 @@
 package zmaster587.advancedRocketry.integration.jei.asteroids;
 
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
-import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
-import zmaster587.advancedRocketry.item.ItemAsteroidChip;
 import zmaster587.advancedRocketry.util.Asteroid;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class AsteroidWrapper implements IRecipeWrapper {
 
-    // Static grid: 6x2
-    public static final int COLS = 6;
-    public static final int ROWS = 2;
-    public static final int PAGE_SIZE = COLS * ROWS; // 12
+    public static final int COLUMNS = 9;
+    public static final int MAX_ROWS = 9;
+    public static final int MAX_OUTPUTS_PER_PAGE = COLUMNS * MAX_ROWS;
 
     private final String asteroidKey;
     private final Asteroid asteroid;
+    private final int pageIndex;
+    private final int pageCount;
+    private final List<ItemStack> outputsPage;
 
-    private final int pageIndex;   // 0-based
-    private final int pageCount;   // >= 1
-
-    private final ItemStack observatory;
-    private final ItemStack chip;
-
-    private final List<ItemStack> outputsVisible; // <= 12 (already sliced)
-
-    public AsteroidWrapper(String asteroidKey, Asteroid asteroid, int pageIndex, int pageCount, List<ItemStack> outputsVisible) {
+    public AsteroidWrapper(String asteroidKey, Asteroid asteroid, int pageIndex, int pageCount, List<ItemStack> outputsPage) {
         this.asteroidKey = asteroidKey;
         this.asteroid = asteroid;
         this.pageIndex = Math.max(0, pageIndex);
         this.pageCount = Math.max(1, pageCount);
-
-        this.observatory = new ItemStack(AdvancedRocketryBlocks.blockObservatory);
-        this.chip = makeDisplayChip(asteroidKey);
-
-        // Detach from subList backing
-        this.outputsVisible = (outputsVisible == null) ? Collections.emptyList() : new ArrayList<>(outputsVisible);
+        this.outputsPage = outputsPage == null ? Collections.emptyList() : new ArrayList<>(outputsPage);
     }
 
     public boolean isValid() {
@@ -51,76 +42,77 @@ public class AsteroidWrapper implements IRecipeWrapper {
         return pageIndex;
     }
 
+    public int getOutputCount() {
+        return outputsPage.size();
+    }
+
     public String getDisplayName() {
-        try {
-            String n = asteroid.getName();
-            if (n != null && !n.isEmpty()) return n;
-        } catch (Throwable ignored) {}
-        return (asteroidKey != null && !asteroidKey.isEmpty()) ? asteroidKey : "Asteroid";
+        if (asteroid != null) {
+            String name = asteroid.getName();
+            if (name != null && !name.isEmpty())
+                return name;
+        }
+        return asteroidKey != null && !asteroidKey.isEmpty() ? asteroidKey : "Asteroid";
     }
 
     public String getHeaderText() {
         String name = getDisplayName();
-        if (pageCount > 1) {
+        if (pageCount > 1)
             name += " (" + (pageIndex + 1) + "/" + pageCount + ")";
-        }
         return name;
     }
 
     @Override
-    public void getIngredients(IIngredients ing) {
-        List<List<ItemStack>> inputs = new ArrayList<>(2);
-        inputs.add(Collections.singletonList(observatory));
-        inputs.add(Collections.singletonList(chip));
-        ing.setInputLists(mezz.jei.api.ingredients.VanillaTypes.ITEM, inputs);
-
-        ing.setOutputLists(mezz.jei.api.ingredients.VanillaTypes.ITEM,
-                Collections.singletonList(outputsVisible)
-        );
+    public void getIngredients(IIngredients ingredients) {
+        ingredients.setOutputs(VanillaTypes.ITEM, outputsPage);
     }
 
     @Override
-    public void drawInfo(Minecraft mc, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        if (mc == null || mc.fontRenderer == null) return;
+    public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+        if (minecraft == null || minecraft.fontRenderer == null) return;
 
-        // Draw header per-recipe (safe; wrapper is per recipe instance)
         String header = getHeaderText();
+
         if (header != null && !header.isEmpty()) {
             GlStateManager.color(1f, 1f, 1f, 1f);
-            mc.fontRenderer.drawString(header, 6, 2, 0x404040);
-            GlStateManager.color(1f, 1f, 1f, 1f);
+            minecraft.fontRenderer.drawString(
+                    minecraft.fontRenderer.trimStringToWidth(header, recipeWidth - 12),
+                    6,
+                    2,
+                    0x404040
+            );
         }
+
+        if (asteroid != null) {
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.75f, 0.75f, 1.0f);
+            minecraft.fontRenderer.drawString(
+                    I18n.format("jei.advancedrocketry.asteroids.distance", asteroid.getDistance()),
+                    Math.round(7 / 0.75f),
+                    Math.round(12 / 0.75f),
+                    0x7A7A7A
+            );
+            GlStateManager.popMatrix();
+        }
+
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
-    private static ItemStack makeDisplayChip(String type) {
-        ItemStack stack = new ItemStack(AdvancedRocketryItems.itemAsteroidChip);
-        if (stack.getItem() instanceof ItemAsteroidChip) {
-            ItemAsteroidChip chip = (ItemAsteroidChip) stack.getItem();
-            chip.setUUID(stack, 0L);
-            chip.setType(stack, type != null ? type : "");
-            chip.setMaxData(stack, 1000);
-        }
-        return stack;
-    }
-
-    // Option A: deterministic “sane correct view”
     public static List<ItemStack> collectOutputsFromConfig(Asteroid asteroid) {
-        if (asteroid == null || asteroid.itemStacks == null) return Collections.emptyList();
+        if (asteroid == null || asteroid.itemStacks == null)
+            return Collections.emptyList();
 
-        LinkedHashMap<String, ItemStack> seen = new LinkedHashMap<>();
+        LinkedHashMap<String, ItemStack> outputs = new LinkedHashMap<>();
+        for (ItemStack stack : asteroid.itemStacks) {
+            if (stack == null || stack.isEmpty() || stack.getItem().getRegistryName() == null)
+                continue;
 
-        for (ItemStack s : asteroid.itemStacks) {
-            if (s == null || s.isEmpty()) continue;
-            if (s.getItem() == null || s.getItem().getRegistryName() == null) continue;
-
-            ItemStack one = s.copy();
-            one.setCount(1);
-
-            String key = String.valueOf(one.getItem().getRegistryName()) + "@" + one.getMetadata();
-            if (!seen.containsKey(key)) {
-                seen.put(key, one);
-            }
+            ItemStack output = stack.copy();
+            output.setCount(1);
+            String key = output.getItem().getRegistryName() + "@" + output.getMetadata();
+            if (!outputs.containsKey(key))
+                outputs.put(key, output);
         }
-        return new ArrayList<>(seen.values());
+        return new ArrayList<>(outputs.values());
     }
 }

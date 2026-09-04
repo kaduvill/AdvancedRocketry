@@ -4,6 +4,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.util.LaserDrillOreTable;
@@ -74,7 +75,10 @@ public class OrbitalLaserDrillRecipeMaker {
                     ? "DIM " + dimensionId
                     : properties.getName();
 
-            addPages(planetRecipes, planetName, properties.getPlanetIcon(), effective, pageSize);
+            StellarBody star = properties.getStar();
+            String starName = star != null && star.getName() != null ? star.getName() : "";
+
+            addPages(planetRecipes, planetName, starName, properties.getPlanetIcon(), effective, pageSize);
         }
 
         if (baselinePlanetCount > 0 && !baseline.isEmpty()) {
@@ -82,7 +86,7 @@ public class OrbitalLaserDrillRecipeMaker {
                     ? "jei.advancedrocketry.orbitallaser.all_other_planets"
                     : "jei.advancedrocketry.orbitallaser.all_planets");
 
-            addPages(recipes, contextName, DimensionProperties.PlanetIcons.EARTHLIKE.getResource(),
+            addPages(recipes, contextName, "", DimensionProperties.PlanetIcons.EARTHLIKE.getResource(),
                     baseline, pageSize);
         }
 
@@ -91,7 +95,8 @@ public class OrbitalLaserDrillRecipeMaker {
     }
 
     private static void addPages(List<OrbitalLaserDrillWrapper> recipes, String contextName,
-                                 ResourceLocation planetIcon, List<ItemStack> ores, int pageSize) {
+                                 String starName, ResourceLocation planetIcon,
+                                 List<ItemStack> ores, int pageSize) {
         int pageCount = (ores.size() + pageSize - 1) / pageSize;
 
         for (int page = 0; page < pageCount; page++) {
@@ -100,6 +105,7 @@ public class OrbitalLaserDrillRecipeMaker {
 
             recipes.add(new OrbitalLaserDrillWrapper(
                     contextName,
+                    starName,
                     planetIcon,
                     page,
                     pageCount,

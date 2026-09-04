@@ -18,14 +18,16 @@ import java.util.List;
 public class OrbitalLaserDrillWrapper implements IRecipeWrapper {
 
     private final String contextName;
+    private final String starName;
     private final ResourceLocation planetIcon;
     private final int pageIndex;
     private final int pageCount;
     private final List<ItemStack> outputsPage;
 
-    public OrbitalLaserDrillWrapper(String contextName, ResourceLocation planetIcon,
+    public OrbitalLaserDrillWrapper(String contextName, String starName, ResourceLocation planetIcon,
                                     int pageIndex, int pageCount, List<ItemStack> outputsPage) {
         this.contextName = contextName == null ? "" : contextName;
+        this.starName = starName == null ? "" : starName;
         this.planetIcon = planetIcon;
         this.pageIndex = Math.max(0, pageIndex);
         this.pageCount = Math.max(1, pageCount);
@@ -68,5 +70,20 @@ public class OrbitalLaserDrillWrapper implements IRecipeWrapper {
         }
 
         font.drawString(font.trimStringToWidth(contextName, Math.max(0, nameWidth)), nameX, 7, 0x404040);
+
+        if (!starName.isEmpty()) {
+            String orbitingText = I18n.format("jei.advancedrocketry.orbitallaser.orbiting", starName);
+            int orbitingWidth = Math.max(0, (int) ((recipeWidth - nameX - 5) / 0.75f));
+
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.75f, 0.75f, 1.0f);
+            font.drawString(
+                    font.trimStringToWidth(orbitingText, orbitingWidth),
+                    Math.round((nameX + 1) / 0.75f),
+                    Math.round(16 / 0.75f),
+                    0x7A7A7A
+            );
+            GlStateManager.popMatrix();
+        }
     }
 }
