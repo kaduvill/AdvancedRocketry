@@ -295,6 +295,20 @@ public class PlanetEventHandler {
                 while (itr.hasNext()) {
                     TransitionEntity ent = itr.next();
                     if (ent.entity.world.getTotalWorldTime() >= ent.time) {
+                        if (ent.entity.world.provider.getDimension() == ent.dimId) {
+                            if (!ent.entity.isDead && ent.entity2 != null && !ent.entity2.isDead &&
+                                    ent.entity.world == ent.entity2.world) {
+                                ent.entity.setPositionAndUpdate(
+                                        ent.entity2.posX,
+                                        ent.entity2.posY,
+                                        ent.entity2.posZ
+                                );
+                                ent.entity.startRiding(ent.entity2, true);
+                            }
+                            itr.remove();
+                            continue;
+                        }
+
                         ent.entity.setLocationAndAngles(
                                 ent.location.getX(),
                                 ent.location.getY(),
@@ -308,7 +322,6 @@ public class PlanetEventHandler {
                                 new BasicTeleporter(ent.entity.getPosition())
                         );
 
-                        // Grace on the post-transfer entity instance
                         if (moved != null) {
                             moved.getEntityData().setLong(
                                     "arRocketTransferGrace",

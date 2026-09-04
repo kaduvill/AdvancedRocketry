@@ -30,7 +30,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
-import zmaster587.advancedRocketry.inventory.modules.ModuleItemSlotButton;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -79,7 +78,6 @@ import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
-import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 import zmaster587.advancedRocketry.util.*;
 import zmaster587.advancedRocketry.world.util.BasicTeleporter;
@@ -1038,24 +1036,22 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         if(last_was_in_orbit != this.dataManager.get(INORBIT)){
             last_was_in_orbit = this.dataManager.get(INORBIT);
-            reset_motion= true;
+            reset_motion = true;
             reset_position = true;
         }
 
-        if (reset_position){
-            this.setPosition(x,y,z);
+        double deltaX = x - this.posX;
+        double deltaY = y - this.posY;
+        double deltaZ = z - this.posZ;
+
+        if (reset_position || (teleport && deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ > 16D * 16D)) {
+            this.setPosition(x, y, z);
+            poscorrection = Vec3d.ZERO;
             reset_position = false;
-        }else {
-            Vec3d new_pos = new Vec3d(x, y, z);
-            poscorrection = new_pos.subtract(posX, posY, posZ);
+        } else {
+            poscorrection = new Vec3d(deltaX, deltaY, deltaZ);
         }
-
-
-        //Vec3d new_pos = new Vec3d(x, y, z);
-        //poscorrection = new_pos.subtract(posX, posY, posZ);
     }
-
-
 
     private void runEngines() {
         //Spawn in the particle effects for the engines
@@ -1913,16 +1909,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         if (destinationDimId != this.world.provider.getDimension())
             this.changeDimension(!DimensionManager.getInstance().isDimensionCreated(this.world.provider.getDimension()) ? 0 : destinationDimId, destPos.x, getEntryHeight(destinationDimId), destPos.z);
         else {
-            List<Entity> eList = this.getPassengers();
-            for (Entity e : eList) {
-                e.dismountRidingEntity();
-                e.setPositionAndUpdate(destPos.x, destPos.y, destPos.z);
-            }
+            preloadDestinationChunks(destinationDimId, destPos.x, destPos.z, 1, 60);
+
+            List<Entity> passengers = getPassengers();
+            for (Entity passenger : passengers) passenger.dismountRidingEntity();
             this.setPositionAndUpdate(destPos.x, destPos.y, destPos.z);
             this.ticksExisted = 0;
             ((WorldServer) world).resetUpdateEntityTick();
-            for (Entity e : eList) {
-                e.startRiding(this, true);
+            for (Entity passenger : passengers) {
+                PlanetEventHandler.addDelayedTransition(new TransitionEntity(
+                        world.getTotalWorldTime(), passenger, destinationDimId, getPosition(), this));
             }
         }
     }
@@ -2301,11 +2297,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         dimId == ARConfiguration.getCurrentConfig().spaceDimId;
 
                     if (canLoad) {
-                        Vector3F<Float> destVec = (storage != null) ? storage.getDestinationCoordinates(dimId, true) : null;
+                        Vector3F<Float> destVec = (storage != null) ? storage.getDestinationCoordinates(dimId, false) : null;
                         double dx = (destVec != null) ? destVec.x : this.posX;
                         double dz = (destVec != null) ? destVec.z : this.posZ;
 
-                        preloadDestinationChunks(dimId, dx, dz, /*radiusChunks*/ 1, /*holdSeconds*/ 60);
+                        preloadDestinationChunks(dimId, dx, dz, 1, 60);
                     }
                 }
             }

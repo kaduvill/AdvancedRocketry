@@ -6,7 +6,7 @@ public class StationLandingLocation {
     private HashedBlockPosition pos;
     private String name;
     private boolean occupied;
-    private boolean allowedForAutoLanding;
+    private boolean allowedForAutoLanding = true;
 
     public StationLandingLocation(HashedBlockPosition pos, String name) {
         this.pos = pos;
@@ -45,8 +45,8 @@ public class StationLandingLocation {
         return allowedForAutoLanding;
     }
 
-    public void setAllowedForAutoLand(boolean occupied) {
-        this.allowedForAutoLanding = occupied;
+    public void setAllowedForAutoLand(boolean allowed) {
+        this.allowedForAutoLanding = allowed;
     }
 
     @Override
