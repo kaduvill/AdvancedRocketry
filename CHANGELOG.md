@@ -4,6 +4,7 @@ Changelog 2.2.14
 - Fixed Warp Controller status messages for insufficient fuel and false artifact warnings
 - Added `replace`attribute to be used in planetdefs. example: `<laserdrillores replace="true">oreRedstone</laserdrillores>` makes this planet laserdrill loottable only contain redstone ore. see more: https://github.com/kaduvill/AdvancedRocketry/blob/1.12/docs/README_PLANETDEFS.md
 - Added proper JEI pages for Orbital Laser Drill
+- Added `Distance: ` to asteroid JEI pages
 
 Changelog 2.2.13
 - Fixed misaligned mass/distance/atmosphere bars in Warp Controller fullscreen planetselector
