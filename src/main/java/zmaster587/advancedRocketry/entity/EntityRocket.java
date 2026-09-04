@@ -2122,9 +2122,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
 
         int physicalSourceDimId = this.world.provider.getDimension();
+        ISpaceObject sourceStation = null;
 
         if (physicalSourceDimId == ARConfiguration.getCurrentConfig().spaceDimId) {
-            ISpaceObject sourceStation = SpaceObjectManager.getSpaceManager()
+            sourceStation = SpaceObjectManager.getSpaceManager()
                     .getSpaceStationFromBlockCoords(this.getPosition());
 
             if (sourceStation == null || sourceStation.getProperties() == null) {
@@ -2139,6 +2140,19 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         if (ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer() != null && storage.getGuidanceComputer().isEmpty()) {
             allowLaunch = true;
         } else {
+            if (sourceStation != null) {
+                int sourceOrbitingPlanetId = sourceStation.getOrbitingPlanetId();
+
+                if (sourceOrbitingPlanetId == Constants.INVALID_PLANET) {
+                    setError("error.rocket.unmappedDimension");
+                    return;
+                }
+
+                if (sourceOrbitingPlanetId == SpaceObjectManager.WARPDIMID) {
+                    setError("error.rocket.stationWarping");
+                    return;
+                }
+            }
 
             //Get destination dimid and lock the computer
             //TODO: lock the computer
@@ -2176,8 +2190,20 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     return;
                 }
 
+                int targetOrbitingPlanetId = spaceObject.getOrbitingPlanetId();
+
+                if (targetOrbitingPlanetId == Constants.INVALID_PLANET) {
+                    setError("error.rocket.unmappedDimension");
+                    return;
+                }
+
+                if (targetOrbitingPlanetId == SpaceObjectManager.WARPDIMID) {
+                    setError("error.rocket.stationWarping");
+                    return;
+                }
+
                 destinationIsSpaceStation = true;
-                finalDest = spaceObject.getOrbitingPlanetId();
+                finalDest = targetOrbitingPlanetId;
 
                 // Authoritative for stations orbiting planets, moons, or stars.
                 destinationStarId = spaceObject.getProperties().getStarId();
@@ -2188,15 +2214,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             int thisDimId = this.world.provider.getDimension();
             int sourceStarId = Constants.INVALID_PLANET;
 
-            if (thisDimId == ARConfiguration.getCurrentConfig().spaceDimId) {
-                ISpaceObject sourceStation = SpaceObjectManager.getSpaceManager()
-                        .getSpaceStationFromBlockCoords(this.getPosition());
-
-                if (sourceStation == null || sourceStation.getProperties() == null) {
-                    setError("error.rocket.unmappedDimension");
-                    return;
-                }
-
+            if (sourceStation != null) {
                 thisDimId = sourceStation.getOrbitingPlanetId();
                 sourceStarId = sourceStation.getProperties().getStarId();
             }

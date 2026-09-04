@@ -250,6 +250,7 @@ error.rocket.gatedArtifactMissingWithItem=Missing required artifact: %sx %s (Pla
 error.rocket.outsideStarSystem=Interstellar travel requires a Warpship.
 error.rocket.outsidePlanetarySystem=Planetary travel requires a Nuclear Rocket.
 error.rocket.unmappedDimension=Navigation failure: dimension not found in the galactic database
+error.rocket.stationWarping=Cannot travel to or from a warping station
 
 msg.satbuilder.build.tooltip=Build satellite
 msg.satbuilder.error.chassis=Requires a Satellite Chassis
