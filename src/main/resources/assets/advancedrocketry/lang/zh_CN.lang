@@ -250,6 +250,7 @@ error.rocket.gatedArtifactMissingWithItem=缺失所需工件：%sx %s（玩家�
 error.rocket.outsideStarSystem=星际航行需要跃迁飞船。
 error.rocket.outsidePlanetarySystem=行星航行需要核动力火箭。
 error.rocket.unmappedDimension=导航失败：星系数据库中未找到该维度
+error.rocket.stationWarping=无法前往或离开正在跃迁的空间站
 
 msg.satbuilder.build.tooltip=组装卫星
 msg.satbuilder.error.chassis=需要一个卫星框架
@@ -396,6 +397,10 @@ msg.observetory.text.processdiscovery=扫描进度
 msg.observetory.text.observabledistance=可观测距离：
 msg.observetory.text.missionTime=任务时间：
 msg.observetory.text.time=时间：
+msg.observetory.text.distancedetails=距离详情
+msg.observetory.text.basedistance=基础距离
+msg.observetory.text.spacestation=空间站
+msg.observetory.text.lenses=透镜
 msg.observetory.req.open=瞭望台必须满足开放条件（夜晚、天气晴朗、可观测天空）或位于空间站中！
 msg.observetory.print.already=你已为此小行星写入了一个芯片！
 
@@ -519,6 +524,14 @@ msg.gravitycontroller.activeset=添加作用力（合并各方向）+升力
 msg.gravitycontroller.targetdir.1=目标->
 msg.gravitycontroller.targetdir.2=方向
 msg.railgun.transfermin=最小传输尺寸
+msg.railgun.transfermin.tooltip=传输的最小堆叠数量
+msg.railgun.linker.tooltip=放入已编程指向另一个轨道炮的链接器
+msg.railgun.status.ready=目的地就绪
+msg.railgun.status.full=目的地已满
+msg.railgun.status.offline=目的地离线
+msg.railgun.status.missing=目的地缺失
+msg.railgun.status.outofrange=目的地超出范围
+msg.railgun.status.linkermissing=仅接收
 msg.spacelaser.reset=重置
 msg.spacelaser.notarget1=未找到目标！
 msg.spacelaser.notarget2=降落并勘察该区域！
@@ -818,6 +831,13 @@ jei.advancedrocketry.gasgiants.title=气体任务
 jei.advancedrocketry.gasgiants.orbiting=轨道环绕%s
 jei.advancedrocketry.gasgiants.harvestcap=采集上限：每次任务%s mB
 jei.advancedrocketry.gasgiants.harvestcap.infinite=采集上限：无限
+
+jei.advancedrocketry.orbitallaser.orbiting=轨道环绕%s
+jei.advancedrocketry.orbitallaser.all_planets=所有行星
+jei.advancedrocketry.orbitallaser.all_other_planets=所有其他行星
+jei.advancedrocketry.orbitallaser.page=页码 %s / %s
+
+jei.advancedrocketry.asteroids.distance=距离：%s
 
 jei.ar.fuel.role.monopropellant=单组元推进剂
 jei.ar.fuel.role.biprop_fuel=双组元推进剂
@@ -1175,6 +1195,7 @@ tooltip.advancedrocketry.sealdetector.shift.1=§f右击方块使用
 
 # Lens
 tooltip.advancedrocketry.lens=§c多方块的组成部分
+tooltip.advancedrocketry.lens.1=§f瞭望台距离：§6+5
 tooltip.advancedrocketry.lens.shift.1=§b使用全息投影器！
 
 ## SPACE SUIT + COMPONENTS
@@ -1321,6 +1342,16 @@ tooltip.libvulpes.battery.0.shift.2=§f容量：§c10.000 §fRF§7
 tooltip.libvulpes.battery.1=§5卫星组件
 tooltip.libvulpes.battery.1.shift.1=§b增加能量存储
 tooltip.libvulpes.battery.1.shift.2=§f容量：§c40.000 §fRF§7
+
+# LibVulpes Motors
+tooltip.advancedrocketry.libvulpes.motor=§c多方块结构的组成部分
+tooltip.advancedrocketry.libvulpes.motor.1=§f瞭望台距离：§6+25
+tooltip.advancedrocketry.libvulpes.advancedmotor=§c多方块结构的组成部分
+tooltip.advancedrocketry.libvulpes.advancedmotor.1=§f瞭望台距离：§6+50
+tooltip.advancedrocketry.libvulpes.enhancedmotor=§c多方块结构的组成部分
+tooltip.advancedrocketry.libvulpes.enhancedmotor.1=§f瞭望台距离：§6+100
+tooltip.advancedrocketry.libvulpes.elitemotor=§c多方块结构的组成部分
+tooltip.advancedrocketry.libvulpes.elitemotor.1=§f瞭望台距离：§6+175
 
 # Data Unit
 tooltip.advancedrocketry.itemdata.header=§5卫星组件
