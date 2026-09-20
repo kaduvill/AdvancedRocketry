@@ -404,6 +404,43 @@ msg.observetory.text.lenses=透镜
 msg.observetory.req.open=瞭望台必须满足开放条件（夜晚、天气晴朗、可观测天空）或位于空间站中！
 msg.observetory.print.already=你已为此小行星写入了一个芯片！
 
+# Rocket 3D printer
+tile.rocketPrinter.name=火箭3D打印机
+item.rocketBlueprint.name=火箭蓝图单元
+msg.rocketprinter.ready=就绪
+msg.rocketprinter.no_assembler=未连接唯一的火箭组装机
+msg.rocketprinter.no_rocket=发射台上没有组装好的火箭
+msg.rocketprinter.saved=蓝图已保存
+msg.rocketprinter.no_blueprint=放入蓝图
+msg.rocketprinter.invalid=无效/缺失方块
+msg.rocketprinter.pad_busy=发射台上存在火箭
+msg.rocketprinter.bad_pad=发射台太小或已改变
+msg.rocketprinter.blocked=打印区域被阻挡
+msg.rocketprinter.missing=缺失材料
+msg.rocketprinter.unsupported=不支持的方块物品
+msg.rocketprinter.unsupported_block=无法打印方块：%s
+msg.rocketprinter.no_power=等待能量供应
+msg.rocketprinter.printing=正在打印
+msg.rocketprinter.paused=操作已暂停
+msg.rocketprinter.saving=正在保存蓝图……
+msg.rocketprinter.complete=打印完成
+msg.rocketprinter.detected=检测到火箭
+msg.rocketprinter.blueprint_ready=蓝图已准备好打印
+msg.rocketprinter.chunks_unloaded=发射台区块未加载
+msg.rocketprinter.save=保存
+msg.rocketprinter.print=打印
+msg.rocketprinter.stop=停止
+tooltip.rocketprinter.preview=切换视图
+tooltip.rocketprinter.rotate=拖动以旋转
+tooltip.rocketprinter.zoom=滚动以缩放
+tooltip.rocketblueprint.design=设计：%s
+tooltip.rocketblueprint.size=尺寸：%s x %s x %s
+tooltip.rocketblueprint.blocks=方块：%s
+tooltip.rocketblueprint.invalid=设计不可用或无效
+tooltip.rocketblueprint.blank=空白蓝图
+tooltip.rocketblueprint.rocket=火箭
+
+
 # Atmosphere detector GUI labels
 msg.atmosphere.air=正常空气
 msg.atmosphere.pressurizedair=加压空气
@@ -818,6 +855,18 @@ commands.weather.cannot_rain=此处无法降雨
 commands.weather.cannot_thunder=此处无法降下雷暴
 
 # Jeistuff
+jei.powergeneration.burntime=%s
+jei.powergeneration.output=%s RF/t
+jei.powergeneration.total=%s RF
+jei.powergeneration.anyother=任意其他物品
+jei.powergeneration.time.tick=%s刻
+jei.powergeneration.time.ticks=%s刻
+jei.powergeneration.time.seconds=%s秒
+jei.powergeneration.solar.daylight=白天 + 可观测天空
+jei.powergeneration.solar.max.tooltip=基于大气密度、恒星亮度和距离。
+jei.powergeneration.solararray.scaling=大气 + 恒星距离
+jei.powergeneration.planetmax=%s 最大：%s RF/t
+jei.powergeneration.max=最大：%s RF/t
 jei.machinerecipe.power=能量：
 jei.machinerecipe.time=时间：
 jei.sb.satellitepreview=已做好入轨准备！
@@ -1393,8 +1442,9 @@ tooltip.advancedrocketry.elevatorchip.shift.1=§f链接电梯平台/目的地。
 
 ## Multiblocks
 # Black Hole Generator
-tooltip.advancedrocketry.blackholegen=通过压缩质量产出能量
+tooltip.advancedrocketry.blackholegen=通过质量产出能量
 tooltip.advancedrocketry.blackholegen.shift.1=§b使用全息投影器！
+tooltip.advancedrocketry.blackholegen.alt.1=§f需要环绕黑洞运行
 
 # Microwave Receiver
 tooltip.advancedrocketry.microwavereceiver=接收来自太阳能卫星的能量
@@ -1537,7 +1587,6 @@ tooltip.advancedrocketry.forcefieldprojector.shift.1=§f使用红石信号激活
 tooltip.advancedrocketry.vacuumlaser=§c多方块结构的组成部分
 tooltip.advancedrocketry.vacuumlaser.shift.1=§b使用全息投影器！
 
-
 # Pump
 tooltip.advancedrocketry.pump=搜索下方的流体
 tooltip.advancedrocketry.pump.shift.1=§b可从64格范围内的流体池中抽取。
@@ -1566,6 +1615,13 @@ tooltip.advancedrocketry.rocketassembler.shift.1=§b需要发射台+结构塔结
 tooltip.advancedrocketry.rocketassembler.shift.2=§f将基础设备连接至此方块，使它们自动与发射台上的火箭连接
 tooltip.advancedrocketry.rocketassembler.alt.1=§f将此方块放置在比发射台高1格的位置，连接底部边角且朝向与发射台方块相反
 
+# Rocket 3D Printer
+tooltip.advancedrocketry.rocketprinter=§c保存火箭设计
+tooltip.advancedrocketry.rocketprinter.shift.1=§b连接到火箭组装机的左侧、右侧、顶部或底部
+tooltip.advancedrocketry.rocketprinter.shift.2=§f放入空白火箭蓝图来保存组装好的火箭
+tooltip.advancedrocketry.rocketprinter.alt.1=§f打印需要能量，以及相邻容器中的火箭组件
+tooltip.advancedrocketry.rocketprinter.alt.2=§f打印完成后，使用火箭组装机扫描并组装
+
 # Station Assembler
 tooltip.advancedrocketry.stationassembler=§c将空间站打包以便发射！
 tooltip.advancedrocketry.stationassembler.shift.1=§b需要发射台+结构塔结构
@@ -1576,7 +1632,7 @@ tooltip.advancedrocketry.packedstructure=§f放入§c卫星仓§f以送入轨道
 tooltip.advancedrocketry.packedstructure.shift.1=§e发射前需设置火箭的目标星球
 
 # Deployable Rocket Assembler
-tooltip.advancedrocketry.deployablerocketassembler=§c在空间站中搭建火箭
+tooltip.advancedrocketry.deployablerocketassembler=§c搭建气体任务火箭
 tooltip.advancedrocketry.deployablerocketassembler.shift.1=§b需要结构塔方块
 tooltip.advancedrocketry.deployablerocketassembler.shift.2=§f用于§6气体任务§7
 tooltip.advancedrocketry.deployablerocketassembler.alt.1=§f将此方块放置在倒T形结构的中间，朝向太空外部，然后从塔顶向外延伸出水平支撑。
