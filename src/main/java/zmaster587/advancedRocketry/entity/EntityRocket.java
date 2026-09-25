@@ -2422,34 +2422,43 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             WorldServer worldserver1 = minecraftserver.getWorld(dimensionIn);
             this.setPosition(posX, y, posZ);
 
-            long preloadTicksRemaining = destPreloadTicket == null ? 0L :
+            Ticket preloadTicket = destPreloadTicket;
+            int preloadDim = destPreloadDim;
+            long preloadTicksRemaining = preloadTicket == null ? 0L :
                     Math.max(0L, destPreloadExpire - worldserver.getTotalWorldTime());
             ITeleporter teleporter = new BasicTeleporter(getPosition());
-            Entity entity = changeDimension(dimensionIn, teleporter);
 
-            if (entity == null) {
-                releaseDestinationPreload();
-                return null;
-            }
+// Keep setDead() from releasing the ticket during transfer.
+            destPreloadTicket = null;
+            destPreloadDim = Integer.MIN_VALUE;
+            destPreloadExpire = Long.MIN_VALUE;
 
-            // Forge creates a replacement entity, so move ownership of the transient ticket.
-            if (destPreloadTicket != null) {
-                if (preloadTicksRemaining > 0L && entity instanceof EntityRocket) {
-                    EntityRocket replacement = (EntityRocket) entity;
-                    replacement.destPreloadTicket = destPreloadTicket;
-                    replacement.destPreloadDim = destPreloadDim;
-                    replacement.destPreloadExpire =
-                            replacement.world.getTotalWorldTime() + preloadTicksRemaining;
+            Entity entity;
+            try {
+                entity = changeDimension(dimensionIn, teleporter);
 
-                    destPreloadTicket = null;
-                    destPreloadDim = Integer.MIN_VALUE;
-                    destPreloadExpire = Long.MIN_VALUE;
-                } else {
-                    releaseDestinationPreload();
+                if (entity == null) {
+                    return null;
+                }
+
+                // Forge creates a replacement entity, so move ownership of the transient ticket.
+                if (preloadTicket != null) {
+                    if (preloadTicksRemaining > 0L && entity instanceof EntityRocket) {
+                        EntityRocket replacement = (EntityRocket) entity;
+                        replacement.destPreloadTicket = preloadTicket;
+                        replacement.destPreloadDim = preloadDim;
+                        replacement.destPreloadExpire =
+                                replacement.world.getTotalWorldTime() + preloadTicksRemaining;
+
+                        preloadTicket = null;
+                    }
+                }
+            } finally {
+                // Release if ownership was not transferred, including on exceptions.
+                if (preloadTicket != null) {
+                    ForgeChunkManager.releaseTicket(preloadTicket);
                 }
             }
-
-            entity.moveToBlockPosAndAngles(new BlockPos(posX, y, posZ), 0, 0);
 
             int timeOffset = 1;
             for (Entity e : passengers) {

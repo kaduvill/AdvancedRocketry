@@ -1,3 +1,6 @@
+2.2.17
+- Fix a lifecycle bug with chunkload ticket when preloading dimension for rockettravel
+
 2.2.16
 - Added Rocket 3D printing and Blueprint, save rocket designs and print blueprints from connected storage
 - Fix some renderculling (more multiblock models should now stick to screen instead of dissapearing)
