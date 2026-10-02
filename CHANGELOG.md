@@ -8,7 +8,7 @@
 - Fixed stale status messages on Rocket Printer
 - Added Rocket Finder with remembered arrival rocket locations. Enabled by default, when component installed in helmet
 - Rocket launch/abort can now be rebound in Controls (default: Space)
-
+- Fixed jetpacks consuming fuel while mounted, including in hover mode
 
 
 2.2.16

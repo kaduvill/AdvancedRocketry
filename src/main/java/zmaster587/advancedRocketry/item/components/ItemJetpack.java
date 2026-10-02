@@ -42,14 +42,13 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
     private ResourceLocation background = TextureResources.rocketHud;
 
-    public ItemJetpack() {
-    }
+    public ItemJetpack() {}
 
     @Override
     public void onTick(World world, EntityPlayer player,
                        @Nonnull ItemStack armorStack, IInventory inv, @Nonnull ItemStack componentStack) {
 
-        if (player.capabilities.isCreativeMode) {
+        if (player.capabilities.isCreativeMode || player.isRiding()) {
             return;
         }
 
@@ -74,7 +73,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
         MODES mode = getMode(componentStack);
         boolean isActive = isActive(componentStack, player);
-
 
         //Apply speed upgrades only if the player isn't using Elytra
         if (!player.isElytraFlying()) {
@@ -107,7 +105,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
                     if (player.motionY < 0.1 && player.motionY > -0.1)
                         player.motionY *= 0.01;
                 }
-
             } else if (isActive) {
                 onAccelerate(componentStack, inv, player);
             }
@@ -122,24 +119,19 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
     }
 
     @Override
-    public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-
-    }
+    public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {}
 
     @Override
     public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
-                               @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-    }
+                               @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
 
     @Override
     public boolean isActive(@Nonnull ItemStack stack, EntityPlayer player) {
-        return InputSyncHandler.isSpaceDown(player);
-    }
+        return InputSyncHandler.isSpaceDown(player);}
 
     @Override
     public boolean isEnabled(@Nonnull ItemStack stack) {
-        return stack.hasTagCompound() && stack.getTagCompound().getBoolean("enabled");
-    }
+        return stack.hasTagCompound() && stack.getTagCompound().getBoolean("enabled");}
 
     @Override
     public void setEnabledState(@Nonnull ItemStack stack, boolean state) {
@@ -168,19 +160,20 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
                 if (hasFuel)
                     break;
             }
-
         }
         return hasFuel;
     }
 
     @Override
     public void onAccelerate(@Nonnull ItemStack stack, IInventory inv, EntityPlayer player) {
-        boolean hasFuel = hasFuel(inv);
+        if (player.isRiding()) {
+            return;
+        }
 
+        boolean hasFuel = hasFuel(inv);
         MODES mode = getMode(stack);
 
         if (hasFuel) {
-
             player.addVelocity(0, (double) ARConfiguration.getCurrentConfig().jetPackThrust * 0.1f, 0);
             if (player.world.isRemote) {
                 double xPos;
@@ -190,8 +183,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
                 zPos = player.posZ + MathHelper.sin(playerRot) * .4f;
 
                 float ejectSpeed = mode == MODES.HOVER ? 0.1f : 0.3f;
-                //AdvancedRocketry.proxy.spawnParticle("smallRocketFlame", player.worldObj, xPos, player.posY - 0.75, zPos, (player.worldObj.rand.nextFloat() - 0.5f)/18f,-.1 ,(player.worldObj.rand.nextFloat() - 0.5f)/18f);
-
                 AdvancedRocketry.proxy.spawnParticle("smallRocketFlame", player.world, xPos, player.posY + 0.75, zPos, 0, player.motionY - ejectSpeed, 0);
 
                 playerRot = (float) ((Math.PI / 180f) * (player.rotationYaw - 125));
@@ -205,13 +196,11 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
                 player.fallDistance = 0;
             }
         }
-
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public ResourceIcon getComponentIcon(@Nonnull ItemStack armorStack) {
-
         return isEnabled(armorStack) ? getMode(armorStack) == MODES.HOVER ? new ResourceIcon(TextureResources.jetpackIconHover) : new ResourceIcon(TextureResources.jetpackIconEnabled) : new ResourceIcon(TextureResources.jetpackIconDisabled);
     }
 
@@ -317,16 +306,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
                     amt += fluidStack.amount;
                 maxAmt += FluidUtils.getFluidItemCapacity(currentStack);
             }
-
-			/*if(!currentStack.isEmpty() && currentStack.getItem() instanceof IFluidContainerItem ) {
-				FluidStack fluid = ((IFluidContainerItem)currentStack.getItem()).getFluid(currentStack);
-				if(fluid == null)
-					maxAmt += ((IFluidContainerItem)currentStack.getItem()).getCapacity(currentStack);
-				else if(fluid.getFluid() == AdvancedRocketryFluids.fluidHydrogen) {
-					maxAmt += ((IFluidContainerItem)currentStack.getItem()).getCapacity(currentStack);
-					amt += fluid.amount;
-				}
-			}*/
         }
 
         if (maxAmt > 0) {
@@ -355,6 +334,5 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
         int insertAt = TooltipInjector.computeInsertIndex(tooltip, flag.isAdvanced());
         TooltipInjector.renderShiftAlt(stack, tooltip, "tooltip.advancedrocketry.jetpack", insertAt);
-    }  
-
+    }
 }
