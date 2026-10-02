@@ -1,9 +1,9 @@
 2.2.17
-- Fix a lifecycle bug with chunkload ticket when preloading dimension for rockettravel
-- Fixed a bug where fuelstation could cause a memoryleak
-- Fixed rocket event listeners causing memoryleak
-- Strengthen infrastructure linking persistance 
-- Fixed LaunchPad dynamic textures wronlgy tilting 90 degrees in some cases
+- Fix a lifecycle bug with chunk load ticket when preloading dimension for rocket travel
+- Fixed a bug where fuel station could cause a memory leak
+- Fixed rocket event listeners causing memory leak
+- Strengthen infrastructure linking persistence 
+- Fixed LaunchPad dynamic textures wrongly tilting 90 degrees in some cases
 - Improved station chip destination screens with clearer lists, landing-pad status, and controls
 - Fixed stale status messages on Rocket Printer
 - Added Rocket Finder with remembered arrival rocket locations. Enabled by default, when component installed in helmet
