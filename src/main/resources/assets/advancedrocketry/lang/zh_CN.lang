@@ -192,6 +192,7 @@ item.biomeChanger.name=生物群系变换器遥控终端
 item.weatherController.name=天气遥控终端
 item.basicLaserGun.name=基础激光枪
 item.beaconFinder.name=信标定位器
+item.rocketFinder.name=火箭定位器
 item.thermite.name=铝热剂
 item.hovercraft.name=气垫船
 item.satellite.opticaltelescope=光学望远镜
@@ -295,6 +296,7 @@ advancement.suitedUp.desc=穿好全套太空服
 # Controls - options
 key.controls.advancedrocketry=高级火箭（Advanced Rocketry）
 key.openRocketUI=打开火箭界面
+key.toggleRocketFinder=开关火箭定位器
 key.toggleJetpack=开关飞行背包
 key.togglercs=切换RCS（反作用控制系统）
 key.turnRocketLeft=向左旋转载具
@@ -413,7 +415,7 @@ msg.rocketprinter.no_rocket=发射台上没有组装好的火箭
 msg.rocketprinter.saved=蓝图已保存
 msg.rocketprinter.no_blueprint=放入蓝图
 msg.rocketprinter.invalid=无效/缺失方块
-msg.rocketprinter.pad_busy=发射台上存在火箭
+msg.rocketprinter.pad_busy=发射台正忙
 msg.rocketprinter.bad_pad=发射台太小或已改变
 msg.rocketprinter.blocked=打印区域被阻挡
 msg.rocketprinter.missing=缺失材料
@@ -424,7 +426,7 @@ msg.rocketprinter.printing=正在打印
 msg.rocketprinter.paused=操作已暂停
 msg.rocketprinter.saving=正在保存蓝图……
 msg.rocketprinter.complete=打印完成
-msg.rocketprinter.detected=检测到火箭
+msg.rocketprinter.detected=在发射台上检测到火箭
 msg.rocketprinter.blueprint_ready=蓝图已准备好打印
 msg.rocketprinter.chunks_unloaded=发射台区块未加载
 msg.rocketprinter.save=保存
@@ -439,6 +441,8 @@ tooltip.rocketblueprint.blocks=方块：%s
 tooltip.rocketblueprint.invalid=设计不可用或无效
 tooltip.rocketblueprint.blank=空白蓝图
 tooltip.rocketblueprint.rocket=火箭
+
+
 
 
 # Atmosphere detector GUI labels
@@ -825,6 +829,19 @@ msg.orbitalregistry.text.anchored.no=否
 msg.orbitalregistry.text.system=星系：
 msg.orbitalregistry.text.system.none=无
 msg.orbitalregistry.text.system.unknown=未知
+
+# Station chip destination selectors
+msg.stationselector.rocket.title=空间站着陆台
+msg.stationselector.chip.title=空间站芯片目的地
+msg.stationselector.name=名称：
+msg.stationselector.unnamed=未命名
+msg.stationselector.auto=自动着陆
+msg.stationselector.selected=已选择
+msg.stationselector.available=可用
+msg.stationselector.saved=已保存
+msg.stationselector.occupied=已占用
+msg.stationselector.empty=无已保存的目的地
+msg.stationselector.station.unavailable=正在等待空间站数据……
 
 # SatelliteDetails power fields
 msg.orbitalregistry.text.sat.pwrgen=能量产出：
@@ -1272,6 +1289,19 @@ tooltip.advancedrocketry.beaconfinder.shift.1=§f显示指向此维度中高级�
 tooltip.advancedrocketry.beaconfinder.shift.2=§d槽位：头盔§7
 tooltip.advancedrocketry.beaconfinder.alt.1=箭头偏移量相对于你的朝向
 tooltip.advancedrocketry.beaconfinder.alt.2=仅在已注册信标的高级火箭模组维度中工作。
+
+# RocketFinder
+tooltip.advancedrocketry.rocketfinder=§5太空服组件
+tooltip.advancedrocketry.rocketfinder.shift.1=§f在旅行时记忆火箭的位置
+tooltip.advancedrocketry.rocketfinder.shift.2=§d槽位：头盔§7
+tooltip.advancedrocketry.rocketfinder.alt.1=在空间站上禁用
+
+msg.rocketFinder.target=火箭
+msg.rocketFinder.noTarget=未记录火箭位置
+msg.rocketFinder.offWorld=火箭：%s
+msg.rocketFinder.nearby=目标位于附近
+msg.rocketFinder.distance=%s m
+msg.rocketFinder.toggleHint=按%s开关火箭定位器
 
 # PressureTank
 tooltip.advancedrocketry.pressuretank.shift.1=§d槽位：胸甲§7
