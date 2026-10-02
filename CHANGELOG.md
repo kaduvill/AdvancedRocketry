@@ -9,6 +9,7 @@
 - Added Rocket Finder with remembered arrival rocket locations. Enabled by default, when component installed in helmet
 - Rocket launch/abort can now be rebound in Controls (default: Space)
 - Fixed jetpacks consuming fuel while mounted, including in hover mode
+- Vehicle controls are now active only while mounted in an AR vehicle, preventing interference with other keybindings on foot
 
 
 2.2.16

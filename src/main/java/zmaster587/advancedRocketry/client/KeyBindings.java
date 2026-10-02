@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -38,6 +39,30 @@ public class KeyBindings {
     boolean prevState;
 
     public static void init() {
+        IKeyConflictContext vehicleControls = new IKeyConflictContext() {
+            @Override
+            public boolean isActive() {
+                Minecraft minecraft = Minecraft.getMinecraft();
+                EntityPlayerSP player = minecraft.player;
+
+                return minecraft.currentScreen == null
+                        && player != null
+                        && (player.getRidingEntity() instanceof EntityRocket
+                        || player.getRidingEntity() instanceof EntityHoverCraft);
+            }
+
+            @Override
+            public boolean conflicts(IKeyConflictContext other) {
+                return other == this
+                        || other == KeyConflictContext.IN_GAME || other == KeyConflictContext.UNIVERSAL;
+            }
+        };
+
+        turnRocketLeft.setKeyConflictContext(vehicleControls);
+        turnRocketRight.setKeyConflictContext(vehicleControls);
+        turnRocketUp.setKeyConflictContext(vehicleControls);
+        turnRocketDown.setKeyConflictContext(vehicleControls);
+
         ClientRegistry.registerKeyBinding(launchRocket);
         ClientRegistry.registerKeyBinding(toggleJetpack);
         ClientRegistry.registerKeyBinding(openRocketUI);
