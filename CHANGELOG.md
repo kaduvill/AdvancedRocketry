@@ -6,8 +6,8 @@
 - Fixed LaunchPad dynamic textures wronlgy tilting 90 degrees in some cases
 - Improved station chip destination screens with clearer lists, landing-pad status, and controls
 - Fixed stale status messages on Rocket Printer
-- Added Rocket Finder with remembered arrival rocket locations. Enabled by default, when component installed in helmet.
-
+- Added Rocket Finder with remembered arrival rocket locations. Enabled by default, when component installed in helmet
+- Rocket launch/abort can now be rebound in Controls (default: Space)
 
 
 
