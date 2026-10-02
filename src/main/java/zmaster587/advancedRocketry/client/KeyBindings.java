@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,7 +25,7 @@ import zmaster587.libVulpes.util.InputSyncHandler;
 @SideOnly(Side.CLIENT)
 public class KeyBindings {
 
-    //static KeyBinding launch = new KeyBinding("Launch", Keyboard.KEY_SPACE, "key.controls." + Constants.modId);
+    private static final KeyBinding launchRocket = new KeyBinding("key.launchRocket", KeyConflictContext.IN_GAME, Keyboard.KEY_SPACE, LibVulpes.proxy.getLocalizedString("key.controls." + Constants.modId));
     static KeyBinding toggleJetpack = new KeyBinding(LibVulpes.proxy.getLocalizedString("key.toggleJetpack"), Keyboard.KEY_X, LibVulpes.proxy.getLocalizedString("key.controls." + Constants.modId));
     static KeyBinding openRocketUI = new KeyBinding(LibVulpes.proxy.getLocalizedString("key.openRocketUI"), Keyboard.KEY_C, LibVulpes.proxy.getLocalizedString("key.controls." + Constants.modId));
     static KeyBinding toggleRocketFinder = new KeyBinding("key.toggleRocketFinder", Keyboard.KEY_V, LibVulpes.proxy.getLocalizedString("key.controls." + Constants.modId));
@@ -37,7 +38,7 @@ public class KeyBindings {
     boolean prevState;
 
     public static void init() {
-        //ClientRegistry.registerKeyBinding(launch);
+        ClientRegistry.registerKeyBinding(launchRocket);
         ClientRegistry.registerKeyBinding(toggleJetpack);
         ClientRegistry.registerKeyBinding(openRocketUI);
         ClientRegistry.registerKeyBinding(toggleRocketFinder);
@@ -48,6 +49,10 @@ public class KeyBindings {
         ClientRegistry.registerKeyBinding(turnRocketDown);
     }
     //Getters for keybindings
+    public static KeyBinding getLaunchRocket() {
+        return launchRocket;
+    }
+
     public static KeyBinding getOpenRocketUI() {
         return openRocketUI;
     }
@@ -67,7 +72,7 @@ public class KeyBindings {
 
 
         //Prevent control when a GUI is open
-        if (Minecraft.getMinecraft().currentScreen != null)// && Minecraft.getMinecraft().currentScreen instanceof GuiChat)
+        if (player == null || minecraft.currentScreen != null)
             return;
 
 
@@ -89,8 +94,9 @@ public class KeyBindings {
                 */
             if (Minecraft.getMinecraft().inGameHasFocus && player.equals(Minecraft.getMinecraft().player)) {
                 if (!rocket.isInFlight()
-                        && Keyboard.getEventKey() == Keyboard.KEY_SPACE
-                        && Keyboard.getEventKeyState()) {
+                        && Keyboard.getEventKeyState()
+                        && !Keyboard.isRepeatEvent()
+                        && launchRocket.isActiveAndMatches(Keyboard.getEventKey())) {
                     rocket.prepareLaunch();
                 }
                 rocket.onTurnLeft(turnRocketLeft.isKeyDown());

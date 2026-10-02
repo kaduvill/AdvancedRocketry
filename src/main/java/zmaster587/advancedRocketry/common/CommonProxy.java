@@ -62,6 +62,8 @@ public class CommonProxy {
 
     public void registerKeyBindings() {}
 
+    public String getRocketLaunchPrompt(String translationKey) { return translationKey; }
+
     public Profiler getProfiler() {
         return FMLCommonHandler.instance().getMinecraftServerInstance().profiler;
     }

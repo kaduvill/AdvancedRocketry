@@ -477,7 +477,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         if (dataManager.get(LAUNCH_COUNTER) >= 0) {
             return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.launch") + (dataManager.get(LAUNCH_COUNTER) / 20) + "\n" +
-                    LibVulpes.proxy.getLocalizedString("msg.entity.rocket.launch2");
+                    AdvancedRocketry.proxy.getRocketLaunchPrompt("msg.entity.rocket.launch2");
         }
 
         if (DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).isAsteroid()) {
@@ -491,7 +491,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             return super.getTextOverlay();
         }
         else if (!isInFlight())
-            return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.2") + " " + displayStr;
+            return AdvancedRocketry.proxy.getRocketLaunchPrompt("msg.entity.rocket.ascend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.2") + " " + displayStr;
 
         return super.getTextOverlay();
     }

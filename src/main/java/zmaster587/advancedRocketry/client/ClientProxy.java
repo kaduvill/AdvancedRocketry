@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.client;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -324,6 +325,11 @@ public class ClientProxy extends CommonProxy {
         KeyBindings.init();
         MinecraftForge.EVENT_BUS.register(new KeyBindings());
 
+    }
+
+    @Override
+    public String getRocketLaunchPrompt(String translationKey) {
+        return I18n.format(translationKey, KeyBindings.getLaunchRocket().getDisplayName());
     }
 
     @Override

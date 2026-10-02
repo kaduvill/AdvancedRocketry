@@ -295,6 +295,7 @@ advancement.suitedUp.desc=Wear a full spacesuit
 
 # Controls - options
 key.controls.advancedrocketry=Advanced Rocketry
+key.launchRocket=Launch / Abort Rocket
 key.openRocketUI=Open Rocket GUI
 key.toggleRocketFinder=Toggle Rocket Finder
 key.toggleJetpack=Toggle Jetpack
@@ -727,10 +728,10 @@ msg.sealdetector.other=Air will leak through this block.
 msg.stationchip.sation=Station
 msg.entity.rocket.descend.1=Press Space to descend!
 msg.entity.rocket.descend.2=Auto descend in
-msg.entity.rocket.ascend.1=Press Space to take off!
+msg.entity.rocket.ascend.1=Press %s to take off!
 msg.entity.rocket.ascend.2=Dest:
 msg.entity.rocket.launch=Launch in T-
-msg.entity.rocket.launch2=Press [Space] to abort
+msg.entity.rocket.launch2=Press [%s] to abort
 msg.entity.rocket.station=Station
 msg.entity.rocket.pad=Pad:
 msg.entity.rocket.disass=Disassemble
