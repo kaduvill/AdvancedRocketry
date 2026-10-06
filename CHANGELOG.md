@@ -1,5 +1,6 @@
 2.2.18
 - Fixed Airtight seal not showing in Chemical Reactor JEI-page
+- Fixed Airtight Seal armor draining oxygen in shallow water or when underwater breathing is already provided. Water-related suit oxygen consumption now runs only on the server.
 
 2.2.17
 - Fix a lifecycle bug with chunk load ticket when preloading dimension for rocket travel

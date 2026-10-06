@@ -7,12 +7,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -277,9 +279,14 @@ public class PlanetEventHandler {
     //Handle gravity
     @SubscribeEvent
     public void playerTick(LivingUpdateEvent event) {
-        if (event.getEntity().isInWater()) {
-            if (AtmosphereType.LOWOXYGEN.isImmune(event.getEntityLiving()))
-                event.getEntity().setAir(300);
+        EntityLivingBase livingEntity = event.getEntityLiving();
+        // Only use suit oxygen when the entity needs underwater breathing protection.
+        if (!livingEntity.world.isRemote && livingEntity.isInWater() && livingEntity.isEntityAlive()
+                && !(livingEntity instanceof EntityPlayer && ((EntityPlayer) livingEntity).capabilities.disableDamage)
+                && !livingEntity.canBreatheUnderwater() && !livingEntity.isPotionActive(MobEffects.WATER_BREATHING)
+                && livingEntity.isInsideOfMaterial(Material.WATER)
+                && AtmosphereType.LOWOXYGEN.isImmune(livingEntity)) {
+            livingEntity.setAir(300);
         }
 
         if (!event.getEntity().world.isRemote && event.getEntity().world.getTotalWorldTime() % 20 == 0 && event.getEntity() instanceof EntityPlayer) {
