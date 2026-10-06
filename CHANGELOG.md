@@ -1,5 +1,5 @@
 2.2.18
-- a
+- Fixed Airtight seal not showing in Chemical Reactor JEI-page
 
 2.2.17
 - Fix a lifecycle bug with chunk load ticket when preloading dimension for rocket travel

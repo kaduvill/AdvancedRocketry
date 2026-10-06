@@ -8,6 +8,7 @@ import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
+import zmaster587.advancedRocketry.api.AdvancedRocketryAPI;
 import zmaster587.advancedRocketry.integration.jei.ARPlugin;
 import zmaster587.advancedRocketry.integration.jei.MachineCategoryTemplate;
 import zmaster587.advancedRocketry.inventory.TextureResources;
@@ -77,7 +78,10 @@ public class ChemicalReactorCategory extends MachineCategoryTemplate<ChemicalRea
         if (isArmorRecipe) {
             List<ItemStack> outputStacks = new LinkedList<>();
             for (ItemStack stacks : ingredients.getInputs(ItemStack.class).get(0)) {
-                outputStacks.add(new ItemStack(ingredients.getOutputs(ItemStack.class).get(0).get(0).getItem(), 1, stacks.getItemDamage()));
+                ItemStack output = new ItemStack(ingredients.getOutputs(ItemStack.class).get(0).get(0).getItem(), 1, stacks.getItemDamage());
+                // Resolve the current ID here; the recipe's stored ID can predate world remapping.
+                output.addEnchantment(AdvancedRocketryAPI.enchantmentSpaceProtection, 1);
+                outputStacks.add(output);
             }
             guiItemStacks.set(i++, outputStacks);
         } else {
