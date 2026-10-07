@@ -66,6 +66,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
     private int frameFromY = -1, frameToY = -1, frameDuration;
     private long frameStartTick;
     private long framePausedAt = -1;
+    private int clientFrameElapsed;
     private int operationTotal, guiProgress;
     private final UniversalBattery energy = new UniversalBattery(ENERGY_CAPACITY);
     private final ForgePowerCapability energyCapability = new ForgePowerCapability(this);
@@ -446,7 +447,12 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
 
     @Override
     public void update() {
-        if (world == null || world.isRemote) return;
+        if (world == null) return;
+        if (world.isRemote) {
+            // World time is periodically reset by server packets; animation must use local ticks.
+            if (isRenderingFrame() && framePausedAt < 0 && clientFrameElapsed < frameDuration) clientFrameElapsed++;
+            return;
+        }
         if (saving) {
             if (!consumeWorkPower(SAVING)) return;
             if (getFrameElapsed() >= frameDuration) finishSave();
@@ -682,6 +688,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         layer = frameFromY = frameToY = -1;
         frameStartTick = 0;
         frameDuration = 0;
+        clientFrameElapsed = 0;
     }
 
     @Override
@@ -702,6 +709,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         tag.setInteger("frameDuration", frameDuration);
         tag.setLong("frameStart", frameStartTick);
         tag.setLong("framePausedAt", framePausedAt);
+        tag.setInteger("frameElapsed", getFrameElapsed());
         if (pad != null) {
             tag.setIntArray("pad", new int[]{(int) pad.minX, (int) pad.minY, (int) pad.minZ, (int) pad.maxX, (int) pad.maxY, (int) pad.maxZ});
         }
@@ -719,6 +727,9 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
     }
 
     private void readVisualData(NBTTagCompound tag) {
+        boolean sameFrame = pad != null && frameFromY == tag.getInteger("frameFrom")
+                && frameToY == tag.getInteger("frameTo") && frameDuration == tag.getInteger("frameDuration")
+                && frameStartTick == tag.getLong("frameStart") && framePausedAt == tag.getLong("framePausedAt");
         byte value = tag.getByte("status");
         status = value >= READY && value <= NO_POWER ? value : INVALID;
         frameFromY = tag.getInteger("frameFrom");
@@ -726,6 +737,8 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         frameDuration = tag.getInteger("frameDuration");
         frameStartTick = tag.getLong("frameStart");
         framePausedAt = tag.getLong("framePausedAt");
+        // Duplicate updates must not rewind a running animation between layer changes.
+        if (!sameFrame || framePausedAt >= 0) clientFrameElapsed = Math.max(0, Math.min(frameDuration, tag.getInteger("frameElapsed")));
         int[] box = tag.getIntArray("pad");
         pad = box.length == 6 ? new AxisAlignedBB(box[0], box[1], box[2], box[3], box[4], box[5]) : null;
         if (statusText != null) {
@@ -740,8 +753,9 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
     }
 
     public double getFrameHeight(float partialTicks) {
-        double tick = framePausedAt >= 0 ? framePausedAt : world.getTotalWorldTime() + partialTicks;
-        double progress = Math.max(0, Math.min(1, (tick - frameStartTick) / frameDuration));
+        double elapsed = world.isRemote ? clientFrameElapsed : getFrameElapsed();
+        if (framePausedAt < 0) elapsed += partialTicks;
+        double progress = Math.max(0, Math.min(1, elapsed / frameDuration));
         return pad.minY + frameFromY + 1 + (frameToY - frameFromY) * progress - pos.getY();
     }
 
