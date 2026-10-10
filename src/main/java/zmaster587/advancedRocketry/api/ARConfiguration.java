@@ -167,6 +167,8 @@ public class ARConfiguration {
     public boolean automaticRetroRockets;
     @ConfigProperty
     public boolean advancedVFX;
+    @ConfigProperty
+    public boolean registerJeiArtifactPage = true;
     @ConfigProperty(needsSync = true)
     public boolean enableLaserDrill;
     @ConfigProperty
@@ -475,6 +477,9 @@ public class ARConfiguration {
         arConfig.maxBiomesPerPlanet = config.get(PLANET, "maxBiomesPerPlanet", 99, "Maximum unique biomes per planet.").getInt();
 
         //Client
+        arConfig.registerJeiArtifactPage = config.get(CLIENT, "registerJeiArtifactPage", true,
+                "Register the JEI artifact page linking artifacts to planets. Client-side setting; requires a Minecraft restart.")
+                .setRequiresMcRestart(true).getBoolean();
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "Use AR's custom skybox on space stations").getBoolean();
         arConfig.planetSkyOverride = config.get(CLIENT, "PlanetSkyOverride", true, "Use AR's custom skybox on planets").getBoolean();
         arConfig.skyOverride = config.get(CLIENT, "overworldSkyOverride", true, "Use AR's custom skybox in the overworld.").getBoolean();

@@ -4,12 +4,10 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import zmaster587.advancedRocketry.integration.jei.PlanetRecipeHeader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,43 +45,11 @@ public class OrbitalLaserDrillWrapper implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        FontRenderer font = minecraft.fontRenderer;
-
-        if (planetIcon != null) {
-            GlStateManager.pushMatrix();
-            GlStateManager.color(1f, 1f, 1f, 1f);
-            GlStateManager.enableBlend();
-            minecraft.getTextureManager().bindTexture(planetIcon);
-            Gui.drawModalRectWithCustomSizedTexture(4, 4, 0, 0, 16, 16, 16, 16);
-            GlStateManager.popMatrix();
-        }
-
         String pageText = pageCount > 1
                 ? I18n.format("jei.advancedrocketry.orbitallaser.page", pageIndex + 1, pageCount)
                 : "";
-        int nameX = planetIcon == null ? 4 : 24;
-        int nameWidth = recipeWidth - nameX - 4;
-
-        if (!pageText.isEmpty()) {
-            nameWidth -= font.getStringWidth(pageText) + 6;
-            font.drawString(pageText, recipeWidth - font.getStringWidth(pageText) - 4, 7, 0x606060);
-        }
-
-        font.drawString(font.trimStringToWidth(contextName, Math.max(0, nameWidth)), nameX, 7, 0x404040);
-
-        if (!starName.isEmpty()) {
-            String orbitingText = I18n.format("jei.advancedrocketry.orbitallaser.orbiting", starName);
-            int orbitingWidth = Math.max(0, (int) ((recipeWidth - nameX - 5) / 0.75f));
-
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(0.75f, 0.75f, 1.0f);
-            font.drawString(
-                    font.trimStringToWidth(orbitingText, orbitingWidth),
-                    Math.round((nameX + 1) / 0.75f),
-                    Math.round(16 / 0.75f),
-                    0x7A7A7A
-            );
-            GlStateManager.popMatrix();
-        }
+        String orbitingText = starName.isEmpty() ? ""
+                : I18n.format("jei.advancedrocketry.orbitallaser.orbiting", starName);
+        PlanetRecipeHeader.draw(minecraft, recipeWidth, planetIcon, contextName, orbitingText, pageText);
     }
 }

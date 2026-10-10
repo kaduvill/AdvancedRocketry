@@ -12,6 +12,10 @@ import zmaster587.advancedRocketry.block.BlockSmallPlatePress;
 import zmaster587.advancedRocketry.integration.jei.arcFurnace.ArcFurnaceCategory;
 import zmaster587.advancedRocketry.integration.jei.arcFurnace.ArcFurnaceRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.arcFurnace.ArcFurnaceRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.artifacts.ArtifactCategory;
+import zmaster587.advancedRocketry.integration.jei.artifacts.ArtifactRecipeHandler;
+import zmaster587.advancedRocketry.integration.jei.artifacts.ArtifactRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.artifacts.ArtifactWrapper;
 import zmaster587.advancedRocketry.integration.jei.asteroids.AsteroidCategory;
 import zmaster587.advancedRocketry.integration.jei.asteroids.AsteroidRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.asteroids.AsteroidRecipeMaker;
@@ -122,6 +126,8 @@ public class ARPlugin implements IModPlugin {
     private static IJeiRuntime jeiRuntime;
     private static OrbitalLaserDrillCategory orbitalLaserCategory;
     private static AsteroidCategory asteroidCategory;
+    private static boolean artifactCategoryRegistered;
+    private static final List<ArtifactWrapper> currentArtifactRecipes = new ArrayList<>();
     private static final List<AsteroidWrapper> currentAsteroidRecipes = new ArrayList<>();
     private static final List<GasGiantWrapper> currentGasGiantRecipes = new ArrayList<>();
     private static final List<OrbitalLaserDrillWrapper> currentOrbitalLaserRecipes = new ArrayList<>();
@@ -186,6 +192,20 @@ public class ARPlugin implements IModPlugin {
             currentOrbitalLaserRecipes.addAll(rebuiltLaserRecipes);
         }
 
+        if (artifactCategoryRegistered) {
+            List<ArtifactWrapper> rebuiltArtifactRecipes = ArtifactRecipeMaker.getRecipes();
+            if (!currentArtifactRecipes.equals(rebuiltArtifactRecipes)) {
+                for (ArtifactWrapper recipe : currentArtifactRecipes) {
+                    recipeRegistry.removeRecipe(recipe, ArtifactCategory.UID);
+                }
+                currentArtifactRecipes.clear();
+                for (ArtifactWrapper recipe : rebuiltArtifactRecipes) {
+                    recipeRegistry.addRecipe(recipe, ArtifactCategory.UID);
+                }
+                currentArtifactRecipes.addAll(rebuiltArtifactRecipes);
+            }
+        }
+
         // Asteroids
         if (asteroidCategory != null && !asteroidCategory.isLayoutInitialized()) {
             for (AsteroidWrapper recipe : currentAsteroidRecipes)
@@ -219,6 +239,8 @@ public class ARPlugin implements IModPlugin {
         IGuiHelper guiHelper = jeiHelpers.getGuiHelper();
         orbitalLaserCategory = new OrbitalLaserDrillCategory(guiHelper);
         asteroidCategory = new AsteroidCategory(guiHelper);
+        artifactCategoryRegistered = ARConfiguration.getCurrentConfig().registerJeiArtifactPage;
+        currentArtifactRecipes.clear();
 
         registry.addRecipeCategories(
                 new RollingMachineCategory(guiHelper),
@@ -243,6 +265,9 @@ public class ARPlugin implements IModPlugin {
                 new GasGiantCategory(guiHelper),
                 orbitalLaserCategory
         );
+        if (artifactCategoryRegistered) {
+            registry.addRecipeCategories(new ArtifactCategory(guiHelper));
+        }
     }
 
 
@@ -302,6 +327,11 @@ public class ARPlugin implements IModPlugin {
                 new GasGiantRecipeHandler(),
                 new OrbitalLaserDrillRecipeHandler()
             );
+        if (artifactCategoryRegistered) {
+            registry.addRecipeHandlers(new ArtifactRecipeHandler());
+            registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockWarpShipMonitor), ArtifactCategory.UID);
+            registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryItems.itemPlanetIdChip), ArtifactCategory.UID);
+        }
 
         registry.addRecipes(RollingMachineRecipeMaker.getMachineRecipes(jeiHelpers, TileRollingMachine.class), rollingMachineUUID);
         registry.addRecipes(LatheRecipeMaker.getMachineRecipes(jeiHelpers, TileLathe.class), latheUUID);

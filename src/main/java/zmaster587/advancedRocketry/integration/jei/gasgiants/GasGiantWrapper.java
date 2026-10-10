@@ -4,8 +4,6 @@ import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -14,6 +12,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
+import zmaster587.advancedRocketry.integration.jei.PlanetRecipeHeader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -116,32 +115,10 @@ public class GasGiantWrapper implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        FontRenderer fr = minecraft.fontRenderer;
-        int mainColor = 0x404040;
-        int hintColor = 0x7A7A7A; // subtler than main line
-
-        if (planetIcon != null) {
-            GlStateManager.pushMatrix();
-            GlStateManager.color(1f, 1f, 1f, 1f);
-            GlStateManager.enableBlend();
-            minecraft.getTextureManager().bindTexture(planetIcon);
-            Gui.drawModalRectWithCustomSizedTexture(4, 4, 0, 0, 16, 16, 16, 16);
-            GlStateManager.popMatrix();
-        }
-
-        fr.drawString(fr.trimStringToWidth(planetName, 64), 24, 7, mainColor);
-
-        if (!starName.isEmpty()) {
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(0.75f, 0.75f, 1.0f);
-            fr.drawString(
-                    I18n.format("jei.advancedrocketry.gasgiants.orbiting", starName),
-                    Math.round(25 / 0.75f),
-                    Math.round(16 / 0.75f),
-                    hintColor
-            );
-            GlStateManager.popMatrix();
-        }
+        int headerWidth = Math.min(recipeWidth, GasGiantCategory.GRID_X - 2);
+        String orbitingText = starName.isEmpty() ? ""
+                : I18n.format("jei.advancedrocketry.gasgiants.orbiting", starName);
+        PlanetRecipeHeader.draw(minecraft, headerWidth, planetIcon, planetName, orbitingText, "");
 
         IDrawable slotFrame = GasGiantCategory.getSharedSlotFrame();
         if (slotFrame != null) {
