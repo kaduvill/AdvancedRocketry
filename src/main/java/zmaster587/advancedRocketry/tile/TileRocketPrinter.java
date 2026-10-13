@@ -50,6 +50,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
             DETECTED = 14, BLUEPRINT_READY = 15, CHUNKS_UNLOADED = 16, SAVING = 17, NO_POWER = 18;
     private byte status = READY;
     private boolean printing, saving;
+    private boolean retainOperationStatus;
     private RocketBlueprint pendingBlueprint;
     private ItemStack saveStack = ItemStack.EMPTY;
     private EntityRocket saveRocket;
@@ -223,6 +224,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
 
     private void refreshIdleStatus() {
         if (world == null || world.isRemote || printing || saving) return;
+        retainOperationStatus = false;
         TileRocketAssemblingMachine assembler = getAssembler();
         if (assembler == null) { setStatus(NO_ASSEMBLER); return; }
         if (!padLoaded(assembler)) { setStatus(CHUNKS_UNLOADED); return; }
@@ -256,6 +258,8 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         actionButton.setText(LibVulpes.proxy.getLocalizedString("msg.rocketprinter." + key));
     }
     private void save() {
+        retainOperationStatus = true;
+        markDirty();
         TileRocketAssemblingMachine assembler = getAssembler();
         if (assembler == null) { setStatus(NO_ASSEMBLER); return; }
         if (!padLoaded(assembler)) { setStatus(CHUNKS_UNLOADED); return; }
@@ -304,6 +308,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         saveAssembler = null;
         saveFacing = null;
         setInventorySlotContents(0, saved);
+        retainOperationStatus = true;
         setStatus(SAVED);
     }
 
@@ -346,6 +351,8 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
     }
 
     private void start(EntityPlayer player) {
+        retainOperationStatus = true;
+        markDirty();
         TileRocketAssemblingMachine assembler = getAssembler();
         if (assembler == null) { setStatus(NO_ASSEMBLER); return; }
         if (!padLoaded(assembler)) { setStatus(CHUNKS_UNLOADED); return; }
@@ -389,6 +396,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
     }
 
     private void stop(byte reason) {
+        retainOperationStatus = true;
         printing = false;
         saving = false;
         pendingBlueprint = null;
@@ -587,8 +595,13 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-        // Results stay visible after an operation, then current conditions are checked on reopening.
-        refreshIdleStatus();
+        if (world != null && !world.isRemote && !printing && !saving) {
+            // Show an operation's result on the first opening, then refresh on later openings.
+            if (retainOperationStatus) {
+                retainOperationStatus = false;
+                markDirty();
+            } else refreshIdleStatus();
+        }
         List<ModuleBase> modules = new LinkedList<>();
         modules.add(new ModulePower(160, 21, this));
         modules.add(new ModuleProgress(149, 21, 0, TileRocketAssemblingMachine.verticalProgressBar, this));
@@ -666,6 +679,7 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         super.writeToNBT(nbt);
         energy.writeToNBT(nbt);
         nbt.setByte("printStatus", printing || saving ? PAUSED : status);
+        nbt.setBoolean("retainOperationStatus", retainOperationStatus);
         return nbt;
     }
 
@@ -678,6 +692,9 @@ public class TileRocketPrinter extends TileInventoryHatch implements ITickable, 
         byte value = nbt.getByte("printStatus");
         status = value >= READY && value <= NO_POWER
                 ? (value == SAVING || value == PRINTING || value == NO_POWER ? PAUSED : value) : INVALID;
+        retainOperationStatus = nbt.hasKey("retainOperationStatus")
+                ? nbt.getBoolean("retainOperationStatus")
+                : status != READY && status != NO_BLUEPRINT && status != DETECTED && status != BLUEPRINT_READY;
         printing = saving = false;
         pendingBlueprint = null;
         saveStack = ItemStack.EMPTY;

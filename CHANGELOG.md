@@ -1,7 +1,8 @@
 2.2.18
 - Fixed Airtight seal not showing in Chemical Reactor JEI-page
-- Fixed Airtight Seal armor draining oxygen in shallow water or when underwater breathing is already provided. Water-related suit oxygen consumption now runs only on the server.
+- Fixed Airtight Seal armor draining oxygen in shallow water or when underwater breathing is already provided. Water-related suit oxygen consumption now runs only on the server
 - Fix laggy 3D-printer animation
+- Polish 3D-printer error messages
 - Added a JEI page linking artifacts to their planets, (enabled by default in config)
 
 
