@@ -72,6 +72,12 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         cleanup();
     }
 
+    @Override
+    public void onChunkUnload() {
+        cleanup();
+        super.onChunkUnload();
+    }
+
     private void cleanup() {
         for (EntityUIPlanet planet : entities) {
             planet.setDead();

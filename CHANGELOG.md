@@ -1,5 +1,5 @@
 2.2.19
-- a
+- Fixed frozen, duplicate starmap holograms after the console’s chunk unloads
 
 2.2.18
 - Fixed Airtight seal not showing in Chemical Reactor JEI-page
