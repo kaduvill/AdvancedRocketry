@@ -1,7 +1,7 @@
 2.2.20
 - Fixed Atmosphere Terraformer not working when fluid requirements are disabled in config
 - Fixed a terraforming memory leak that allowed future terraforming work to use stale world references
-
+- Move "Unexpected ore name:" to debug log (laserdrilloretable)
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads
 

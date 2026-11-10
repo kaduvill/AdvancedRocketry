@@ -99,7 +99,7 @@ public final class LaserDrillOreTable {
             try {
                 name = args[0] + ":" + args[1];
             } catch (IndexOutOfBoundsException e) {
-                AdvancedRocketry.logger.warn("Unexpected ore name: \"{}\" during laser drill harvesting", oreDictName);
+                AdvancedRocketry.logger.debug("Unexpected ore name: \"{}\" during laser drill harvesting", oreDictName);
                 continue;
             }
 
