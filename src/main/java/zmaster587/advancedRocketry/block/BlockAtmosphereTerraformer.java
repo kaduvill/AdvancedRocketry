@@ -20,6 +20,15 @@ public class BlockAtmosphereTerraformer extends BlockMultiblockMachine {
     }
 
     @Override
+    public IBlockState getStateFromMeta(int meta) {
+        // BlockTile encodes activity in bit 8; its inherited decoder only restores facing.
+        EnumFacing facing = EnumFacing.getFront(meta & 7);
+        if (facing.getAxis() == EnumFacing.Axis.Y)
+            facing = EnumFacing.NORTH;
+        return getDefaultState().withProperty(FACING, facing).withProperty(STATE, (meta & 8) != 0);
+    }
+
+    @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         boolean r = super.onBlockActivated(world,pos,state,player,hand, facing,hitX,hitY,hitZ);
 

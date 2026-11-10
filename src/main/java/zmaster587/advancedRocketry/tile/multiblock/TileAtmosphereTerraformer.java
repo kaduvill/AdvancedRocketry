@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -18,12 +19,14 @@ import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
+import zmaster587.advancedRocketry.block.BlockAtmosphereTerraformer;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
+import zmaster587.libVulpes.block.BlockTile;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.gui.CommonResources;
 import zmaster587.libVulpes.inventory.TextureResources;
@@ -263,6 +266,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     private ModuleText text;
 
     private boolean outOfFluid;
+    private boolean workedThisTick;
     private int last_mode;
     int requiredN2 = 0, requiredO2 = 0;
 
@@ -289,7 +293,22 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public void update() {
+        workedThisTick = false;
         super.update();
+        if (world.isRemote) {
+            if (isWorking())
+                spawnGasParticles();
+        } else {
+            // Publish once after processing so cycle completion cannot flicker the active state.
+            setMachineRunning(workedThisTick && getMachineEnabled());
+        }
+    }
+
+    public boolean isWorking() {
+        if (world == null)
+            return false;
+        IBlockState state = world.getBlockState(pos);
+        return state.getBlock() instanceof BlockAtmosphereTerraformer && state.getValue(BlockTile.STATE);
     }
 
     private int getCompletionTime() {
@@ -336,7 +355,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         if (outOfFluid)
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.outofgas");
 
-        else if (isRunning())
+        else if (isWorking())
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.running");
         else
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.notrunning");
@@ -355,79 +374,76 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         return new AxisAlignedBB(pos.add(-15, -15, -15), pos.add(15, 15, 15));
     }
 
-    @Override
-    protected void onRunningPoweredTick() {
-        //System.out.println("energy:"+this.batteries.getUniversalEnergyStored());
+    @SideOnly(Side.CLIENT)
+    private void spawnGasParticles() {
+        if (Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
+            EnumFacing dir = RotatableBlock.getFront(world.getBlockState(pos)).getOpposite();
+            BlockPos offsetPos = pos.offset(dir);
 
-        if (world.isRemote && !outOfFluid) {
-            if (Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
-                EnumFacing dir = RotatableBlock.getFront(world.getBlockState(pos)).getOpposite();
+            for (int i = 0; i < 3; i++) {
+                if (radioButton.getOptionSelected() == 0) {
+                    float xMot = (float) ((world.rand.nextGaussian()) / 40f);
+                    float zMot = (float) ((world.rand.nextGaussian()) / 40f);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.02f, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.02f, zMot);
 
-                for (int i = 0; i < 3; i++) {
-
-
-                    if (radioButton.getOptionSelected() == 0) {
-                        float xMot = (float) ((world.rand.nextGaussian()) / 40f);
-                        float zMot = (float) ((world.rand.nextGaussian()) / 40f);
-                        BlockPos offsetPos = pos.offset(dir);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.02f, zMot);
-
-                    } else {
-                        float xMot = (float) ((world.rand.nextGaussian()) / 4f);
-                        float yMot = (float) (world.rand.nextGaussian() / 20f);
-                        float zMot = (float) ((world.rand.nextGaussian()) / 4f);
-                        BlockPos offsetPos = pos.offset(dir);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.4f + yMot, zMot);
-                    }
+                } else {
+                    float xMot = (float) ((world.rand.nextGaussian()) / 4f);
+                    float yMot = (float) (world.rand.nextGaussian() / 20f);
+                    float zMot = (float) ((world.rand.nextGaussian()) / 4f);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.4f + yMot, zMot);
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.4f + yMot, zMot);
                 }
             }
         }
-        if (!world.isRemote) {
-            if (last_mode != radioButton.getOptionSelected()) {
-                last_mode = radioButton.getOptionSelected();
-                this.setProgress(0, 0);
+    }
+
+    @Override
+    protected void onRunningPoweredTick() {
+        if (world.isRemote || !isComplete())
+            return;
+
+        int mode = radioButton.getOptionSelected();
+        if (last_mode != mode) {
+            last_mode = mode;
+            this.setProgress(0, 0);
+        }
+        if (ARConfiguration.getCurrentConfig().terraformRequiresFluid && mode == 0) {
+
+            if (requiredN2 == 0 && requiredO2 == 0) {
+                requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
+                requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
             }
-            if (ARConfiguration.getCurrentConfig().terraformRequiresFluid && radioButton.getOptionSelected() == 0) {
 
-                if (requiredN2 == 0 && requiredO2 == 0) {
-                    requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
-                    requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
-                }
+            for (IFluidHandler handler : fluidInPorts) {
+                FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
 
-                for (IFluidHandler handler : fluidInPorts) {
-                    FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
+                if (fStack != null)
+                    requiredN2 -= fStack.amount;
 
-                    if (fStack != null)
-                        requiredN2 -= fStack.amount;
+                fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidOxygen, requiredO2), true);
 
-                    fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidOxygen, requiredO2), true);
+                if (fStack != null)
+                    requiredO2 -= fStack.amount;
+            }
 
-                    if (fStack != null)
-                        requiredO2 -= fStack.amount;
-                }
-
-
-                if (requiredN2 != 0 || requiredO2 != 0) {
-                    setOOF(true);
-                } else {
-                    setOOF(false);
-                }
+            if (requiredN2 != 0 || requiredO2 != 0) {
+                setOOF(true);
             } else {
                 setOOF(false);
             }
+        } else {
+            setOOF(false);
         }
 
         if (!outOfFluid) {
             /////////from the super method
-            if (!world.isRemote)
-                useEnergy(powerPerTick);
-            //Increment for both client and server
+            useEnergy(powerPerTick);
+            workedThisTick = true;
             currentTime++;
 
             if (currentTime == completionTime)
@@ -452,6 +468,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public boolean isRunning() {
+
+        // The server must keep retrying stalled work; clients only display its published result.
+        if (world != null && world.isRemote)
+            return isWorking();
 
         boolean bool = getMachineEnabled() &&
                 //super.isRunning() &&
@@ -479,11 +499,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public void setMachineRunning(boolean running) {
-        super.setMachineRunning(running);
-        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-
+        if (world != null && !world.isRemote) {
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() instanceof BlockAtmosphereTerraformer && state.getValue(BlockTile.STATE) != running)
+                super.setMachineRunning(running);
+        }
     }
-
 
     @Override
     protected void processComplete() {
