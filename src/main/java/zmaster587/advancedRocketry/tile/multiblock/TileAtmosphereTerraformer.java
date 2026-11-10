@@ -388,15 +388,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                 }
             }
         }
-        if (!ARConfiguration.getCurrentConfig().terraformRequiresFluid)
-            return;
-
         if (!world.isRemote) {
             if (last_mode != radioButton.getOptionSelected()) {
                 last_mode = radioButton.getOptionSelected();
                 this.setProgress(0, 0);
             }
-            if (radioButton.getOptionSelected() == 0) {
+            if (ARConfiguration.getCurrentConfig().terraformRequiresFluid && radioButton.getOptionSelected() == 0) {
 
                 if (requiredN2 == 0 && requiredO2 == 0) {
                     requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;

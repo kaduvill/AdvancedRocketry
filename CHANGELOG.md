@@ -1,6 +1,5 @@
 2.2.20
-- a
-
+- Fixed Atmosphere Terraformer not working when fluid requirements are disabled in config
 
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads
