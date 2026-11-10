@@ -25,6 +25,8 @@ public class TerraformingHelper {
     public BiomeProvider chunkMgrTerraformed;
     public int dimId;
     public List<BiomeManager.BiomeEntry> biomeList;
+    // Only the lazily created terrain generator owns a World. Targets and progress
+    // survive dimension unload; these two cache fields must not.
     public World world;
     public ChunkProviderPlanet generator;
     private DimensionProperties props;
@@ -62,17 +64,16 @@ public class TerraformingHelper {
         this.dimId = dimension;
         this.props = DimensionManager.getInstance().getDimensionProperties(dimension);
         this.biomeList = biomes;
-        this.world = net.minecraftforge.common.DimensionManager.getWorld(dimId);
+        World world = net.minecraftforge.common.DimensionManager.getWorld(dimId);
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList);
         this.terraformingqueue = new ArrayList<>();
         this.biomechangingqueue = new ArrayList<>();
         this.decorationqueue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
-        generator = new ChunkProviderPlanet(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), world.getWorldInfo().getGeneratorOptions());
 
         System.out.println("register generated chunks...");
         for (ChunkPos i:generated_chunks){
-            chunkdata data = new chunkdata(i.x,i.z,null, world, this);
+            chunkdata data = new chunkdata(i.x,i.z,null, this);
             data.chunk_fully_generated = true;
             chunkDataMap.put(new ChunkPos(data.x,data.z), data);
         }
@@ -93,6 +94,25 @@ public class TerraformingHelper {
     //1 = yes
     // -1 = never (if it includes a type.PROTECTED chunk
     public int can_populate(int x, int z){
+        return can_populate(net.minecraftforge.common.DimensionManager.getWorld(dimId), x, z);
+    }
+
+    boolean isCurrentWorld(World world) {
+        return world != null && !world.isRemote
+                && net.minecraftforge.common.DimensionManager.getWorld(dimId) == world;
+    }
+
+    /** Release only resources belonging to this World, without resetting any work. */
+    public void releaseWorldResources(World unloadedWorld) {
+        if (world == unloadedWorld) {
+            generator = null;
+            world = null;
+        }
+    }
+
+    public int can_populate(World world, int x, int z){
+        if (!isCurrentWorld(world)) return 0;
+
         chunkdata currentchunk = getChunkFromList(x,z);
         chunkdata currentchunkx1 = getChunkFromList(x+1,z);
         chunkdata currentchunkz1 = getChunkFromList(x,z+1);
@@ -104,7 +124,7 @@ public class TerraformingHelper {
                 return -1; // chunks contain a protected chunk
 
             if (currentchunkz1.terrain_fully_generated && currentchunkx1.terrain_fully_generated && currentchunkx1z1.terrain_fully_generated && currentchunk.terrain_fully_generated) {
-                currentchunk.populate_chunk_if_not_already_done();
+                currentchunk.populate_chunk_if_not_already_done(world);
                 return 1;
             }
         }
@@ -340,12 +360,22 @@ public class TerraformingHelper {
 
 
 
-        data = new chunkdata(cpos.x,cpos.z, null, world, this);
+        data = new chunkdata(cpos.x,cpos.z, null, this);
         data.type = get_chunk_type(data.x,data.z);
         chunkDataMap.put(new ChunkPos(data.x,data.z),data);
     }
 
     public IBlockState[] getBlocksAt(int x, int z){
+        return getBlocksAt(net.minecraftforge.common.DimensionManager.getWorld(dimId), x, z);
+    }
+
+    public IBlockState[] getBlocksAt(World currentWorld, int x, int z){
+        if (!isCurrentWorld(currentWorld)) return null;
+        if (world != currentWorld) {
+            generator = null;
+            world = null;
+        }
+
         ChunkPos cpos = getChunkPosFromBlockPos(new BlockPos(x,0,z));
         chunkdata data = getChunkFromList(cpos.x,cpos.z);
         if (data == null){
@@ -354,6 +384,11 @@ public class TerraformingHelper {
             data = getChunkFromList(cpos.x,cpos.z);
         }
         if (data.blockStates == null){
+            if (generator == null) {
+                generator = new ChunkProviderPlanet(currentWorld, currentWorld.getSeed(),
+                        currentWorld.getWorldInfo().isMapFeaturesEnabled(), currentWorld.getWorldInfo().getGeneratorOptions());
+                world = currentWorld;
+            }
             System.out.println("generate new blockstates: "+cpos.x+":"+cpos.z);
             ChunkPrimer primer = generator.getChunkPrimer(cpos.x, cpos.z, chunkMgrTerraformed);
             IBlockState[][][] blockStates = new IBlockState[16][16][256];

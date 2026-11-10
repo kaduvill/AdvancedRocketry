@@ -37,12 +37,16 @@ public class chunkdata {
 
     public IBlockState[][][] blockStates;
 
-    World world; // used to call populate after decoration is finished
     TerraformingHelper helper;
 
+    /** Kept for callers using the old constructor; the World is no longer retained. */
+    @Deprecated
     public chunkdata(int x, int z, IBlockState[][][] blockStates, World world, TerraformingHelper helper) {
+        this(x, z, blockStates, helper);
+    }
+
+    public chunkdata(int x, int z, IBlockState[][][] blockStates, TerraformingHelper helper) {
         this.x = x;
-        this.world = world;
         this.helper = helper;
         this.z = z;
         this.blockStates = blockStates;
@@ -101,6 +105,12 @@ public class chunkdata {
     }
 
     public void populate_chunk_if_not_already_done() {
+        populate_chunk_if_not_already_done(net.minecraftforge.common.DimensionManager.getWorld(helper.dimId));
+    }
+
+    public void populate_chunk_if_not_already_done(World world) {
+        if (!helper.isCurrentWorld(world)) return;
+
         // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it generated
         if (!chunk_fully_generated && !chunk_populated) {
 

@@ -514,6 +514,7 @@ public class DimensionManager implements IGalaxy {
     }
 
     public void onServerStopped() {
+        if (proxylists != null) proxylists.reset();
         unregisterAllDimensions();
         knownPlanets.clear();
         overworldProperties.resetProperties();

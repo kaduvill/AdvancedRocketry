@@ -1,5 +1,6 @@
 2.2.20
 - Fixed Atmosphere Terraformer not working when fluid requirements are disabled in config
+- Fixed a terraforming memory leak and allowed future terraforming work to use stale world references
 
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads

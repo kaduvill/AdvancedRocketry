@@ -74,6 +74,7 @@ import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.advancedRocketry.tile.infrastructure.TileRocketMonitoringStation;
 import zmaster587.advancedRocketry.tile.station.TileLandingPad;
 import zmaster587.advancedRocketry.util.WeakIdentityRegistry;
+import zmaster587.advancedRocketry.util.TerraformingHelper;
 import zmaster587.advancedRocketry.util.SpawnListEntryNBT;
 import zmaster587.advancedRocketry.util.TransitionEntity;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
@@ -487,8 +488,13 @@ public class PlanetEventHandler {
     public void worldUnloadEvent(WorldEvent.Unload event) {
         (event.getWorld().isRemote ? clientRocketListeners : serverRocketListeners)
                 .removeIf(tile -> tile.getWorld() == event.getWorld());
-        if (!event.getWorld().isRemote)
+        if (!event.getWorld().isRemote) {
+            if (DimensionProperties.proxylists != null) {
+                TerraformingHelper helper = DimensionProperties.proxylists.gethelper(event.getWorld().provider.getDimension());
+                if (helper != null) helper.releaseWorldResources(event.getWorld());
+            }
             AtmosphereHandler.unregisterWorld(event.getWorld().provider.getDimension());
+        }
     }
 
     //Handle fog density and color

@@ -75,7 +75,8 @@ public class BiomeHandler {
         ChunkPos cpos = DimensionProperties.proxylists.gethelper(props.getId()).getChunkPosFromBlockPos(pos);
 
 
-        IBlockState[] target_blocks = DimensionProperties.proxylists.gethelper(props.getId()).getBlocksAt(pos.getX(), pos.getZ());
+        IBlockState[] target_blocks = DimensionProperties.proxylists.gethelper(props.getId()).getBlocksAt(world, pos.getX(), pos.getZ());
+        if (target_blocks == null) return;
         chunkdata data = DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z);
         //System.out.println("d1"+(System.currentTimeMillis()-startTime));
         //startTime = System.currentTimeMillis();
@@ -243,7 +244,7 @@ public class BiomeHandler {
 
 
 
-        int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(cpos.x, cpos.z);
+        int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(world, cpos.x, cpos.z);
         if (can_populate == -1){
             //because it can never be populated, it is considered "done with population"
             DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
