@@ -330,7 +330,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             modules.add(new ModuleImage(173, 0, new IconResource(90, 0, 84, 88, CommonResources.genericBackground)));
         }
 
-        modules.add(radioButton);
+        modules.add(0, radioButton);
         modules.add(new ModuleProgress(30, 57, 0, zmaster587.advancedRocketry.inventory.TextureResources.terraformProgressBar, this));
         modules.add(text);
 
