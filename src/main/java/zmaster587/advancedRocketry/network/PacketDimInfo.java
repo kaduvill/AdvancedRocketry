@@ -19,12 +19,15 @@ import java.util.logging.Logger;
 
 public class PacketDimInfo extends BasePacket {
 
+    private static final String SKIP_JEI_REFRESH = "skipJeiRefresh";
+
     private DimensionProperties dimProperties;
     private NBTTagCompound dimNBT;
     private int dimNumber;
     private boolean deleteDim;
     private List<ItemStack> artifacts;
     private String customIcon;
+    private boolean refreshJei = true;
 
     public PacketDimInfo() {
         artifacts = new LinkedList<>();
@@ -32,9 +35,14 @@ public class PacketDimInfo extends BasePacket {
     }
 
     public PacketDimInfo(int dimNumber, DimensionProperties dimProperties) {
+        this(dimNumber, dimProperties, true);
+    }
+
+    public PacketDimInfo(int dimNumber, DimensionProperties dimProperties, boolean refreshJei) {
         this();
         this.dimProperties = dimProperties;
         this.dimNumber = dimNumber;
+        this.refreshJei = refreshJei;
     }
 
     @Override
@@ -49,6 +57,8 @@ public class PacketDimInfo extends BasePacket {
             PacketBuffer packetBuffer = new PacketBuffer(out);
             try {
                 dimProperties.writeToNBT(nbt);
+                if (!refreshJei)
+                    nbt.setBoolean(SKIP_JEI_REFRESH, true);
                 out.writeBoolean(false);
                 packetBuffer.writeCompoundTag(nbt);
 
@@ -84,6 +94,7 @@ public class PacketDimInfo extends BasePacket {
             //TODO: error handling
             try {
                 dimNBT = packetBuffer.readCompoundTag();
+                refreshJei = !dimNBT.getBoolean(SKIP_JEI_REFRESH);
 
                 int number = packetBuffer.readShort();
                 for (int i = 0; i < number; i++) {
@@ -110,6 +121,8 @@ public class PacketDimInfo extends BasePacket {
 
     @Override
     public void executeClient(EntityPlayer thePlayer) {
+        boolean shouldRefreshJei = refreshJei || deleteDim
+                || !DimensionManager.getInstance().isDimensionCreated(dimNumber);
         if (deleteDim) {
             if (DimensionManager.getInstance().isDimensionCreated(dimNumber)) {
                 DimensionManager.getInstance().deleteDimension(dimNumber);
@@ -137,7 +150,7 @@ public class PacketDimInfo extends BasePacket {
                 DimensionManager.getInstance().registerDimNoUpdate(dimProperties, true);
             }
         }
-        if (Loader.isModLoaded("jei")) {
+        if (shouldRefreshJei && Loader.isModLoaded("jei")) {
             zmaster587.advancedRocketry.integration.jei.ARPlugin.requestDimensionRecipeRefresh();
         }
     }

@@ -812,7 +812,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         load_terraforming_helper(true);
 
 
-        PacketHandler.sendToAll(new PacketDimInfo(getId(), this));
+        // Pressure changes do not need a JEI refresh; displayed icons can update later.
+        PacketHandler.sendToAll(new PacketDimInfo(getId(), this, false));
     }
 
     public void setAtmosphereDensityDirect(int atmosphereDensity) {
