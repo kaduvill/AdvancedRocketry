@@ -1064,10 +1064,9 @@ tooltip.advancedrocketry.structuretower.alt.2=§oCheck wiki for more info.
 
 # Terraformer
 tooltip.advancedrocketry.terraformer=Terraform the entire planet!
-tooltip.advancedrocketry.terraformer.shift.1=§fUse with §cBiome Changer Satellite
-tooltip.advancedrocketry.terraformer.shift.2=§fSatellite has to orbit this planet
-tooltip.advancedrocketry.terraformer.alt.1=§fInsert §cBiome Changer Remote
-tooltip.advancedrocketry.terraformer.alt.2=§fPowered by Satellite
+tooltip.advancedrocketry.terraformer.shift.1=§fChanges the entire planet's biomes based on pressure
+tooltip.advancedrocketry.terraformer.alt.1=§fUse with §cBiome Changer Satellite§fand §cAtmospheric Terraformer
+tooltip.advancedrocketry.terraformer.alt.2=§fSatellite has to orbit this planet
 
 # Rocket Monitoring Station
 tooltip.advancedrocketry.monitoringstation=§cInfrastructure
@@ -1401,7 +1400,7 @@ tooltip.advancedrocketry.biomechangerremote=§bShift-Right Click to open GUI
 tooltip.advancedrocketry.biomechangerremote.shift.1=§fRight-click in hand to transform a 20×20 area
 tooltip.advancedrocketry.biomechangerremote.shift.2=§f"Scan Biome" stores the Biome you're standing in to satellite’s memory.
 tooltip.advancedrocketry.biomechangerremote.alt.1=§6Satellite needs a lot of power
-tooltip.advancedrocketry.biomechangerremote.alt.2=§fUsed in §cTerraforming Terminal§f and§c Atmosphere Terraformer
+tooltip.advancedrocketry.biomechangerremote.alt.2=§fUsed in §cTerraforming Terminal §fto change the planets biomes based on pressure
 
 # Ore Scanner
 tooltip.advancedrocketry.orescanner=§bRight-Click to open GUI
@@ -1601,7 +1600,7 @@ tooltip.advancedrocketry.spaceelevatorctrl.alt.2=§cUse Linker
 # Atmosphere Terraformer
 tooltip.advancedrocketry.atmosterraformer=Changes Atmospheric pressure on an entire planet
 tooltip.advancedrocketry.atmosterraformer.shift.1=§bUse Holo-Projector!
-tooltip.advancedrocketry.atmosterraformer.alt.1=§fIncrease and decrease the Atmospheric pressure by using connected §cBiome Changer Remote.
+tooltip.advancedrocketry.atmosterraformer.alt.1=§fUse §cBiome Changer Remote §fin Terraformer Terminal to change biomes based on pressure
 
 # Area Gravity Controller
 tooltip.advancedrocketry.gravitymachine=Manipulates Gravity

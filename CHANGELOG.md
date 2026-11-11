@@ -3,6 +3,7 @@
 - Fixed a terraforming memory leak that allowed future terraforming work to use stale world references
 - Fixed Atmospheric Terraformer gas animation, controller light, and running status to reflect if it is working
 - Fixed unnecessary JEI rebuilds triggered by Atmospheric Terraformer pressure updates (planet updates)
+- Clean up tooltips concerning terraforming
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
 
 2.2.19
