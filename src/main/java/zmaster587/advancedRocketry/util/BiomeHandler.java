@@ -12,9 +12,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.BiomeDictionary;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
-import zmaster587.libVulpes.network.PacketHandler;
-import zmaster587.libVulpes.util.HashedBlockPosition;
 
 import java.util.Random;
 
@@ -278,6 +275,10 @@ public class BiomeHandler {
 
 
     public static void terraform_biomes(World world, Biome biomeId, BlockPos pos, int dimId) {
+        terraform_biomes(world, biomeId, pos, dimId, null);
+    }
+
+    public static void terraform_biomes(World world, Biome biomeId, BlockPos pos, int dimId, BiomeUpdateBatch updates) {
         Biome old_biome = world.getBiome(pos);
         changeBiome(world,biomeId, old_biome, pos);
         decorate_simple(world, biomeId, old_biome, pos);
@@ -294,12 +295,15 @@ public class BiomeHandler {
         }
         data.set_position_biomechanged(inchunkx,inchunkz);
 
-        Chunk chunk = world.getChunkFromBlockCoords(pos);
-        PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+        syncBiomeChange(world, biomeId, old_biome, pos, updates);
 
     }
 
     public static void terraform(World world, Biome biomeId, BlockPos pos, boolean was_biome_remote, int dimId) {
+        terraform(world, biomeId, pos, was_biome_remote, dimId, null);
+    }
+
+    public static void terraform(World world, Biome biomeId, BlockPos pos, boolean was_biome_remote, int dimId, BiomeUpdateBatch updates) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         if (biomeId == null)return;
 
@@ -310,7 +314,7 @@ public class BiomeHandler {
         if(was_biome_remote) {
             changeBiome(world,biomeId, old_biome, pos); // this should not be needed in heavy terraforming because it should have already been done before
             decorate_simple(world, biomeId, old_biome, pos);
-            PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+            syncBiomeChange(world, biomeId, old_biome, pos, updates);
         }
 
         if (!was_biome_remote) { // heavy terraforming here...
@@ -320,6 +324,13 @@ public class BiomeHandler {
 
 
 
+    }
+
+    private static void syncBiomeChange(World world, Biome biome, Biome oldBiome, BlockPos pos, BiomeUpdateBatch updates) {
+        // Decoration and completion tracking must still run for already-correct columns.
+        if (biome == oldBiome || world.isRemote) return;
+        if (updates == null) BiomeUpdateBatch.send(world, pos);
+        else updates.add(pos);
     }
 
     private static void spawn_decoration_block(World world, BlockPos pos, IBlockState state, int p){

@@ -13,6 +13,7 @@ import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
 import zmaster587.advancedRocketry.item.ItemBiomeChanger;
 import zmaster587.advancedRocketry.util.BiomeHandler;
+import zmaster587.advancedRocketry.util.BiomeUpdateBatch;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergy;
 import zmaster587.libVulpes.util.HashedBlockPosition;
@@ -89,23 +90,23 @@ private int noise_val;
         //This is hacky..
         World world = net.minecraftforge.common.DimensionManager.getWorld(getDimensionId());
         int powerrequired = 120;
-        if (world != null) {
+        if (world != null && !toChangeList.isEmpty() && battery.getUniversalEnergyStored() > powerrequired) {
 
-            for (int i = 0; i < 10; i++) {
-                //TODO: Better imp
+            try (BiomeUpdateBatch updates = new BiomeUpdateBatch(world)) {
+                for (int i = 0; i < 10; i++) {
+                    //TODO: Better imp
 
-                if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
-                    if (battery.getUniversalEnergyStored() > powerrequired) {
-                        if (battery.extractEnergy(powerrequired, false) == powerrequired) {
-                            HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
-                            //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
-
-                            BiomeHandler.terraform(world, biomeId, pos.getBlockPos(), true, world.provider.getDimension());
-                        }
+                    if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
+                        if (battery.getUniversalEnergyStored() > powerrequired) {
+                            if (battery.extractEnergy(powerrequired, false) == powerrequired) {
+                                HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
+                                BiomeHandler.terraform(world, biomeId, pos.getBlockPos(), true, world.provider.getDimension(), updates);
+                            }
+                        } else
+                            break;
                     } else
                         break;
-                } else
-                    break;
+                }
             }
         }
         super.tickEntity();

@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.libVulpes.network.BasePacket;
@@ -60,16 +62,43 @@ public class PacketBiomeIDChange extends BasePacket {
 
     @Override
     public void executeClient(EntityPlayer thePlayer) {
-        if (thePlayer.world.provider.getDimension() == worldId) {
-            chunk = thePlayer.world.getChunkFromChunkCoords(xPos, zPos);
-            if (chunk.isLoaded()) {
-                chunk.setBiomeArray(array);
-                BlockPos pos2 = pos.getBlockPos();// new BlockPos(chunk.xPosition << 4, 48, chunk.zPosition << 4);
-                thePlayer.world.markBlockRangeForRenderUpdate(pos2, pos2.add(1, 64, 1));
+        // The player captured when scheduling this packet may precede a respawn.
+        Minecraft minecraft = Minecraft.getMinecraft();
+        World world = minecraft.world;
+        if (world == null || world.provider.getDimension() != worldId) return;
+        chunk = world.getChunkProvider().getLoadedChunk(xPos, zPos);
+        if (chunk == null || !chunk.isLoaded()) return;
+
+        // Use biome lookups, not the byte array: REID stores extended IDs separately.
+        BiomeProvider provider = world.getBiomeProvider();
+        Biome[] previous = new Biome[256];
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        int baseX = xPos << 4, baseZ = zPos << 4;
+        for (int z = 0; z < 16; z++) {
+            for (int x = 0; x < 16; x++) {
+                previous[z * 16 + x] = chunk.getBiome(cursor.setPos(baseX + x, 0, baseZ + z), provider);
             }
-            if (Minecraft.getMinecraft().gameSettings.particleSetting < 2)
-                AdvancedRocketry.proxy.spawnParticle("smallLazer", thePlayer.world, pos.x, pos.y, pos.z, 0, 0, 0);
         }
+
+        chunk.setBiomeArray(array); // Keep this call in executeClient for REID's client mixin.
+        int minX = 16, minZ = 16, maxX = -1, maxZ = -1;
+        for (int z = 0; z < 16; z++) {
+            for (int x = 0; x < 16; x++) {
+                if (previous[z * 16 + x] != chunk.getBiome(cursor.setPos(baseX + x, 0, baseZ + z), provider)) {
+                    minX = Math.min(minX, x);
+                    minZ = Math.min(minZ, z);
+                    maxX = Math.max(maxX, x);
+                    maxZ = Math.max(maxZ, z);
+                }
+            }
+        }
+        if (maxX >= 0) {
+            // RenderGlobal adds the neighboring block margin used for biome tint blending.
+            world.markBlockRangeForRenderUpdate(baseX + minX, 0, baseZ + minZ,
+                    baseX + maxX, world.getHeight() - 1, baseZ + maxZ);
+        }
+        if (minecraft.player != null && minecraft.gameSettings.particleSetting < 2)
+            AdvancedRocketry.proxy.spawnParticle("smallLazer", world, pos.x, pos.y, pos.z, 0, 0, 0);
     }
 
     @Override

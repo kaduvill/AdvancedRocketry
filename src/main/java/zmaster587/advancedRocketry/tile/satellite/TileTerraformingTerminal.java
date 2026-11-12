@@ -24,6 +24,7 @@ import zmaster587.advancedRocketry.item.ItemBiomeChanger;
 import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.util.BiomeHandler;
+import zmaster587.advancedRocketry.util.BiomeUpdateBatch;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
 import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.libVulpes.LibVulpes;
@@ -174,42 +175,44 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                     SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
                     IUniversalEnergy battery = sat.getBattery();
 
-                    for (int i = 0; i < 1000; i++) {
-                        //TODO: Better imp
+                    try (BiomeUpdateBatch updates = new BiomeUpdateBatch(world)) {
+                        for (int i = 0; i < 1000; i++) {
+                            //TODO: Better imp
 
-                        if (battery.getUniversalEnergyStored() > powerrequired) {
-                            try {
+                            if (battery.getUniversalEnergyStored() > powerrequired) {
+                                try {
 
 
-                                TerraformingHelper t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
+                                    TerraformingHelper t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
 
-                                if (t == null) {
-                                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).load_terraforming_helper(false);
-                                    t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
+                                    if (t == null) {
+                                        DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).load_terraforming_helper(false);
+                                        t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
+                                    }
+
+                                    BiomeProvider chunkmgr = t.chunkMgrTerraformed;
+                                    //BlockPos next_block_pos = t.get_next_position(false);
+                                    //BlockPos next_block_pos = t.get_next_position_biomechanging(false);
+                                    BlockPos next_block_pos = t.get_next_position_biomechanging(true);
+
+                                    if (next_block_pos != null) { // it is null when there is everything terraformed
+                                        battery.extractEnergy(powerrequired, false);
+                                        //BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
+                                        BiomeHandler.terraform_biomes(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, world.provider.getDimension(), updates);
+                                    } else {
+                                        //System.out.println("nothing to terraform");
+                                        break; // nothing to do, everything is terraformed
+                                    }
+
+                                    //} catch (NullPointerException e) {
+                                    //    e.printStackTrace();
+                                } catch (NoClassDefFoundError e) {
+                                    e.printStackTrace(); //WTF
                                 }
 
-                                BiomeProvider chunkmgr = t.chunkMgrTerraformed;
-                                //BlockPos next_block_pos = t.get_next_position(false);
-                                //BlockPos next_block_pos = t.get_next_position_biomechanging(false);
-                                BlockPos next_block_pos = t.get_next_position_biomechanging(true);
-
-                                if (next_block_pos != null) { // it is null when there is everything terraformed
-                                    battery.extractEnergy(powerrequired, false);
-                                    //BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
-                                    BiomeHandler.terraform_biomes(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, world.provider.getDimension());
-                                } else {
-                                    //System.out.println("nothing to terraform");
-                                    break; // nothing to do, everything is terraformed
-                                }
-
-                                //} catch (NullPointerException e) {
-                                //    e.printStackTrace();
-                            } catch (NoClassDefFoundError e) {
-                                e.printStackTrace(); //WTF
-                            }
-
-                        } else
-                            break;
+                            } else
+                                break;
+                        }
                     }
                 }
             }
