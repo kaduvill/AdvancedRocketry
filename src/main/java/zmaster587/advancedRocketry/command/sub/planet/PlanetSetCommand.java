@@ -62,8 +62,14 @@ public class PlanetSetCommand extends ARCommand {
         }
         DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(dimId);
         if (propName.equalsIgnoreCase("atmosphereDensity")) {
+            if (args.length != argsOffset + 1) {
+                throw wrongUsage(sender);
+            }
             int atmosphereDensity = parseInt(args[argsOffset]);
             props.setAtmosphereDensityDirect(atmosphereDensity);
+            props.setAtmosphereOverride(true);
+            props.getAverageTemp();
+            PacketHandler.sendToAll(new PacketDimInfo(dimId, props, false));
             sender.sendMessage(new TextComponentTranslation("commands.advancedrocketry.planet.set.success",
                     dimId, propName, atmosphereDensity));
             return;

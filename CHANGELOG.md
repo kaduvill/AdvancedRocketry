@@ -4,6 +4,8 @@
 - Fixed Atmospheric Terraformer gas animation, controller light, and running status to reflect if it is working
 - Fixed unnecessary JEI rebuilds triggered by Atmospheric Terraformer pressure updates (planet updates)
 - Clean up tooltips concerning terraforming
+- Preserve terraformed pressure when reloading planet definitions from XML
+  - Added /ar planet reset [dimId] atmosphereOverride to restore XML pressure on the next XML reload
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
 
 2.2.19

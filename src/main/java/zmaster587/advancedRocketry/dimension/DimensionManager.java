@@ -1046,6 +1046,11 @@ public class DimensionManager implements IGalaxy {
                 }
             }
 
+            // All parents and canonical stars must be registered before moon temperatures are calculated.
+            for (DimensionProperties properties : dimCouplingList.dims) {
+                properties.getAverageTemp();
+            }
+
             //Don't load random planets twice on initial load
             //TODO: rework the logic, low priority because low time cost and one time run per world
             if (!loadedFromXML) {

@@ -133,6 +133,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     int starId;
     private int originalAtmosphereDensity;
     private int atmosphereDensity;
+    private boolean atmosphereOverride;
     private String name;
     //public ExtendedBiomeProperties biomeProperties;
     private LinkedList<BiomeEntry> allowedBiomes;
@@ -397,6 +398,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public void copyData(DimensionProperties props) {
         this.satellites = props.satellites;
         this.tickingSatellites = props.tickingSatellites;
+        atmosphereOverride = props.atmosphereOverride;
+        if (atmosphereOverride) {
+            atmosphereDensity = props.atmosphereDensity;
+            // Generation still uses the pressure from before terraforming.
+            originalAtmosphereDensity = props.originalAtmosphereDensity;
+        }
     }
 
 
@@ -431,6 +438,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         rotationalPeriod = 24000;
         orbitalDist = 100;
         originalAtmosphereDensity = atmosphereDensity = 100;
+        atmosphereOverride = false;
         childPlanets = new HashSet<>();
         requiredArtifacts = new LinkedList<>();
         parentPlanet = Constants.INVALID_PLANET;
@@ -806,8 +814,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
     public void setAtmosphereDensity(int atmosphereDensity) {
 
-        int prevAtm = this.atmosphereDensity;
         this.atmosphereDensity = atmosphereDensity;
+        atmosphereOverride = true;
 
         load_terraforming_helper(true);
 
@@ -818,6 +826,14 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
     public void setAtmosphereDensityDirect(int atmosphereDensity) {
         originalAtmosphereDensity = this.atmosphereDensity = atmosphereDensity;
+    }
+
+    public boolean hasAtmosphereOverride() {
+        return atmosphereOverride;
+    }
+
+    public void setAtmosphereOverride(boolean atmosphereOverride) {
+        this.atmosphereOverride = atmosphereOverride;
     }
 
     /**
@@ -1657,6 +1673,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             unsetDecoratoration();
         }
         atmosphereDensity = nbt.getInteger("atmosphereDensity");
+        atmosphereOverride = nbt.getBoolean("atmosphereOverride");
 
         if (nbt.hasKey("originalAtmosphereDensity"))
             originalAtmosphereDensity = nbt.getInteger("originalAtmosphereDensity");
@@ -2032,6 +2049,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
         nbt.setInteger("atmosphereDensity", atmosphereDensity);
         nbt.setInteger("originalAtmosphereDensity", originalAtmosphereDensity);
+        nbt.setBoolean("atmosphereOverride", atmosphereOverride);
         nbt.setDouble("peakInsolationMultiplier", peakInsolationMultiplier);
         nbt.setDouble("peakInsolationMultiplierWithoutAtmosphere", peakInsolationMultiplierWithoutAtmosphere);
         nbt.setInteger("avgTemperature", averageTemperature);
@@ -2550,10 +2568,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         @Nullable
         public MethodHandle getPropertyGetter(String name) throws IllegalAccessException {
+            String propertyName = "ao".equalsIgnoreCase(name) ? "atmosphereOverride" : name;
             Optional<Field> field = Arrays.stream(props.getClass().getDeclaredFields())
                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
                     .filter(f -> !Modifier.isFinal(f.getModifiers()))
-                    .filter(f -> f.getName().equalsIgnoreCase(name))
+                    .filter(f -> f.getName().equalsIgnoreCase(propertyName))
                     .findFirst();
             if (!field.isPresent()) {
                 return null;
@@ -2563,6 +2582,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         @Nullable
         public MethodHandle getPropertySetter(String name) throws IllegalAccessException {
+            if ("atmosphereOverride".equalsIgnoreCase(name) || "ao".equalsIgnoreCase(name)) {
+                return null;
+            }
             Optional<Field> field = Arrays.stream(props.getClass().getDeclaredFields())
                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
                     .filter(f -> !Modifier.isFinal(f.getModifiers()))
@@ -2575,12 +2597,15 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
 
         public static List<String> getPropertyNames(boolean fromSet) {
-            return Arrays.stream(DimensionProperties.class.getDeclaredFields())
+            List<String> names = Arrays.stream(DimensionProperties.class.getDeclaredFields())
                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
                     .filter(f -> !Modifier.isFinal(f.getModifiers()))
                     .filter(f -> {
                         // Only primitives or Strings (and array variants) can be set by command
                         if (fromSet) {
+                            if (f.getName().equals("atmosphereOverride")) {
+                                return false;
+                            }
                             Class<?> type = f.getType();
                             if (type.isArray()) {
                                 type = type.getComponentType();
@@ -2591,6 +2616,10 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                     })
                     .map(Field::getName)
                     .collect(Collectors.toList());
+            if (!fromSet) {
+                names.add("ao");
+            }
+            return names;
         }
     }
 }
