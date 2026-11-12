@@ -14,8 +14,14 @@ final class TerrainWorkQueue {
     private long columns;
 
     void addChunk(int x, int z) {
-        work.addLast(new ChunkWork(x, z));
-        columns += 256;
+        addChunk(x, z, null);
+    }
+
+    void addChunk(int x, int z, boolean[][] generated) {
+        ChunkWork chunk = new ChunkWork(x, z, generated);
+        if (chunk.remaining() == 0) return;
+        work.addLast(chunk);
+        columns += chunk.remaining();
     }
 
     void addColumn(BlockPos pos) {
@@ -46,7 +52,15 @@ final class TerrainWorkQueue {
         }
 
         // Preserve uniform selection over logical columns, rather than over chunk jobs.
-        long index = ThreadLocalRandom.current().nextLong(columns);
+        return removeAt(ThreadLocalRandom.current().nextLong(columns));
+    }
+
+    BlockPos removeRandomFromFirst(int limit) {
+        if (work.isEmpty()) return null;
+        return removeAt(ThreadLocalRandom.current().nextInt((int) Math.min(columns, limit)));
+    }
+
+    private BlockPos removeAt(long index) {
         Iterator<Work> iterator = work.iterator();
         while (iterator.hasNext()) {
             Work entry = iterator.next();
@@ -86,12 +100,27 @@ final class TerrainWorkQueue {
         private final int x, z;
         private int nextColumn;
         private int remaining = 256;
-        // Only random pulls need a mask. The normal FIFO consumer uses just the cursor.
+        // Filtered chunks and out-of-order pulls need a mask. Full FIFO passes use the cursor.
         private BitSet randomColumns;
 
-        private ChunkWork(int x, int z) {
+        private ChunkWork(int x, int z, boolean[][] generated) {
             this.x = x;
             this.z = z;
+            if (generated == null) return;
+            for (int column = 0; column < 256; column++) {
+                if (generated[column >> 4][column & 15]) {
+                    pendingColumns().clear(column);
+                    remaining--;
+                }
+            }
+        }
+
+        private BitSet pendingColumns() {
+            if (randomColumns == null) {
+                randomColumns = new BitSet(256);
+                randomColumns.set(nextColumn, 256);
+            }
+            return randomColumns;
         }
 
         public int remaining() { return remaining; }
@@ -102,11 +131,7 @@ final class TerrainWorkQueue {
             if (randomColumns == null && index == 0) {
                 column = nextColumn++;
             } else {
-                if (randomColumns == null) {
-                    randomColumns = new BitSet(256);
-                    randomColumns.set(nextColumn, 256);
-                }
-                column = randomColumns.nextSetBit(0);
+                column = pendingColumns().nextSetBit(0);
                 for (int i = 0; i < index; i++) column = randomColumns.nextSetBit(column + 1);
                 randomColumns.clear(column);
             }

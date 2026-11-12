@@ -48,7 +48,7 @@ public class TerraformingHelper {
     private TerrainWorkQueue terraformingqueue;
     // Snapshot mutable inputs on enqueue so queued positions can be returned directly.
     private List<BlockPos> decorationqueue;
-    private List<BlockPos> biomechangingqueue;
+    private TerrainWorkQueue biomechangingqueue;
 
     int safe_zone_radius = 3; // radius for protected zone
     int border_zone = 3; // border zone size
@@ -73,7 +73,7 @@ public class TerraformingHelper {
         this.biomeList = biomes;
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList, rivers);
         this.terraformingqueue = new TerrainWorkQueue();
-        this.biomechangingqueue = new ArrayList<>();
+        this.biomechangingqueue = new TerrainWorkQueue();
         this.decorationqueue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
 
@@ -303,7 +303,11 @@ public class TerraformingHelper {
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        biomechangingqueue.add(p.toImmutable());
+        biomechangingqueue.addColumn(p);
+    }
+
+    public synchronized void add_chunk_to_biomechanging_queue(int x, int z, boolean[][] generated) {
+        biomechangingqueue.addChunk(x, z, generated);
     }
 
     public synchronized void add_position_to_decoration_queue(BlockPos p){
@@ -324,18 +328,7 @@ public class TerraformingHelper {
         return terraformingqueue.remove(random);
     }
     public synchronized BlockPos get_next_position_biomechanging(boolean random) {
-        if (biomechangingqueue.isEmpty()) {
-            return null;
-        }
-
-        int index;
-        if (random) {
-            index = ThreadLocalRandom.current().nextInt(Math.min(8192, biomechangingqueue.size()));
-        } else {
-            index = 0; // Default to the first element if not random mode
-        }
-
-        return biomechangingqueue.remove(index);
+        return random ? biomechangingqueue.removeRandomFromFirst(8192) : biomechangingqueue.remove(false);
     }
 
     public synchronized BlockPos get_next_position_decoration(boolean random){

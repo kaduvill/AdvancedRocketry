@@ -361,24 +361,14 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             if (chunk_was_already_done)
                 return;
 
-            //System.out.println("add chunk to terraforming list: "+chunk.x+":"+chunk.z);
-
             chunkdata current_chunk = proxylists.gethelper(getId()).getChunkFromList(chunk.x, chunk.z);
             if (current_chunk == null || !current_chunk.chunk_fully_biomechanged) {
 
                 if(chunk_was_added_to_terraforming_list_if_not_add_it(new ChunkPos(chunk.x,chunk.z)))
                     return;
 
-
-
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        if (current_chunk == null || !current_chunk.fully_generated[x][z])
-                            // if a position in the chunk is already fully generated, skip
-                            add_block_to_biomechanging_queue(new BlockPos(chunk.x * 16 + x, 0, chunk.z * 16 + z));
-
-                    }
-                }
+                proxylists.gethelper(getId()).add_chunk_to_biomechanging_queue(chunk.x, chunk.z,
+                        current_chunk == null ? null : current_chunk.fully_generated);
             }else  if (!current_chunk.chunk_fully_generated) {
                 if(chunk_was_added_to_terraforming_list_if_not_add_it(new ChunkPos(chunk.x,chunk.z)))
                     return;
