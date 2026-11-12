@@ -36,12 +36,14 @@ public class BiomeHandler {
     }
 
     // Bro I am sorry for changing this again and I know it will mess up your mixin but terraforming had a BIG update so....
+    // later comment: REID mixin fixed to accept this^
     public static void changeBiome(World world, Biome biomeId, Biome old_biome, BlockPos pos) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         if (old_biome != biomeId) {
             byte[] biomeArr = chunk.getBiomeArray();
             try {
                 biomeArr[(pos.getX() & 15) + (pos.getZ() & 15) * 16] = (byte) Biome.getIdForBiome(biomeId);
+                chunk.markDirty();
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }

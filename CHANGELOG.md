@@ -6,6 +6,7 @@
 - Clean up tooltips concerning terraforming
 - Preserve terraformed pressure when reloading planet definitions from XML
   - Added /ar planet reset [dimId] atmosphereOverride to restore XML pressure on the next XML reload
+- Fixed biome changes from terraforming not always being saved
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
 
 2.2.19
