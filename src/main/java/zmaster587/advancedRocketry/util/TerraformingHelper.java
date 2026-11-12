@@ -3,7 +3,6 @@ package zmaster587.advancedRocketry.util;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -14,8 +13,7 @@ import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.ChunkProviderPlanet;
 
 import java.util.*;
-
-import static org.apache.commons.lang3.RandomUtils.nextInt;
+import java.util.concurrent.ThreadLocalRandom;
 
 enum TerraformingType{
     ALLOWED, BORDER, PROTECTED
@@ -48,8 +46,9 @@ public class TerraformingHelper {
     //   add every chunk that was PROTECTED and no longer is PROTECTED to the queue for terraforming.
     //   doesn't matter if it is type ALLOWED or type BORDER
     private TerrainWorkQueue terraformingqueue;
-    private List<Vec3i> decorationqueue;
-    private List<Vec3i> biomechangingqueue;
+    // Snapshot mutable inputs on enqueue so queued positions can be returned directly.
+    private List<BlockPos> decorationqueue;
+    private List<BlockPos> biomechangingqueue;
 
     int safe_zone_radius = 3; // radius for protected zone
     int border_zone = 3; // border zone size
@@ -304,7 +303,7 @@ public class TerraformingHelper {
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        biomechangingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ()));
+        biomechangingqueue.add(p.toImmutable());
     }
 
     public synchronized void add_position_to_decoration_queue(BlockPos p){
@@ -315,9 +314,9 @@ public class TerraformingHelper {
         }
         int insertionIndex = 0;
         if (decorationqueue.size() > 0) {
-            insertionIndex = new Random().nextInt(Math.min(decorationqueue.size(), 1000));
+            insertionIndex = ThreadLocalRandom.current().nextInt(Math.min(decorationqueue.size(), 1000));
         }
-        decorationqueue.add(insertionIndex, new Vec3i(p.getX(),p.getY(),p.getZ()));
+        decorationqueue.add(insertionIndex, p.toImmutable());
     }
 
 
@@ -331,13 +330,12 @@ public class TerraformingHelper {
 
         int index;
         if (random) {
-            index = new Random().nextInt(Math.min(8192, biomechangingqueue.size()));
+            index = ThreadLocalRandom.current().nextInt(Math.min(8192, biomechangingqueue.size()));
         } else {
             index = 0; // Default to the first element if not random mode
         }
 
-        Vec3i pos = biomechangingqueue.remove(index);
-        return new BlockPos(pos);
+        return biomechangingqueue.remove(index);
     }
 
     public synchronized BlockPos get_next_position_decoration(boolean random){
@@ -345,10 +343,9 @@ public class TerraformingHelper {
             return null;
         int index = 0;
         if (random)
-            index = nextInt(0,decorationqueue.size());
+            index = ThreadLocalRandom.current().nextInt(decorationqueue.size());
 
-        Vec3i pos = decorationqueue.remove(index);
-        return new BlockPos(pos);
+        return decorationqueue.remove(index);
     }
 
     public void set_chunk_biomechanged(ChunkPos pos){ // mark a chunk ready for terraforming
