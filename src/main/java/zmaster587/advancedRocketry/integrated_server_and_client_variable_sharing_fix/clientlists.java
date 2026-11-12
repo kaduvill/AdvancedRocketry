@@ -32,6 +32,14 @@ public class clientlists implements Afuckinginterface {
     public boolean isinitialized(int dim){
         return (terraforminginfolists.get(dim) != null);
     }
+
+    public dimensionTerraformingInfo getTerraformingInfo(int dim) {
+        return terraforminginfolists.get(dim);
+    }
+
+    public void removeDimension(int dim) {
+        terraforminginfolists.remove(dim);
+    }
     public List<BlockPos> getProtectingBlocksForDimension(int dim){
         if (terraforminginfolists.get(dim) == null)return null;
         return terraforminginfolists.get(dim).terraformingProtectedBlocks;

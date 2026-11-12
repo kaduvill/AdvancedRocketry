@@ -64,6 +64,7 @@ public class PlanetResetCommand extends ARCommand {
             return;
         }
         properties.resetProperties();
+        DimensionManager.getInstance().refreshTerraformingBiomes();
         PacketHandler.sendToAll(new PacketDimInfo(dimId, properties));
     }
 

@@ -72,6 +72,7 @@ public class PlanetSetCommand extends ARCommand {
             props.setAtmosphereDensityDirect(atmosphereDensity);
             props.setAtmosphereOverride(true);
             props.getAverageTemp();
+            DimensionManager.getInstance().refreshTerraformingBiomes();
             PacketHandler.sendToAll(new PacketDimInfo(dimId, props, false));
             sender.sendMessage(new TextComponentTranslation("commands.advancedrocketry.planet.set.success",
                     dimId, propName, atmosphereDensity));
@@ -122,6 +123,7 @@ public class PlanetSetCommand extends ARCommand {
             e.printStackTrace();
             throw new CommandException("commands.advancedrocketry.planet.set.invalid");
         }
+        DimensionManager.getInstance().refreshTerraformingBiomes();
         PacketHandler.sendToAll(new PacketDimInfo(dimId, props));
     }
 

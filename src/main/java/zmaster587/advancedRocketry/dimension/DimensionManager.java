@@ -233,6 +233,13 @@ public class DimensionManager implements IGalaxy {
         dimensionList.put(dimId, properties);
     }
 
+    /** Command-time refresh includes moons inheriting their parent's orbital distance. */
+    public void refreshTerraformingBiomes() {
+        for (DimensionProperties properties : dimensionList.values()) {
+            properties.refreshExistingTerraformingBiomes();
+        }
+    }
+
     /**
      * Iterates though the list of existing dimIds, and returns the closest free id greater than two
      *
@@ -497,6 +504,11 @@ public class DimensionManager implements IGalaxy {
             }
         }
         dimensionList.remove(dimId);
+        // This method also serves client deletion packets; only the server owns terraforming work.
+        net.minecraft.server.MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != null && server.isCallingFromMinecraftThread() && proxylists != null) {
+            proxylists.removeDimension(dimId);
+        }
 
         //Delete World Folder
         File file = new File(getCurrentSaveRootDirectory(), workingPath + "/DIM" + dimId);

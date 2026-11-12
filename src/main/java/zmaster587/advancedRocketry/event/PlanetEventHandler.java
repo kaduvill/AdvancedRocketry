@@ -552,6 +552,7 @@ public class PlanetEventHandler {
 
     @SubscribeEvent
     public void onChunkLoad(ChunkEvent.Load event) {
+        if (event.getWorld().isRemote) return;
         DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).add_chunk_to_terraforming_list(event.getChunk());
     }
 

@@ -30,11 +30,11 @@ public class ChunkManagerPlanet extends BiomeProvider {
     private GenLayer genBiomes;
     private List<BiomeEntry> biomes;
 
-    private void setup(long seed, WorldType default1, String str, DimensionProperties properties){
+    private void setup(long seed, WorldType default1, String str, boolean hasRivers){
         this.biomeCache = new BiomeCache(this);//new BiomeCacheExtended(this);
         //TODO: more biomes
         //TODO: remove rivers - why?
-        GenLayer[] agenlayer = initializeAllBiomeGenerators(seed, default1, str, properties, this.biomes);
+        GenLayer[] agenlayer = initializeAllBiomeGenerators(seed, default1, str, hasRivers, this.biomes);
         agenlayer = getModdedBiomeGenerators(default1, seed, agenlayer);
         this.genBiomes = agenlayer[0];
         this.biomeIndexLayer = agenlayer[1];
@@ -55,10 +55,14 @@ public class ChunkManagerPlanet extends BiomeProvider {
         this.str = str;
         this.properties = properties;
         this.biomes = properties.getBiomes();
-        this.setup(seed, default1, str, properties);
+        this.setup(seed, default1, str, properties.hasRivers());
     }
 
     public ChunkManagerPlanet(World world, String str, List<BiomeEntry> biomes) {
+        this(world, str, biomes, DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).hasRivers());
+    }
+
+    public ChunkManagerPlanet(World world, String str, List<BiomeEntry> biomes, boolean hasRivers) {
         this.seed = world.getSeed();
         this.default1 = AdvancedRocketry.planetWorldType;
         this.str = str;
@@ -66,7 +70,7 @@ public class ChunkManagerPlanet extends BiomeProvider {
         this.biomes = biomes;
 
         // World must already be registered with DimensionManager.
-        this.setup(this.seed, this.default1, this.str, this.properties);
+        this.setup(this.seed, this.default1, this.str, hasRivers);
     }
 
     /**
@@ -74,11 +78,10 @@ public class ChunkManagerPlanet extends BiomeProvider {
      * first.
      */
     public static GenLayer[] initializeAllBiomeGenerators(long seed, WorldType worldType, String generatorOptions, DimensionProperties properties) {
-        return initializeAllBiomeGenerators(seed, worldType, generatorOptions, properties, properties.getBiomes());
+        return initializeAllBiomeGenerators(seed, worldType, generatorOptions, properties.hasRivers(), properties.getBiomes());
     }
 
-    private static GenLayer[] initializeAllBiomeGenerators(long seed, WorldType p_180781_2_, String p_180781_3_, DimensionProperties properties, List<BiomeEntry> biomeEntries) {
-        boolean hasRivers = properties.hasRivers();
+    private static GenLayer[] initializeAllBiomeGenerators(long seed, WorldType p_180781_2_, String p_180781_3_, boolean hasRivers, List<BiomeEntry> biomeEntries) {
 
         GenLayer genlayer = new GenLayerIsland(1L);
         genlayer = new GenLayerFuzzyZoom(2000L, genlayer);

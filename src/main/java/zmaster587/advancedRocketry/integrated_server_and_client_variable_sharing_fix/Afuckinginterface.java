@@ -21,6 +21,10 @@ public interface Afuckinginterface {
 
     public boolean isinitialized(int dim);
 
+    public dimensionTerraformingInfo getTerraformingInfo(int dim);
+
+    public void removeDimension(int dim);
+
     public List<BlockPos> getProtectingBlocksForDimension(int dim);
 
     public void setProtectingBlocksForDimension(int dim, ArrayList<BlockPos> blocks);

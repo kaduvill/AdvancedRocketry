@@ -21,6 +21,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.*;
@@ -30,6 +31,7 @@ import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.integrated_server_and_client_variable_sharing_fix.Afuckinginterface;
+import zmaster587.advancedRocketry.integrated_server_and_client_variable_sharing_fix.dimensionTerraformingInfo;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketDimInfo;
 import zmaster587.advancedRocketry.network.PacketSatellite;
@@ -236,36 +238,61 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void load_terraforming_helper(boolean reset) {
-        if (!net.minecraftforge.common.DimensionManager.getWorld(getId()).isRemote) {
+        refreshTerraformingHelper(reset, true);
+    }
 
-            if (!proxylists.isinitialized(getId())){
-                proxylists.initdim(getId());
-            }
+    /** Recheck admin edits without starting terraforming on an untouched planet. */
+    public void refreshExistingTerraformingBiomes() {
+        refreshTerraformingHelper(false, false);
+    }
 
-            getAverageTemp();
-            if (reset) {
-                proxylists.getChunksFullyTerraformed(getId()).clear();
-                proxylists.getChunksFullyBiomeChanged(getId()).clear();
-                terraformingChunksAlreadyAdded.clear();
-            }
-
-            System.out.println("load helper with protecting blocks: " + proxylists.getProtectingBlocksForDimension(getId()).size() + " (" + reset + ")");
-
-            List<Biome> targetBiomes = getViableBiomes(false);
-            proxylists.sethelper(getId(), new TerraformingHelper(getId(), getBiomesEntries(targetBiomes), proxylists.getChunksFullyTerraformed(getId()), proxylists.getChunksFullyBiomeChanged(getId())));
-
-            System.out.println("num biomes: "+ targetBiomes.size());
-
-            Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
-            System.out.println("add chunks to tf list");
-            if (!list.isEmpty()) {
-                for (Chunk chunk : list) {
-                    add_chunk_to_terraforming_list(chunk);
-                }
-            }
-            System.out.println("ok!");
+    private void refreshTerraformingHelper(boolean reset, boolean initialize) {
+        if (!FMLCommonHandler.instance().getEffectiveSide().isServer()) return;
+        dimensionTerraformingInfo info = proxylists.getTerraformingInfo(getId());
+        if (!initialize && (info == null || info.biomeState == null && info.terraformingHelper == null)) return;
+        if (info == null) {
+            proxylists.initdim(getId());
+            info = proxylists.getTerraformingInfo(getId());
         }
 
+        int temperature = getAverageTemp();
+        BiomeClimate climate = getBiomeClimate(temperature);
+        boolean highPressure = climate != BiomeClimate.EMPTY && hasHighPressureBiomes(temperature);
+        boolean rivers = hasRivers(temperature);
+        int profile = climate.ordinal() | (highPressure ? 8 : 0) | (rivers ? 16 : 0);
+        ARConfiguration config = ARConfiguration.getCurrentConfig();
+        TerraformingBiomeState previous = info.biomeState;
+        TerraformingBiomeState targets = previous;
+        if (targets == null || !targets.matchesClimate(profile, config.maxBiomesPerPlanet, config.allowNonArBiomesInTerraforming)) {
+            targets = TerraformingBiomeState.reconcile(previous, collectViableBiomes(climate, false),
+                    highPressure ? AdvancedRocketryBiomes.instance.getHighPressureBiomes() : Collections.emptyList(),
+                    config.maxBiomesPerPlanet, rivers, profile, config.allowNonArBiomesInTerraforming);
+        }
+        boolean changed = previous != null && targets != previous;
+        if (!reset && targets == previous && info.terraformingHelper != null) return;
+
+        net.minecraft.world.WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
+        TerraformingHelper helper = null;
+        if (world != null && !world.isRemote) {
+            // Construct successfully before replacing the old targets or clearing their progress.
+            helper = new TerraformingHelper(getId(), targets.getBiomes(),
+                    reset || changed ? Collections.emptySet() : info.terraformingChunksDone,
+                    reset || changed ? Collections.emptySet() : info.biomeChangingChunksDone,
+                    world, targets.hasRivers());
+        }
+        if (reset || changed) {
+            info.terraformingChunksDone.clear();
+            info.biomeChangingChunksDone.clear();
+        }
+        info.biomeState = targets;
+        info.terraformingHelper = helper;
+        terraformingChunksAlreadyAdded.clear();
+        if (helper != null) {
+            terraformingChunksAlreadyAdded = helper.registeredChunks;
+            for (Chunk chunk : world.getChunkProvider().getLoadedChunks()) {
+                add_chunk_to_terraforming_list(chunk);
+            }
+        }
     }
 
     public void registerProtectingBlock(BlockPos p) {
@@ -303,11 +330,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         proxylists.gethelper(getId()).add_position_to_queue(p);
     }
     public void add_chunk_to_terraforming_list_but_this_time_real_terraforming_and_not_biomechanging(ChunkPos pos){
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                    add_block_to_terraforming_queue(new BlockPos(pos.x * 16 + x, 0, pos.z * 16 + z));
-            }
-        }
+        proxylists.gethelper(getId()).add_chunk_to_queue(pos);
     }
 
     public void add_block_to_biomechanging_queue(BlockPos p) {
@@ -315,6 +338,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     synchronized boolean chunk_was_added_to_terraforming_list_if_not_add_it(ChunkPos pos){
+        // Planet metadata may be replaced by client packets; registration belongs to the work.
+        terraformingChunksAlreadyAdded = proxylists.gethelper(getId()).registeredChunks;
         for (ChunkPos i : terraformingChunksAlreadyAdded) {
             if (pos.x == i.x && pos.z == i.z) {
                 return true;
@@ -328,6 +353,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     //adds it to be biomechanged by default
     //if it already was biomechanged fully, add it directly to terraforming queue
     public void add_chunk_to_terraforming_list(Chunk chunk) {
+        if (chunk.getWorld().isRemote || chunk.getWorld().provider.getDimension() != getId()) return;
 
         if (proxylists.gethelper(getId()) != null) {
 
@@ -817,7 +843,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         this.atmosphereDensity = atmosphereDensity;
         atmosphereOverride = true;
 
-        load_terraforming_helper(true);
+        load_terraforming_helper(false);
 
 
         // Pressure changes do not need a JEI refresh; displayed icons can update later.
@@ -1147,7 +1173,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if this dimension is allowed to have rivers
      */
     public boolean hasRivers() {
-        return hasRivers || (AtmosphereTypes.getAtmosphereTypeFromValue(originalAtmosphereDensity).compareTo(AtmosphereTypes.LOW) <= 0 && Temps.getTempFromValue(getAverageTemp()).isInRange(Temps.COLD, Temps.HOT));
+        return hasRivers || (originalAtmosphereDensity > AtmosphereTypes.LOW.value && hasRivers(getAverageTemp()));
+    }
+
+    private boolean hasRivers(int temperature) {
+        return hasRivers || (originalAtmosphereDensity > AtmosphereTypes.LOW.value
+                && temperature >= Temps.COLD.temp && temperature < Temps.TOOHOT.temp);
     }
 
 
@@ -1196,86 +1227,80 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return a list of biomes allowed to spawn in this dimension
      */
     public List<Biome> getViableBiomes(boolean not_terraforming) {
-        List<Biome> viableBiomes = new ArrayList<>();
+        if (!hasSurface()) return new ArrayList<>();
 
-        if (!hasSurface()) {
-            return viableBiomes;
-        }
-
-        Random random = new Random(System.nanoTime());
-
-        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0 && not_terraforming) {
-            List<Biome> list = new LinkedList<>(AdvancedRocketryBiomes.instance.getSingleBiome());
-
-            while (list.size() > 1) {
-                Biome biome = list.get(random.nextInt(list.size()));
-                Temps temp = Temps.getTempFromValue(averageTemperature);
-                if ((biome.getTempCategory() == TempCategory.COLD && temp.isInRange(Temps.FRIGID, Temps.NORMAL)) ||
-                        ((biome.getTempCategory() == TempCategory.MEDIUM || biome.getTempCategory() == TempCategory.OCEAN) &&
-                                temp.isInRange(Temps.COLD, Temps.HOT)) ||
-                        (biome.getTempCategory() == TempCategory.WARM && temp.isInRange(Temps.NORMAL, Temps.HOT))) {
-                    viableBiomes.add(biome);
-                    return viableBiomes;
-                }
-                list.remove(biome);
-            }
-        }
-
-
-        if (atmosphereDensity <= AtmosphereTypes.LOW.value) {
-            viableBiomes.add(AdvancedRocketryBiomes.moonBiome);
-            viableBiomes.add(AdvancedRocketryBiomes.moonBiomeDark);
-        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.TOOHOT)) {
-            viableBiomes.add(AdvancedRocketryBiomes.hotDryBiome);
-            viableBiomes.add(AdvancedRocketryBiomes.volcanic);
-            viableBiomes.add(AdvancedRocketryBiomes.volcanicBarren);
-//            viableBiomes.add(Biomes.HELL);
-        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.HOT)) {
-
-            for (Biome biome : Biome.REGISTRY) {
-                if (biome != null && (BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) || BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OCEAN)) && !isBiomeblackListed(biome, not_terraforming)) {
-                    viableBiomes.add(biome);
-                }
-            }
-        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.NORMAL)) {
-            for (Biome biome : Biome.REGISTRY) {
-                if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.COLD) && !isBiomeblackListed(biome, not_terraforming)) {
-                    viableBiomes.add(biome);
-                }
-            }
-            //if (not_terraforming)
-            //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
-        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.COLD)) {
-            for (Biome biome : Biome.REGISTRY) {
-                if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) && !isBiomeblackListed(biome, not_terraforming)) {
-                    viableBiomes.add(biome);
-                }
-            }
-            //if (not_terraforming)
-            //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
-        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.FRIGID)) {
-
-            for (Biome biome : Biome.REGISTRY) {
-                if (biome != null && BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.COLD) && !isBiomeblackListed(biome, not_terraforming)) {
-                    viableBiomes.add(biome);
-                }
-            }
-        } else {
-            for (Biome biome : Biome.REGISTRY) {
-                if (biome != null && BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.COLD) && !isBiomeblackListed(biome, not_terraforming)) {
-                    viableBiomes.add(biome);
+        if (not_terraforming && atmosphereDensity > AtmosphereTypes.LOW.value) {
+            Random random = new Random(System.nanoTime());
+            if (random.nextInt(3) == 0) {
+                List<Biome> list = new LinkedList<>(AdvancedRocketryBiomes.instance.getSingleBiome());
+                while (list.size() > 1) {
+                    Biome biome = list.get(random.nextInt(list.size()));
+                    Temps temp = Temps.getTempFromValue(averageTemperature);
+                    if ((biome.getTempCategory() == TempCategory.COLD && temp.isInRange(Temps.FRIGID, Temps.NORMAL)) ||
+                            ((biome.getTempCategory() == TempCategory.MEDIUM || biome.getTempCategory() == TempCategory.OCEAN) &&
+                                    temp.isInRange(Temps.COLD, Temps.HOT)) ||
+                            (biome.getTempCategory() == TempCategory.WARM && temp.isInRange(Temps.NORMAL, Temps.HOT))) {
+                        List<Biome> singleBiome = new ArrayList<>(1);
+                        singleBiome.add(biome);
+                        return singleBiome;
+                    }
+                    list.remove(biome);
                 }
             }
         }
 
+        List<Biome> viableBiomes = collectViableBiomes(getBiomeClimate(averageTemperature), not_terraforming);
         int maxBiomesPerPlanet = ARConfiguration.getCurrentConfig().maxBiomesPerPlanet;
         if (viableBiomes.size() > maxBiomesPerPlanet) {
             viableBiomes = ZUtils.copyRandomElements(viableBiomes, maxBiomesPerPlanet);
         }
-
-        if (atmosphereDensity > AtmosphereTypes.HIGHPRESSURE.value && Temps.getTempFromValue(averageTemperature).isInRange(Temps.NORMAL, Temps.HOT))
+        if (hasHighPressureBiomes(averageTemperature))
             viableBiomes.addAll(AdvancedRocketryBiomes.instance.getHighPressureBiomes());
+        return viableBiomes;
+    }
 
+    private enum BiomeClimate { EMPTY, MOON, TOOHOT, HOT, NORMAL, COLD, FROZEN }
+
+    private BiomeClimate getBiomeClimate(int temperature) {
+        if (!hasSurface()) return BiomeClimate.EMPTY;
+        if (atmosphereDensity <= AtmosphereTypes.LOW.value) return BiomeClimate.MOON;
+        if (temperature >= Temps.TOOHOT.temp) return BiomeClimate.TOOHOT;
+        if (temperature >= Temps.HOT.temp) return BiomeClimate.HOT;
+        if (temperature >= Temps.NORMAL.temp) return BiomeClimate.NORMAL;
+        if (temperature >= Temps.COLD.temp) return BiomeClimate.COLD;
+        return BiomeClimate.FROZEN;
+    }
+
+    private boolean hasHighPressureBiomes(int temperature) {
+        return atmosphereDensity > AtmosphereTypes.HIGHPRESSURE.value
+                && temperature >= Temps.NORMAL.temp && temperature < Temps.TOOHOT.temp;
+    }
+
+    /** Uncapped candidates: selection must not randomly disqualify an existing target. */
+    private List<Biome> collectViableBiomes(BiomeClimate climate, boolean notTerraforming) {
+        List<Biome> viableBiomes = new ArrayList<>();
+        switch (climate) {
+            case EMPTY: return viableBiomes;
+            case MOON:
+                viableBiomes.add(AdvancedRocketryBiomes.moonBiome);
+                viableBiomes.add(AdvancedRocketryBiomes.moonBiomeDark);
+                return viableBiomes;
+            case TOOHOT:
+                viableBiomes.add(AdvancedRocketryBiomes.hotDryBiome);
+                viableBiomes.add(AdvancedRocketryBiomes.volcanic);
+                viableBiomes.add(AdvancedRocketryBiomes.volcanicBarren);
+                return viableBiomes;
+            default:
+                for (Biome biome : Biome.REGISTRY) {
+                    if (biome == null || isBiomeblackListed(biome, notTerraforming)) continue;
+                    Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(biome);
+                    boolean eligible = climate == BiomeClimate.HOT ? types.contains(BiomeDictionary.Type.HOT) || types.contains(BiomeDictionary.Type.OCEAN)
+                            : climate == BiomeClimate.NORMAL ? !types.contains(BiomeDictionary.Type.COLD)
+                            : climate == BiomeClimate.COLD ? !types.contains(BiomeDictionary.Type.HOT)
+                            : types.contains(BiomeDictionary.Type.COLD);
+                    if (eligible) viableBiomes.add(biome);
+                }
+        }
         return viableBiomes;
     }
 
@@ -1815,6 +1840,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         if (!proxylists.isinitialized(dimid)){
             proxylists.initdim(dimid);
         }
+        proxylists.getTerraformingInfo(dimid).biomeState = TerraformingBiomeState.readFromNBT(nbt);
 
         if (nbt.hasKey("fullyGeneratedChunks")) {
 
@@ -1886,6 +1912,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         if (!proxylists.isinitialized(dimid)){
             return;
         }
+        TerraformingBiomeState targets = proxylists.getTerraformingInfo(dimid).biomeState;
+        if (targets != null) targets.writeToNBT(nbt);
         NBTTagList list = new NBTTagList();
         for (ChunkPos pos : proxylists.getChunksFullyTerraformed(dimid)) {
             NBTTagCompound entry = new NBTTagCompound();

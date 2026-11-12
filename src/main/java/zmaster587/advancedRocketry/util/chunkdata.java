@@ -85,6 +85,7 @@ public class chunkdata {
 
 
     public void set_position_biomechanged(int x, int z){
+        if (chunk_fully_biomechanged) return;
         fully_biomechanged[x][z] = true;
         boolean all_generated = true;
         for (int i = 0; i < 16; i++) {

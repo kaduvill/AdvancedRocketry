@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.integrated_server_and_client_variable_sharin
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
+import zmaster587.advancedRocketry.util.TerraformingBiomeState;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,4 +14,5 @@ public class dimensionTerraformingInfo{
     public HashSet<ChunkPos> terraformingChunksDone;
     public HashSet<ChunkPos> biomeChangingChunksDone;
     public TerraformingHelper terraformingHelper;
+    public TerraformingBiomeState biomeState;
 }
