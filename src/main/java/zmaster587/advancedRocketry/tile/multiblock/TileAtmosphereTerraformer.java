@@ -296,8 +296,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         workedThisTick = false;
         super.update();
         if (world.isRemote) {
-            if (isWorking())
-                spawnGasParticles();
+            spawnGasParticles();
         } else {
             // Publish once after processing so cycle completion cannot flicker the active state.
             setMachineRunning(workedThisTick && getMachineEnabled());
@@ -305,9 +304,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     }
 
     public boolean isWorking() {
-        if (world == null)
-            return false;
-        IBlockState state = world.getBlockState(pos);
+        return world != null && isWorking(world.getBlockState(pos));
+    }
+
+    private static boolean isWorking(IBlockState state) {
         return state.getBlock() instanceof BlockAtmosphereTerraformer && state.getValue(BlockTile.STATE);
     }
 
@@ -377,7 +377,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @SideOnly(Side.CLIENT)
     private void spawnGasParticles() {
         if (Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
-            EnumFacing dir = RotatableBlock.getFront(world.getBlockState(pos)).getOpposite();
+            IBlockState state = world.getBlockState(pos);
+            if (!isWorking(state))
+                return;
+            EnumFacing dir = RotatableBlock.getFront(state).getOpposite();
             BlockPos offsetPos = pos.offset(dir);
 
             for (int i = 0; i < 3; i++) {
@@ -419,23 +422,33 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                 requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
             }
 
+            FluidStack nitrogenRequest = null;
+            FluidStack oxygenRequest = null;
             for (IFluidHandler handler : fluidInPorts) {
-                FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
+                if (requiredN2 == 0 && requiredO2 == 0)
+                    break;
 
-                if (fStack != null)
-                    requiredN2 -= fStack.amount;
+                if (requiredN2 > 0) {
+                    if (nitrogenRequest == null)
+                        nitrogenRequest = new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2);
+                    else
+                        nitrogenRequest.amount = requiredN2;
+                    FluidStack drained = handler.drain(nitrogenRequest, true);
+                    if (drained != null)
+                        requiredN2 -= drained.amount;
+                }
 
-                fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidOxygen, requiredO2), true);
-
-                if (fStack != null)
-                    requiredO2 -= fStack.amount;
+                if (requiredO2 > 0) {
+                    if (oxygenRequest == null)
+                        oxygenRequest = new FluidStack(AdvancedRocketryFluids.fluidOxygen, requiredO2);
+                    else
+                        oxygenRequest.amount = requiredO2;
+                    FluidStack drained = handler.drain(oxygenRequest, true);
+                    if (drained != null)
+                        requiredO2 -= drained.amount;
+                }
             }
-
-            if (requiredN2 != 0 || requiredO2 != 0) {
-                setOOF(true);
-            } else {
-                setOOF(false);
-            }
+            setOOF(requiredN2 != 0 || requiredO2 != 0);
         } else {
             setOOF(false);
         }

@@ -66,6 +66,9 @@ public class PlanetSetCommand extends ARCommand {
                 throw wrongUsage(sender);
             }
             int atmosphereDensity = parseInt(args[argsOffset]);
+            if (props == DimensionManager.defaultSpaceDimensionProperties) {
+                throw invalidValue("Dimension", dimId);
+            }
             props.setAtmosphereDensityDirect(atmosphereDensity);
             props.setAtmosphereOverride(true);
             props.getAverageTemp();
