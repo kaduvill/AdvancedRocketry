@@ -512,6 +512,25 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public ModuleBase createScrollListPan(int baseX, int baseY, List<ModuleBase> list,
+                                          int sizeX, int sizeY, int contentHeight) {
+        return new ModuleContainerPanYOnlyWithScrollCache(baseX, baseY, list, new LinkedList<>(), null,
+                sizeX, sizeY, 0, 0, 1, 1) {
+            {
+                containerSizeX = 0;
+                containerSizeY = Math.max(0, contentHeight - screenSizeY);
+            }
+
+            @Override
+            protected void setUpScissor(net.minecraft.client.gui.inventory.GuiContainer gui,
+                                        int x, int y, int width, int height) {
+                // LV passes the pane's right/bottom coordinates as its clip dimensions.
+                super.setUpScissor(gui, x, y, screenSizeX, screenSizeY);
+            }
+        };
+    }
+
+    @Override
     public void clearScrollCache() {
         ModuleContainerPanYOnlyWithScrollCache.clearScrollCache();
     }

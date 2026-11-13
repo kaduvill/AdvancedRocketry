@@ -36,6 +36,18 @@ public class CommonProxy {
                 0, -48, 0, 72);
     }
 
+    public ModuleBase createScrollListPan(int baseX, int baseY, List<ModuleBase> list,
+                                          int sizeX, int sizeY, int contentHeight) {
+        return new ModuleContainerPanYOnly(baseX, baseY, list, new LinkedList<>(), null,
+                sizeX, sizeY, 0, 0, 1, 1) {
+            {
+                // The LV constructor treats a zero bound as a request to autosize.
+                containerSizeX = 0;
+                containerSizeY = Math.max(0, contentHeight - screenSizeY);
+            }
+        };
+    }
+
     /** Generic clear for any UI scroll cache (no-op on server) */
     public void clearScrollCache() {
         // no-op on server/common

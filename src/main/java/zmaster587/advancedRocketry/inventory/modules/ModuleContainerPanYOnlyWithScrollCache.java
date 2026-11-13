@@ -140,7 +140,7 @@ public class ModuleContainerPanYOnlyWithScrollCache extends ModuleContainerPanYO
     @SideOnly(Side.CLIENT)
     public void renderBackground(GuiContainer gui, int x, int y, int mouseX, int mouseY, FontRenderer font) {
         // Remember the GUI we’re rendering in so the event handler can filter by current screen
-        this.lastGui = new WeakReference<>(gui);
+        if (lastGui.get() != gui) this.lastGui = new WeakReference<>(gui);
 
         // >>> Capture guiLeft/guiTop from the parameters
         this.lastGuiLeft = x;

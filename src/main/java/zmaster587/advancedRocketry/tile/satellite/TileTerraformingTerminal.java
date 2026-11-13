@@ -1,16 +1,25 @@
 package zmaster587.advancedRocketry.tile.satellite;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
@@ -20,20 +29,26 @@ import zmaster587.advancedRocketry.block.BlockTileTerraformer;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.inventory.modules.ModuleSatellite;
+import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.ItemBiomeChanger;
 import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.util.BiomeHandler;
 import zmaster587.advancedRocketry.util.BiomeUpdateBatch;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
+import zmaster587.advancedRocketry.util.TerraformingBiomeState;
 import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergy;
+import zmaster587.libVulpes.gui.CommonResources;
+import zmaster587.libVulpes.inventory.GuiHandler;
+import zmaster587.libVulpes.inventory.GuiModular;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.TileInventoriedRFConsumer;
 import zmaster587.libVulpes.util.INetworkMachine;
+import zmaster587.libVulpes.util.IconResource;
 import zmaster587.libVulpes.cap.TeslaHandler;
 
 import javax.annotation.Nonnull;
@@ -42,10 +57,25 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Locale;
 
-public class TileTerraformingTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory {
+public class TileTerraformingTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory, IGuiCallback, IDataSync {
+
+    private static final byte TAB_SWITCH = 23, CLIMATE_INFO = 24, REQUEST_CLIMATE_INFO = 25;
 
     private ModuleText moduleText;
+    private ModuleText climateInfoText;
+    private Container climateContainer;
+    private int requestedTab;
+    private int requestedWindowId;
+    private NBTTagCompound climateInfo;
+    private int climateRevision = -1;
+    private int requestedClimateRevision = -1;
+    private long lastClimateCheck = Long.MIN_VALUE;
+    private TerraformingBiomeState climateTargets;
     public boolean was_enabled_last_tick;
     private int sat_power_per_tick;
     private float randomblocks_per_tick;
@@ -96,6 +126,15 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         if (packetId == (byte) 22) {
             out.writeInt(sat_power_per_tick);
             out.writeFloat(randomblocks_per_tick);
+        } else if (packetId == TAB_SWITCH) {
+            out.writeByte(requestedTab);
+            out.writeInt(requestedWindowId);
+        } else if (packetId == CLIMATE_INFO) {
+            out.writeInt(climateRevision);
+            out.writeInt(climateInfo.getInteger("pressure"));
+            out.writeInt(climateInfo.getInteger("temperature"));
+            out.writeByte(climateInfo.getByte("climate"));
+            new PacketBuffer(out).writeVarIntArray(climateInfo.getIntArray("biomes"));
         }
     }
 
@@ -105,6 +144,15 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         if (packetId == (byte) 22) {
             nbt.setInteger("powergen", in.readInt());
             nbt.setFloat("blockpertick", in.readFloat());
+        } else if (packetId == TAB_SWITCH) {
+            nbt.setByte("tab", in.readByte());
+            nbt.setInteger("window", in.readInt());
+        } else if (packetId == CLIMATE_INFO) {
+            nbt.setInteger("revision", in.readInt());
+            nbt.setInteger("pressure", in.readInt());
+            nbt.setInteger("temperature", in.readInt());
+            nbt.setByte("climate", in.readByte());
+            nbt.setIntArray("biomes", new PacketBuffer(in).readVarIntArray());
         }
     }
 
@@ -114,6 +162,85 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
             this.sat_power_per_tick = nbt.getInteger("powergen");
             this.randomblocks_per_tick = nbt.getFloat("blockpertick");
             this.updateInventoryInfo();
+        } else if (side == Side.SERVER && player.world == world && isUsableByPlayer(player)) {
+            if (id == TAB_SWITCH) {
+                int tab = nbt.getByte("tab");
+                if ((tab == 0 || tab == 1) && player.openContainer.windowId == nbt.getInteger("window"))
+                    player.openGui(LibVulpes.instance, (tab == 1 ? GuiHandler.guiId.MODULARNOINV
+                            : GuiHandler.guiId.MODULAR).ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
+            } else if (id == REQUEST_CLIMATE_INFO) {
+                refreshClimateInfo();
+                PacketHandler.sendToPlayer(new PacketMachine(this, CLIMATE_INFO), player);
+            }
+        } else if (side == Side.CLIENT && id == CLIMATE_INFO) {
+            receiveClimateInfo(nbt);
+        }
+    }
+
+    private void refreshClimateInfo() {
+        long now = world.getTotalWorldTime();
+        if (climateInfo != null && now >= lastClimateCheck && now - lastClimateCheck < 20) return;
+        lastClimateCheck = now;
+
+        DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
+        int temperature = properties.getAverageTemp();
+        DimensionProperties.BiomeClimate climate = properties.getBiomeClimate(temperature);
+        TerraformingBiomeState targets = properties.getOrCreateTerraformingBiomeTargets(temperature);
+        int[] biomes;
+        if (targets != climateTargets) {
+            biomes = targets.getBiomes().stream().mapToInt(entry -> Biome.getIdForBiome(entry.biome))
+                    .filter(id -> id >= 0).distinct().sorted().toArray();
+            climateTargets = targets;
+        } else {
+            biomes = climateInfo.getIntArray("biomes");
+        }
+        if (climateInfo != null && climateInfo.getInteger("pressure") == properties.getAtmosphereDensity()
+                && climateInfo.getInteger("temperature") == temperature
+                && climateInfo.getByte("climate") == climate.ordinal()
+                && Arrays.equals(climateInfo.getIntArray("biomes"), biomes)) return;
+
+        climateInfo = new NBTTagCompound();
+        climateInfo.setInteger("pressure", properties.getAtmosphereDensity());
+        climateInfo.setInteger("temperature", temperature);
+        climateInfo.setByte("climate", (byte) climate.ordinal());
+        climateInfo.setIntArray("biomes", biomes);
+        climateRevision = (climateRevision + 1) & 0x7fff; // Container properties are signed shorts.
+    }
+
+    @Override
+    public int getData(int id) {
+        if (!world.isRemote) refreshClimateInfo();
+        return climateRevision;
+    }
+
+    @Override
+    public void setData(int id, int value) {
+        if (world.isRemote) requestClimateInfo(value);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void requestClimateInfo(int revision) {
+        climateContainer = Minecraft.getMinecraft().player.openContainer;
+        if ((climateInfo == null || climateRevision != revision) && requestedClimateRevision != revision) {
+            requestedClimateRevision = revision;
+            PacketHandler.sendToServer(new PacketMachine(this, REQUEST_CLIMATE_INFO));
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void receiveClimateInfo(NBTTagCompound info) {
+        boolean listChanged = climateInfo == null
+                || !Arrays.equals(climateInfo.getIntArray("biomes"), info.getIntArray("biomes"));
+        climateInfo = info;
+        climateRevision = info.getInteger("revision");
+        Minecraft mc = Minecraft.getMinecraft();
+        if (climateInfoText == null || !(mc.currentScreen instanceof GuiModular)
+                || mc.player.openContainer != climateContainer) return;
+        if (listChanged) {
+            // Rebuild the list only when its contents change, retaining the standard scroll cache.
+            sendTabRequest(1);
+        } else {
+            climateInfoText.setText(getClimateText());
         }
     }
 
@@ -274,18 +401,114 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-
+        boolean climateView = ID == GuiHandler.guiId.MODULARNOINV.ordinal();
         List<ModuleBase> modules = new LinkedList<>();
-        ModuleSatellite moduleSatellite = new ModuleSatellite(152, 10, this, 0);
-        modules.add(moduleSatellite);
+        if (!climateView) modules.add(new ModuleSatellite(152, 10, this, 0));
 
-        moduleText = new ModuleText(5, 20, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.nolink"), 0x404040);
-        modules.add(moduleText);
+        ModuleTab tabs = new ModuleTab(4, 0, 0, this, 2, new String[]{
+                LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.operation"),
+                LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.climate")
+        }, new ResourceLocation[][]{TextureResources.tabData, TextureResources.tabPlanet});
+        tabs.setTab(climateView ? 1 : 0);
+        modules.add(tabs);
 
-        updateInventoryInfo();
+        moduleText = null;
+        climateInfoText = null;
+        if (climateView) {
+            modules.add(new ModuleSync(0, this));
+            if (world.isRemote) addClimateModules(modules);
+        } else {
+            moduleText = new ModuleText(5, 20, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.nolink"), 0x404040);
+            modules.add(moduleText);
+            updateInventoryInfo();
+        }
         return modules;
     }
 
+    @SideOnly(Side.CLIENT)
+    private void addClimateModules(List<ModuleBase> modules) {
+        // Use the Orbital Registry's extended background and AR window frames.
+        modules.add(new ModuleImage(173, 0, new IconResource(98, 0, 78, 86, CommonResources.genericBackground)));
+        modules.add(new ModuleImage(173, 86, new IconResource(98, 3, 78, 82, CommonResources.genericBackground)));
+        modules.add(new ModuleImage(173, 168, new IconResource(98, 168, 78, 3, CommonResources.genericBackground)));
+        final int top = 44, height = 96, listX = 106, listWidth = 138;
+        for (int pane = 0; pane < 2; pane++) {
+            int x = pane == 0 ? 6 : listX;
+            int width = pane == 0 ? 94 : listWidth;
+            modules.add(new ModuleScaledImage(x - 3, top - 3, 3, height + 6, TextureResources.verticalBar));
+            modules.add(new ModuleScaledImage(x + width, top - 3, -3, height + 6, TextureResources.verticalBar));
+            modules.add(new ModuleScaledImage(x, top - 3, width, 3, TextureResources.horizontalBar));
+            modules.add(new ModuleScaledImage(x, top + height, width, -3, TextureResources.horizontalBar));
+        }
+        modules.add(new ModuleText(9, 31, LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.current"), 0x404040));
+        climateInfoText = new ModuleText(9, top + 3, getClimateText(), 0x404040);
+        modules.add(climateInfoText);
+
+        List<Biome> biomes = new ArrayList<>();
+        if (climateInfo != null) {
+            for (int id : climateInfo.getIntArray("biomes")) {
+                Biome biome = Biome.getBiome(id);
+                if (biome != null) biomes.add(biome);
+            }
+        }
+        biomes.sort(Comparator.comparing(AdvancedRocketry.proxy::getNameFromBiome, String.CASE_INSENSITIVE_ORDER));
+        String heading = climateInfo == null ? LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.climate")
+                : I18n.format("msg.terraformingterminal.targets", biomes.size());
+        modules.add(new ModuleText(listX + 3, 31, heading, 0x404040));
+
+        FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+        List<ModuleBase> rows = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        if (climateInfo == null) names.add(LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.loading"));
+        else {
+            if (biomes.isEmpty()) names.add(LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.empty"));
+            for (Biome biome : biomes) names.add(AdvancedRocketry.proxy.getNameFromBiome(biome));
+        }
+        int y = 3;
+        for (String name : names) {
+            List<String> lines = font.listFormattedStringToWidth(name, listWidth - 8);
+            rows.add(new ModuleText(3, y, String.join("\n", lines), 0x404040));
+            y += lines.size() * font.FONT_HEIGHT + 3;
+        }
+        modules.add(AdvancedRocketry.proxy.createScrollListPan(listX, top, rows, listWidth, height, y));
+    }
+
+    @SideOnly(Side.CLIENT)
+    private String getClimateText() {
+        if (climateInfo == null) return LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.loading");
+        int temperature = climateInfo.getInteger("temperature");
+        DimensionProperties.BiomeClimate climate = DimensionProperties.BiomeClimate.values()[climateInfo.getByte("climate")];
+        String condition = "";
+        if (climate == DimensionProperties.BiomeClimate.MOON)
+            condition = I18n.format("msg.terraformingterminal.lowpressure", String.format(Locale.ROOT, "%.2f",
+                    DimensionProperties.AtmosphereTypes.LOW.getAtmosphereValue() / 100.0));
+        else if (climate == DimensionProperties.BiomeClimate.TOOHOT)
+            condition = I18n.format("msg.terraformingterminal.atleast", climate.minimumTemperature);
+        else if (climate == DimensionProperties.BiomeClimate.FROZEN)
+            condition = I18n.format("msg.terraformingterminal.below", climate.maximumTemperature + 1);
+        else if (climate != DimensionProperties.BiomeClimate.EMPTY)
+            condition = climate.minimumTemperature + " - " + climate.maximumTemperature + " K";
+        return LibVulpes.proxy.getLocalizedString("msg.terraformer.pressure") + "\n"
+                + String.format(Locale.ROOT, "%.2f", climateInfo.getInteger("pressure") / 100.0) + "\n\n"
+                + LibVulpes.proxy.getLocalizedString("data.temperature.name") + "\n" + temperature + " K\n("
+                + (temperature - 273) + " \u00b0C)\n\n"
+                + LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.climate") + "\n"
+                + LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.climate." + climate.name().toLowerCase(Locale.ROOT))
+                + "\n" + condition;
+    }
+
+    @Override
+    public void onModuleUpdated(ModuleBase module) {
+        if (world.isRemote && module instanceof ModuleTab)
+            sendTabRequest(((ModuleTab) module).getTab());
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void sendTabRequest(int tab) {
+        requestedTab = tab;
+        requestedWindowId = Minecraft.getMinecraft().player.openContainer.windowId;
+        PacketHandler.sendToServer(new PacketMachine(this, TAB_SWITCH));
+    }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {

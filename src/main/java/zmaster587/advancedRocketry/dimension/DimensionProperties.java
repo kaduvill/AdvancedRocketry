@@ -246,6 +246,18 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         refreshTerraformingHelper(false, false);
     }
 
+    /** Server-only: select and save missing targets without creating a helper or changing progress. */
+    public TerraformingBiomeState getOrCreateTerraformingBiomeTargets(int temperature) {
+        dimensionTerraformingInfo info = proxylists.getTerraformingInfo(getId());
+        if (info == null) {
+            proxylists.initdim(getId());
+            info = proxylists.getTerraformingInfo(getId());
+        }
+        if (info.biomeState == null)
+            info.biomeState = selectTerraformingBiomes(null, temperature);
+        return info.biomeState;
+    }
+
     private void refreshTerraformingHelper(boolean reset, boolean initialize) {
         if (!FMLCommonHandler.instance().getEffectiveSide().isServer()) return;
         dimensionTerraformingInfo info = proxylists.getTerraformingInfo(getId());
@@ -255,19 +267,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             info = proxylists.getTerraformingInfo(getId());
         }
 
-        int temperature = getAverageTemp();
-        BiomeClimate climate = getBiomeClimate(temperature);
-        boolean highPressure = climate != BiomeClimate.EMPTY && hasHighPressureBiomes(temperature);
-        boolean rivers = hasRivers(temperature);
-        int profile = climate.ordinal() | (highPressure ? 8 : 0) | (rivers ? 16 : 0);
-        ARConfiguration config = ARConfiguration.getCurrentConfig();
         TerraformingBiomeState previous = info.biomeState;
-        TerraformingBiomeState targets = previous;
-        if (targets == null || !targets.matchesClimate(profile, config.maxBiomesPerPlanet, config.allowNonArBiomesInTerraforming)) {
-            targets = TerraformingBiomeState.reconcile(previous, collectViableBiomes(climate, false),
-                    highPressure ? AdvancedRocketryBiomes.instance.getHighPressureBiomes() : Collections.emptyList(),
-                    config.maxBiomesPerPlanet, rivers, profile, config.allowNonArBiomesInTerraforming);
-        }
+        TerraformingBiomeState targets = selectTerraformingBiomes(previous, getAverageTemp());
         boolean changed = previous != null && targets != previous;
         if (!reset && targets == previous && info.terraformingHelper != null) return;
 
@@ -293,6 +294,21 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 add_chunk_to_terraforming_list(chunk);
             }
         }
+    }
+
+    private TerraformingBiomeState selectTerraformingBiomes(TerraformingBiomeState previous, int temperature) {
+        BiomeClimate climate = getBiomeClimate(temperature);
+        boolean highPressure = climate != BiomeClimate.EMPTY && hasHighPressureBiomes(temperature);
+        boolean rivers = hasRivers(temperature);
+        int profile = climate.ordinal() | (highPressure ? 8 : 0) | (rivers ? 16 : 0);
+        ARConfiguration config = ARConfiguration.getCurrentConfig();
+        TerraformingBiomeState targets = previous;
+        if (targets == null || !targets.matchesClimate(profile, config.maxBiomesPerPlanet, config.allowNonArBiomesInTerraforming)) {
+            targets = TerraformingBiomeState.reconcile(previous, collectViableBiomes(climate, false),
+                    highPressure ? AdvancedRocketryBiomes.instance.getHighPressureBiomes() : Collections.emptyList(),
+                    config.maxBiomesPerPlanet, rivers, profile, config.allowNonArBiomesInTerraforming);
+        }
+        return targets;
     }
 
     public void registerProtectingBlock(BlockPos p) {
@@ -1254,9 +1270,24 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         return viableBiomes;
     }
 
-    private enum BiomeClimate { EMPTY, MOON, TOOHOT, HOT, NORMAL, COLD, FROZEN }
+    public enum BiomeClimate {
+        EMPTY(0, 0), MOON(0, 0),
+        TOOHOT(Temps.TOOHOT.temp, Integer.MAX_VALUE),
+        HOT(Temps.HOT.temp, Temps.TOOHOT.temp - 1),
+        NORMAL(Temps.NORMAL.temp, Temps.HOT.temp - 1),
+        COLD(Temps.COLD.temp, Temps.NORMAL.temp - 1),
+        FROZEN(0, Temps.COLD.temp - 1);
 
-    private BiomeClimate getBiomeClimate(int temperature) {
+        public final int minimumTemperature;
+        public final int maximumTemperature;
+
+        BiomeClimate(int minimumTemperature, int maximumTemperature) {
+            this.minimumTemperature = minimumTemperature;
+            this.maximumTemperature = maximumTemperature;
+        }
+    }
+
+    public BiomeClimate getBiomeClimate(int temperature) {
         if (!hasSurface()) return BiomeClimate.EMPTY;
         if (atmosphereDensity <= AtmosphereTypes.LOW.value) return BiomeClimate.MOON;
         if (temperature >= Temps.TOOHOT.temp) return BiomeClimate.TOOHOT;
