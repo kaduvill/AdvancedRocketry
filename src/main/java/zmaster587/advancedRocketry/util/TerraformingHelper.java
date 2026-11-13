@@ -77,23 +77,17 @@ public class TerraformingHelper {
         this.decorationqueue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
 
-        System.out.println("register generated chunks...");
         for (ChunkPos i:generated_chunks){
             chunkdata data = new chunkdata(i.x,i.z,null, this);
             data.chunk_fully_generated = true;
             chunkDataMap.put(new ChunkPos(data.x,data.z), data);
         }
-        System.out.println("register biome changed chunks...");
         for (ChunkPos i:biomechanged_chunks){
-
             generate_new_chunkdata(new ChunkPos(i.x, i.z));
             chunkdata data = getChunkFromList(i.x,i.z);
             data.chunk_fully_biomechanged = true;
         }
-
-        System.out.println("recalculate chunk types...");
         recalculate_chunk_status();
-        System.out.println("ok!");
     }
 
     //0 = no
@@ -182,7 +176,6 @@ public class TerraformingHelper {
                             }
                         }
                     }
-                    System.out.println("border chunk terrain fully generated");
                     data.terrain_fully_generated = true;
                     data.blockStates = null; // no longer needed, gc should collect them now - actually, these are never needed but who cares...
                     check_next_border_chunk_fully_generated(data.x, data.z); // update border chunks next to this one to check if they can decorate
@@ -199,7 +192,6 @@ public class TerraformingHelper {
                 if (getChunkFromList(px+x,pz+z) != null && !getChunkFromList(px+x,pz+z).chunk_fully_generated){
                     if (can_populate(px+x,pz+z) != 0){
                         //re-add all position to queue for decoration
-                        System.out.println("chunk can populate now: "+(px+x)+":"+(pz+z));
                         for (int bx = 0; bx < 16; bx++) {
                             for (int bz = 0; bz < 16; bz++) {
                                 add_position_to_decoration_queue(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
@@ -238,15 +230,10 @@ public class TerraformingHelper {
         Iterator<Map.Entry<ChunkPos, chunkdata>> iterator = chunkDataMap.entrySet().iterator();
 
         while (iterator.hasNext()) {
-
             Map.Entry<ChunkPos, chunkdata> entry = iterator.next();
-
             chunkdata data = entry.getValue();
-
             TerraformingType prevtype = data.type;
-
             data.type = get_chunk_type(data.x, data.z);
-
             if (prevtype != TerraformingType.ALLOWED)
                 if (data.type == TerraformingType.ALLOWED || data.type == TerraformingType.BORDER)
                     if (data.terrain_fully_generated)
@@ -255,16 +242,10 @@ public class TerraformingHelper {
         }
     }
 
-
-
-
-
     public chunkdata getChunkFromList(int x, int z){
         ChunkPos key = new ChunkPos(x,z);
         return chunkDataMap.get(key);
     }
-
-
 
     public synchronized void add_position_to_queue(BlockPos p){
         //System.out.println("add position: "+p.getX()+":"+p.getZ());
@@ -349,9 +330,6 @@ public class TerraformingHelper {
     }
     public void generate_new_chunkdata(ChunkPos cpos){
         chunkdata data;
-
-
-
         data = new chunkdata(cpos.x,cpos.z, null, this);
         data.type = get_chunk_type(data.x,data.z);
         chunkDataMap.put(new ChunkPos(data.x,data.z),data);
@@ -367,11 +345,9 @@ public class TerraformingHelper {
             generator = null;
             world = null;
         }
-
         ChunkPos cpos = getChunkPosFromBlockPos(new BlockPos(x,0,z));
         chunkdata data = getChunkFromList(cpos.x,cpos.z);
         if (data == null){
-            System.out.println("generate new chunk: "+cpos.x+":"+cpos.z);
             generate_new_chunkdata(new ChunkPos(cpos.x, cpos.z));
             data = getChunkFromList(cpos.x,cpos.z);
         }
@@ -381,7 +357,6 @@ public class TerraformingHelper {
                         currentWorld.getWorldInfo().isMapFeaturesEnabled(), currentWorld.getWorldInfo().getGeneratorOptions());
                 world = currentWorld;
             }
-            System.out.println("generate new blockstates: "+cpos.x+":"+cpos.z);
             ChunkPrimer primer = generator.getChunkPrimer(cpos.x, cpos.z, chunkMgrTerraformed);
             IBlockState[][][] blockStates = new IBlockState[16][16][256];
             for (int px = 0; px < 16; px++) {
@@ -401,7 +376,6 @@ public class TerraformingHelper {
 
         return data.blockStates[chunkx][chunkz];
     }
-
 
     public void setChunkFullyGenerated(int x, int z) {
         getChunkFromList(x,z).chunk_fully_generated = true;

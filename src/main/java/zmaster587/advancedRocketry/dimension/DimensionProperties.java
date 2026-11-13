@@ -1877,7 +1877,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 assert entry instanceof NBTTagCompound;
                 int x = ((NBTTagCompound) entry).getInteger("x");
                 int z = ((NBTTagCompound) entry).getInteger("z");
-                System.out.println("Chunk fully terraformed: " + x + ":" + z);
 
                 boolean chunk_was_already_done = false;
                 for (ChunkPos i : proxylists.getChunksFullyTerraformed(dimid)) {
@@ -1888,7 +1887,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 }
                 if (!chunk_was_already_done)
                     proxylists.getChunksFullyTerraformed(dimid).add(new ChunkPos(x, z));
-                else System.out.println("Chunk is already in list: " + x + ":" + z);
             }
         }
 
@@ -1901,7 +1899,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 assert entry instanceof NBTTagCompound;
                 int x = ((NBTTagCompound) entry).getInteger("x");
                 int z = ((NBTTagCompound) entry).getInteger("z");
-                System.out.println("Chunk fully biome changed: " + x + ":" + z);
 
                 boolean chunk_was_already_done = false;
                 for (ChunkPos i : proxylists.getChunksFullyBiomeChanged(dimid)) {
@@ -1912,7 +1909,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 }
                 if (!chunk_was_already_done)
                     proxylists.getChunksFullyBiomeChanged(dimid).add(new ChunkPos(x, z));
-                else System.out.println("Chunk is already in list: " + x + ":" + z);
             }
         }
 
@@ -1927,7 +1923,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 int z = ((NBTTagCompound) entry).getInteger("z");
                 int y = ((NBTTagCompound) entry).getInteger("y");
                 proxylists.getProtectingBlocksForDimension(dimid).add(new BlockPos(x, y, z));
-                System.out.println("read protecting block at " + x + ":" + y + ":" + z + " - - " + proxylists.getProtectingBlocksForDimension(dimid).size());
             }
         }
     }

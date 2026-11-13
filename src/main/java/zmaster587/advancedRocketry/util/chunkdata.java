@@ -12,7 +12,6 @@ public class chunkdata {
 
     // chunk can be populated if itself and the 3 chunks with (x+1), (z+1) and (x+1,z+1) are fully generated in the world
 
-
     // if a chunks terrain is fully generated and does not need any future updates - causes it to set the IBlockState[][][] to null to free memory
     // if the terrain is fully generated it allows for calling populate()
     public boolean terrain_fully_generated;
@@ -20,9 +19,7 @@ public class chunkdata {
     // will be set by BiomeHandler after calling the populate method, makes the chunk fully generated and it does not need any future updates
     // as long as the atmosphere does not change, chunks that are fully generated will not register their blocks in the terraforming queue
     public boolean chunk_fully_generated;
-
     public boolean chunk_populated;
-
     public boolean chunk_fully_biomechanged;
 
     // if the y values of new chunk and chunk in world match, terrain at this position is considered fully generated
@@ -33,7 +30,6 @@ public class chunkdata {
 
     // if all positions have been biomechanged
     public boolean[][] fully_biomechanged;
-
 
     public IBlockState[][][] blockStates;
 
@@ -74,7 +70,6 @@ public class chunkdata {
             }
         }
         if (all_generated){
-            System.out.println("chunk fully generated: "+this.x+":"+this.z);
             terrain_fully_generated = true;
             this.blockStates = null; // no longer needed, gc should collect them now
             helper.check_next_border_chunk_fully_generated(this.x,this.z); // update border chunks next to this one to check if they can decorate
@@ -96,12 +91,9 @@ public class chunkdata {
             }
         }
         if (all_generated){
-            System.out.println("chunk fully biomechanged: "+this.x+":"+this.z);
             chunk_fully_biomechanged = true;
-
-            /// add chunk to terraforming queue now
+            // add chunk to terraforming queue now
             helper.set_chunk_biomechanged(new ChunkPos(this.x, this.z));
-
         }
     }
 
@@ -118,17 +110,7 @@ public class chunkdata {
             //2 times i want more population!
             world.provider.createChunkGenerator().populate(this.x, this.z);
             world.provider.createChunkGenerator().populate(this.x, this.z);
-
-            System.out.println("populate chunk " + this.x + ":" + this.z);
             chunk_populated = true;
-            //make a biome lasers here
-            // no - looks bad
-            //for (int i = 0; i < 32; i++) {
-            //    int bx = world.rand.nextInt(16);
-            //    int bz = world.rand.nextInt(16);
-            //    BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
-            //    PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
-            //}
         }
     }
 
@@ -144,11 +126,7 @@ public class chunkdata {
             }
         }
         if (all_decorated){
-
             helper.setChunkFullyGenerated(this.x,this.z);
         }
-
-
     }
-
 }
