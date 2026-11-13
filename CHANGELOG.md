@@ -1,4 +1,5 @@
 2.2.20
+- Added "Set" target pressure for Atmospheric Terraformer GUI, (no more babysitting the machine)
 - Fixed Atmospheric Terraformer not working when fluid requirements are disabled in config
 - Fixed a terraforming memory leak that allowed future terraforming work to use stale world references
 - Fixed Atmospheric Terraformer gas animation, controller light, and running status to reflect if it is working

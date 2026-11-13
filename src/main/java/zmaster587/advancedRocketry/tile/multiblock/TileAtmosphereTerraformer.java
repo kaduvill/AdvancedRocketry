@@ -3,6 +3,8 @@ package zmaster587.advancedRocketry.tile.multiblock;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,6 +13,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,20 +33,24 @@ import zmaster587.libVulpes.block.BlockTile;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.gui.CommonResources;
 import zmaster587.libVulpes.inventory.TextureResources;
+import zmaster587.libVulpes.inventory.GuiModular;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
-import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.IconResource;
 
-import java.util.LinkedList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 
 //This code is a complete mess. it should be rewritten just like the space laser, but it kinda works, so I'll leave it with this for now
 
-public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements INetworkMachine {
+public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements INetworkMachine, IGuiCallback {
+
+    private static final byte SET_TARGET_PRESSURE = 2;
 
     private static final Object[][][] structure = new Object[][][]{
             {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
@@ -261,39 +268,40 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
                     {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
                     {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}}};
-    private ModuleToggleSwitch buttonIncrease, buttonDecrease;
-    private ModuleRadioButton radioButton;
+    private ModuleTextBox targetPressureBox;
     private ModuleText text;
 
+    private int targetPressure = 100;
+    private int pressureDirection;
+    private boolean targetPressureEdited;
     private boolean outOfFluid;
     private boolean workedThisTick;
-    private int last_mode;
     int requiredN2 = 0, requiredO2 = 0;
-
-    boolean client_contructed = false;
 
     public TileAtmosphereTerraformer() {
         super();
 
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
-        buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
-        buttonDecrease = new ModuleToggleSwitch(40, 38, 2, LibVulpes.proxy.getLocalizedString("msg.terraformer.atmdec"), this, TextureResources.buttonScan, 80, 16, false);
         text = new ModuleText(10, 100, "", 0x282828);
         powerPerTick = 1000;
+    }
 
-        List<ModuleToggleSwitch> buttons = new LinkedList<>();
-        buttons.add(buttonIncrease);
-        buttons.add(buttonDecrease);
-        radioButton = new ModuleRadioButton(this, buttons);
-
-        outOfFluid = false;
-        last_mode = radioButton.getOptionSelected();
-
+    @Override
+    public boolean attemptCompleteStructure(IBlockState state) {
+        boolean wasComplete = isComplete();
+        // Assemble normally, without TileMultiPowerConsumer's automatic power-on.
+        canRender = completeStructure = completeStructure(state);
+        if (!world.isRemote && !wasComplete && completeStructure)
+            setMachineEnabled(false);
+        return completeStructure;
     }
 
     @Override
     public void update() {
         workedThisTick = false;
+        if (!world.isRemote && getMachineEnabled() && hasReachedTarget(
+                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension())))
+            setMachineEnabled(false);
         super.update();
         if (world.isRemote) {
             spawnGasParticles();
@@ -328,9 +336,33 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         //Backgrounds
         if (world.isRemote) {
             modules.add(new ModuleImage(173, 0, new IconResource(90, 0, 84, 88, CommonResources.genericBackground)));
+            final List<String> targetPressureTooltip = Collections.singletonList(
+                    LibVulpes.proxy.getLocalizedString("msg.terraformer.targetpressure.tooltip"));
+            targetPressureBox = new ModuleTextBox(this, 40, 20, 80, 16, 16) {
+                @Override
+                @SideOnly(Side.CLIENT)
+                public void onMouseClicked(GuiModular gui, int x, int y, int button) {
+                    super.onMouseClicked(gui, x, y, button);
+                    if (targetPressureEdited && (x <= offsetX || x >= offsetX + 80 || y <= offsetY || y >= offsetY + 16)) {
+                        setText(BigDecimal.valueOf(targetPressure, 2).toPlainString());
+                        targetPressureEdited = false;
+                    }
+                }
+
+                @Override
+                @SideOnly(Side.CLIENT)
+                public void renderToolTip(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel,
+                                          GuiContainer gui, FontRenderer font) {
+                    if (mouseX >= offsetX && mouseX < offsetX + 80 && mouseY >= offsetY && mouseY < offsetY + 16)
+                        drawTooltip(gui, targetPressureTooltip, mouseX, mouseY, zLevel, font);
+                }
+            };
+            targetPressureBox.setText(BigDecimal.valueOf(targetPressure, 2).toPlainString());
+            targetPressureEdited = false;
+            modules.add(targetPressureBox);
         }
 
-        modules.add(0, radioButton);
+        modules.add(new ModuleButton(40, 38, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.set"), this, TextureResources.buttonScan, 80, 16));
         modules.add(new ModuleProgress(30, 57, 0, zmaster587.advancedRocketry.inventory.TextureResources.terraformProgressBar, this));
         modules.add(text);
 
@@ -384,7 +416,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             BlockPos offsetPos = pos.offset(dir);
 
             for (int i = 0; i < 3; i++) {
-                if (radioButton.getOptionSelected() == 0) {
+                if (pressureDirection > 0) {
                     float xMot = (float) ((world.rand.nextGaussian()) / 40f);
                     float zMot = (float) ((world.rand.nextGaussian()) / 40f);
                     AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
@@ -410,12 +442,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         if (world.isRemote || !isComplete())
             return;
 
-        int mode = radioButton.getOptionSelected();
-        if (last_mode != mode) {
-            last_mode = mode;
-            this.setProgress(0, 0);
-        }
-        if (ARConfiguration.getCurrentConfig().terraformRequiresFluid && mode == 0) {
+        if (ARConfiguration.getCurrentConfig().terraformRequiresFluid && pressureDirection > 0) {
 
             if (requiredN2 == 0 && requiredO2 == 0) {
                 requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
@@ -527,27 +554,17 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
         if (!world.isRemote && properties != null && properties.getId() == world.provider.getDimension() && ((world.provider.getClass().equals(WorldProviderPlanet.class) &&
                 properties.isNativeDimension) || ARConfiguration.getCurrentConfig().allowTerraformNonAR)) {
-            if (buttonIncrease.getState() && properties.getAtmosphereDensity() < 1600) {
-                properties.setAtmosphereDensity(properties.getAtmosphereDensity() + 1);
-                if (buttonIncrease.getState() && properties.getAtmosphereDensity() >= 1600) {
-                    this.setMachineEnabled(false);
-                    this.setMachineRunning(false);
-                    markDirty();
-                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-
-                }
-            }
-            if (buttonDecrease.getState() && properties.getAtmosphereDensity() > 0) {
-                properties.setAtmosphereDensity(properties.getAtmosphereDensity() - 1);
-                if (buttonDecrease.getState() && properties.getAtmosphereDensity() <= 0) {
-                    this.setMachineEnabled(false);
-                    this.setMachineRunning(false);
-                    markDirty();
-                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-
-                }
-            }
+            if (!hasReachedTarget(properties))
+                properties.setAtmosphereDensity(properties.getAtmosphereDensity() + pressureDirection);
+            if (hasReachedTarget(properties))
+                setMachineEnabled(false);
         }
+    }
+
+    private boolean hasReachedTarget(DimensionProperties properties) {
+        return pressureDirection == 0 || (pressureDirection > 0
+                ? properties.getAtmosphereDensity() >= targetPressure
+                : properties.getAtmosphereDensity() <= targetPressure);
     }
 
     @Override
@@ -555,54 +572,93 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                                     NBTTagCompound nbt) {
         super.readDataFromNetwork(in, packetId, nbt);
 
-        if (packetId == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
-            radioButton.setOptionSelected(in.readByte());
-        }
+        if (packetId == SET_TARGET_PRESSURE)
+            nbt.setInteger("targetPressure", in.readInt());
     }
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
         super.writeDataToNetwork(out, id);
 
-        if (id == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
-            out.writeByte(radioButton.getOptionSelected());
-        }
+        if (id == SET_TARGET_PRESSURE)
+            out.writeInt(targetPressure);
     }
 
     @Override
     public void setMachineEnabled(boolean enabled) {
-        super.setMachineEnabled(enabled);
-
-        if (getMachineEnabled())
+        if (enabled) {
             completionTime = getCompletionTime();
+            if (!world.isRemote) {
+                pressureDirection = Integer.compare(targetPressure, DimensionManager.getInstance()
+                        .getDimensionProperties(world.provider.getDimension()).getAtmosphereDensity());
+                enabled = pressureDirection != 0;
+            }
+        }
+        currentTime = 0;
+        requiredN2 = requiredO2 = 0;
+        outOfFluid = false;
+        toggleSwitch.setToggleState(enabled);
+        super.setMachineEnabled(enabled);
     }
 
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
-        super.useNetworkData(player, side, id, nbt);
-        if(!world.isRemote) {
-            setOOF(false);
-            markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        if (id == SET_TARGET_PRESSURE && side == Side.SERVER) {
+            int newTarget = MathHelper.clamp(nbt.getInteger("targetPressure"), 0, 1600);
+            if (newTarget == targetPressure)
+                return;
 
-        }
+            targetPressure = newTarget;
+            if (getMachineEnabled()) {
+                int direction = Integer.compare(targetPressure, DimensionManager.getInstance()
+                        .getDimensionProperties(world.provider.getDimension()).getAtmosphereDensity());
+                // Keep the current cycle and gas payments unless the direction changes.
+                if (direction != pressureDirection) {
+                    setMachineEnabled(direction != 0);
+                    return;
+                }
+            }
+            markDirty();
+            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        } else
+            super.useNetworkData(player, side, id, nbt);
     }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        //if (hasValidBiomeChanger()) {
         super.onInventoryButtonPressed(buttonId);
-        if (buttonId == 1 || buttonId == 2) {
-            PacketHandler.sendToServer(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()));
+        if (buttonId == 1) {
+            try {
+                targetPressure = parseTargetPressure(targetPressureBox.getText());
+            } catch (NumberFormatException e) {
+                return;
+            }
+            targetPressureBox.setText(BigDecimal.valueOf(targetPressure, 2).toPlainString());
+            targetPressureEdited = false;
+            PacketHandler.sendToServer(new PacketMachine(this, SET_TARGET_PRESSURE));
         }
-        //}
+    }
+
+    static int parseTargetPressure(String input) {
+        String value = input.trim();
+        if (!value.matches("-?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)"))
+            throw new NumberFormatException(value);
+        return new BigDecimal(value).max(BigDecimal.ZERO).min(BigDecimal.valueOf(16))
+                .movePointRight(2).setScale(0, RoundingMode.HALF_UP).intValueExact();
+    }
+
+    @Override
+    public void onModuleUpdated(ModuleBase module) {
+        if (module == targetPressureBox)
+            targetPressureEdited = true;
     }
 
     @Override
     protected void writeNetworkData(NBTTagCompound nbt) {
         super.writeNetworkData(nbt);
-        nbt.setInteger("selected", radioButton.getOptionSelected());
+        nbt.setInteger("targetPressure", targetPressure);
+        nbt.setInteger("pressureDirection", pressureDirection);
         nbt.setBoolean("oofluid", outOfFluid);
         //System.out.println("write oof:"+outOfFluid);
     }
@@ -610,14 +666,20 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     protected void readNetworkData(NBTTagCompound nbt) {
         super.readNetworkData(nbt);
-        radioButton.setOptionSelected(nbt.getInteger("selected"));
+        targetPressure = nbt.hasKey("targetPressure")
+                ? MathHelper.clamp(nbt.getInteger("targetPressure"), 0, 1600) : 100;
+        pressureDirection = nbt.getInteger("pressureDirection");
+        if (!nbt.hasKey("targetPressure")) {
+            enabled = false;
+            currentTime = 0;
+        }
+        toggleSwitch.setToggleState(enabled);
         outOfFluid = nbt.getBoolean("oofluid");
         //System.out.println("oof:"+outOfFluid);
 
-        if (world !=null && world.isRemote){
-            //if (!client_contructed)
-                //client_contructed = this.completeStructure(this.world.getBlockState(this.pos));
-
+        if (world != null && world.isRemote) {
+            if (targetPressureBox != null && !targetPressureEdited)
+                targetPressureBox.setText(BigDecimal.valueOf(targetPressure, 2).toPlainString());
             setText();
         }
     }
