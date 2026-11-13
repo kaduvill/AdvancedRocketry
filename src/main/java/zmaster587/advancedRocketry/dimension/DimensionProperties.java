@@ -1122,11 +1122,16 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
 
+        TerraformingHelper t = proxylists.gethelper(getId());
+        if (t != null) {
+            // Cleanup throttles itself and must also run while the World is unloaded
+            t.chunkMgrTerraformed.cleanupCache();
+        }
+
         World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
         //world has to be loaded
         if (world != null) {
-            if (proxylists.gethelper(getId()) != null) {
-                TerraformingHelper t = proxylists.gethelper(getId());
+            if (t != null) {
                 if (t.has_blocks_in_dec_queue()) {
                     //if (new Random().nextInt(100) < 50) {
                     for (int i = 0; i < 5; i++) {
