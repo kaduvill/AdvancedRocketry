@@ -244,6 +244,10 @@ public class BiomeHandler {
 
 
         int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(world, cpos.x, cpos.z);
+        if (can_populate == 0) {
+            DimensionProperties.proxylists.gethelper(props.getId()).add_chunk_to_decoration_queue(cpos.x, cpos.z);
+            return;
+        }
         if (can_populate == -1){
             //because it can never be populated, it is considered "done with population"
             DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);

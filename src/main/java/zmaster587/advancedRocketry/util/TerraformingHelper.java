@@ -13,7 +13,6 @@ import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.ChunkProviderPlanet;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 enum TerraformingType{
     ALLOWED, BORDER, PROTECTED
@@ -47,7 +46,7 @@ public class TerraformingHelper {
     //   doesn't matter if it is type ALLOWED or type BORDER
     private TerrainWorkQueue terraformingqueue;
     // Snapshot mutable inputs on enqueue so queued positions can be returned directly.
-    private List<BlockPos> decorationqueue;
+    private TerrainWorkQueue decorationqueue;
     private TerrainWorkQueue biomechangingqueue;
 
     int safe_zone_radius = 3; // radius for protected zone
@@ -74,17 +73,21 @@ public class TerraformingHelper {
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList, rivers);
         this.terraformingqueue = new TerrainWorkQueue();
         this.biomechangingqueue = new TerrainWorkQueue();
-        this.decorationqueue = new ArrayList<>();
+        this.decorationqueue = new TerrainWorkQueue(true);
         chunkDataMap = new HashMap<>();
 
         for (ChunkPos i:generated_chunks){
             chunkdata data = new chunkdata(i.x,i.z,null, this);
             data.chunk_fully_generated = true;
+            data.terrain_fully_generated = true;
             chunkDataMap.put(new ChunkPos(data.x,data.z), data);
         }
         for (ChunkPos i:biomechanged_chunks){
-            generate_new_chunkdata(new ChunkPos(i.x, i.z));
             chunkdata data = getChunkFromList(i.x,i.z);
+            if (data == null) {
+                generate_new_chunkdata(i);
+                data = getChunkFromList(i.x,i.z);
+            }
             data.chunk_fully_biomechanged = true;
         }
         recalculate_chunk_status();
@@ -185,19 +188,14 @@ public class TerraformingHelper {
             }
         }
     }
-    public void check_can_decorate(int px, int pz){
+    public synchronized void check_can_decorate(int px, int pz){
         // for every chunk next to this one, check if it can decorate (except for if it is already decorated)
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-                if (getChunkFromList(px+x,pz+z) != null && !getChunkFromList(px+x,pz+z).chunk_fully_generated){
-                    if (can_populate(px+x,pz+z) != 0){
-                        //re-add all position to queue for decoration
-                        for (int bx = 0; bx < 16; bx++) {
-                            for (int bz = 0; bz < 16; bz++) {
-                                add_position_to_decoration_queue(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
-                            }
-                        }
-                    }
+                int cx = px + x, cz = pz + z;
+                chunkdata data = getChunkFromList(cx, cz);
+                if (data != null && !data.chunk_fully_generated && can_populate(cx, cz) != 0) {
+                    add_chunk_to_decoration_queue(cx, cz);
                 }
             }
         }
@@ -234,7 +232,8 @@ public class TerraformingHelper {
             chunkdata data = entry.getValue();
             TerraformingType prevtype = data.type;
             data.type = get_chunk_type(data.x, data.z);
-            if (prevtype != TerraformingType.ALLOWED)
+            // Completed records still provide terrain readiness to neighboring chunks.
+            if (!data.chunk_fully_generated && prevtype != TerraformingType.ALLOWED)
                 if (data.type == TerraformingType.ALLOWED || data.type == TerraformingType.BORDER)
                     if (data.terrain_fully_generated)
                         iterator.remove();
@@ -291,17 +290,23 @@ public class TerraformingHelper {
         biomechangingqueue.addChunk(x, z, generated);
     }
 
+    /** Scheduling and retries share the current unfinished pass, including after chunk callbacks. */
+    public synchronized void add_chunk_to_decoration_queue(int x, int z) {
+        chunkdata data = getChunkFromList(x, z);
+        if (data != null && data.chunk_fully_generated)
+            return;
+        if (data == null && DimensionProperties.proxylists.getChunksFullyTerraformed(dimId).contains(new ChunkPos(x, z)))
+            return;
+        decorationqueue.addChunk(x, z, data == null ? null : data.fully_decorated);
+    }
+
     public synchronized void add_position_to_decoration_queue(BlockPos p){
         //System.out.println("add position: "+p.getX()+":"+p.getZ());
         if (p == null){
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        int insertionIndex = 0;
-        if (decorationqueue.size() > 0) {
-            insertionIndex = ThreadLocalRandom.current().nextInt(Math.min(decorationqueue.size(), 1000));
-        }
-        decorationqueue.add(insertionIndex, p.toImmutable());
+        decorationqueue.addColumn(p);
     }
 
 
@@ -313,13 +318,13 @@ public class TerraformingHelper {
     }
 
     public synchronized BlockPos get_next_position_decoration(boolean random){
-        if (decorationqueue.isEmpty())
-            return null;
-        int index = 0;
-        if (random)
-            index = ThreadLocalRandom.current().nextInt(decorationqueue.size());
-
-        return decorationqueue.remove(index);
+        BlockPos pos;
+        while ((pos = decorationqueue.remove(random)) != null) {
+            chunkdata data = getChunkFromList(pos.getX() >> 4, pos.getZ() >> 4);
+            if (data == null || (!data.chunk_fully_generated && !data.fully_decorated[pos.getX() & 15][pos.getZ() & 15]))
+                return pos;
+        }
+        return null;
     }
 
     public void set_chunk_biomechanged(ChunkPos pos){ // mark a chunk ready for terraforming
