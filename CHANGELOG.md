@@ -10,6 +10,7 @@
   - Added /ar planet reset [dimId] atmosphereOverride to restore XML pressure on the next XML reload
 - Fixed biome changes from terraforming not always being saved
 - Fixed unnecessary terraforming biome rerolls and progress resets, allocations, reduce redundant work and memory use
+- Terraforming terminal now has a 2nd tab that displays current climat, temperature and atmospheric pressure. alongside viable biomes for this climate.
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
 - Fix flickering skylights when high pressure fog is present
 
