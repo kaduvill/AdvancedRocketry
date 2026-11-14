@@ -11,6 +11,7 @@
 - Fixed biome changes from terraforming not always being saved
 - Fixed unnecessary terraforming biome rerolls and progress resets, allocations, reduce redundant work and memory use
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
+- Fix flickering skylights when high pressure fog is present
 
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads

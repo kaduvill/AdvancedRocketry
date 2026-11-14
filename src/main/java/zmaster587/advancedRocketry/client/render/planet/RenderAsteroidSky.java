@@ -425,7 +425,7 @@ public class RenderAsteroidSky extends IRenderHandler {
             }
 
             buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(0.0D, 100.0D, 0.0D).color(f6, f7, f8, afloat[3] * atmosphere).endVertex();
+            buffer.pos(0.0D, 100.0D, 0.0D).color(f6, f7, f8, MathHelper.clamp(afloat[3] * atmosphere, 0.0F, 1.0F)).endVertex();
             byte b0 = 16;
 
             for (int j = 0; j <= b0; ++j) {
