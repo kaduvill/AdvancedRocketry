@@ -488,11 +488,11 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
             condition = I18n.format("msg.terraformingterminal.below", climate.maximumTemperature + 1);
         else if (climate != DimensionProperties.BiomeClimate.EMPTY)
             condition = climate.minimumTemperature + " - " + climate.maximumTemperature + " K";
-        return LibVulpes.proxy.getLocalizedString("msg.terraformer.pressure") + "\n"
+        return LibVulpes.proxy.getLocalizedString("msg.terraformer.pressure") + ":\n"
                 + String.format(Locale.ROOT, "%.2f", climateInfo.getInteger("pressure") / 100.0) + "\n\n"
-                + LibVulpes.proxy.getLocalizedString("data.temperature.name") + "\n" + temperature + " K\n("
+                + LibVulpes.proxy.getLocalizedString("data.temperature.name") + ":\n" + temperature + " K\n("
                 + (temperature - 273) + " \u00b0C)\n\n"
-                + LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.climate") + "\n"
+                + LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.tab.climate") + ":\n"
                 + LibVulpes.proxy.getLocalizedString("msg.terraformingterminal.climate." + climate.name().toLowerCase(Locale.ROOT))
                 + "\n" + condition;
     }
