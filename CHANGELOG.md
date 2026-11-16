@@ -13,6 +13,7 @@
 - Terraforming terminal now has a 2nd tab that displays current climat, temperature and atmospheric pressure. alongside viable biomes for this climate.
 - Move "Unexpected ore name:" to debug log (laserdrilloretable)
 - Fix flickering skylights when high pressure fog is present
+- Fixed a memory leak where Crystal Chasms and Ocean Spires generators was retaining worlds
 
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads

@@ -18,6 +18,15 @@ public class MapGenLargeCrystal extends MapGenBase {
         this.crystalBlock = blockCrystal;
     }
 
+    @Override
+    public void generate(World worldIn, int x, int z, ChunkPrimer primer) {
+        try {
+            super.generate(worldIn, x, z, primer);
+        } finally {
+            this.world = null;
+        }
+    }
+
     public void setFillerBlock(IBlockState fillerBlock) {
         this.fillerBlock = fillerBlock;
     }

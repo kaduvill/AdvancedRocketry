@@ -23,6 +23,15 @@ public class MapGenInvertedPillar extends MapGenBase {
     }
 
     @Override
+    public void generate(World worldIn, int x, int z, ChunkPrimer primer) {
+        try {
+            super.generate(worldIn, x, z, primer);
+        } finally {
+            this.world = null;
+        }
+    }
+
+    @Override
     protected void recursiveGenerate(World worldIn, int rangeX,
                                      int rangeZ, int chunkX, int chunkZ, ChunkPrimer chunkPrimerIn) {
         if (rand.nextInt(chancePerChunk) == Math.abs(rangeX) % chancePerChunk || rand.nextInt(chancePerChunk) == Math.abs(rangeZ) % chancePerChunk) {
