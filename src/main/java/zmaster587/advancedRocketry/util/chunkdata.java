@@ -108,8 +108,9 @@ public class chunkdata {
         if (!chunk_fully_generated && !chunk_populated) {
 
             //2 times i want more population!
+            // Say what?
             world.provider.createChunkGenerator().populate(this.x, this.z);
-            world.provider.createChunkGenerator().populate(this.x, this.z);
+            //world.provider.createChunkGenerator().populate(this.x, this.z);
             chunk_populated = true;
         }
     }
