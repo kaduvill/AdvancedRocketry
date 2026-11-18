@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
+import zmaster587.advancedRocketry.client.render.multiblocks.MultiblockRenderHelper;
 import zmaster587.advancedRocketry.tile.TileRocketPrinter;
 import zmaster587.libVulpes.render.RenderHelper;
 
@@ -45,7 +46,7 @@ public class RendererRocketPrinter extends TileEntitySpecialRenderer<TileRocketP
                 RenderHelper.renderBottomFaceWithUV(buffer, frameY + offset, xOffset, zOffset, xOffset + xSize, zOffset + zSize, 0, xSize, 0, zSize);
                 RenderHelper.renderTopFaceWithUV(buffer, frameY + offset, xOffset, zOffset, xOffset + xSize, zOffset + zSize, 0, xSize, 0, zSize);
             }
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
@@ -58,7 +59,7 @@ public class RendererRocketPrinter extends TileEntitySpecialRenderer<TileRocketP
             RenderHelper.renderSouthFaceWithUV(buffer, zMax, xMin, yMin, xMax, yMax, 0, 1, 0, 1);
             RenderHelper.renderNorthFaceWithUV(buffer, zMin, xMin, yMin, xMax, yMax, 0, 1, 0, 1);
             RenderHelper.renderTopFaceWithUV(buffer, yMax, xMin, zMin, xMax, zMax, 0, 1, 0, 1);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.disableTexture2D();
             GlStateManager.color(.25f, .9f, 1f, 1f);
@@ -67,7 +68,7 @@ public class RendererRocketPrinter extends TileEntitySpecialRenderer<TileRocketP
             xMin = xOffset + xSize - .5;
             xMax = xOffset + xSize;
             RenderHelper.renderWestFace(buffer, xMin, yMin, zMin, yMax, zMax);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.enableTexture2D();
             GlStateManager.color(1f, 1f, 1f, 1f);
@@ -77,7 +78,7 @@ public class RendererRocketPrinter extends TileEntitySpecialRenderer<TileRocketP
             RenderHelper.renderSouthFaceWithUV(buffer, zMax, xMin, yMin, xMax, yMax, 0, 1, 0, 1);
             RenderHelper.renderNorthFaceWithUV(buffer, zMin, xMin, yMin, xMax, yMax, 0, 1, 0, 1);
             RenderHelper.renderTopFaceWithUV(buffer, yMax, xMin, zMin, xMax, zMax, 0, 1, 0, 1);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.color(.78f, .5f, .34f, 1f);
             bindTexture(GIRDER);
@@ -87,7 +88,7 @@ public class RendererRocketPrinter extends TileEntitySpecialRenderer<TileRocketP
             RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, baseY, zOffset, xOffset + xSize, frameY, zOffset + size, 0, 1, 0, girderV);
             RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, baseY, zOffset + zSize - size, xOffset + xSize, frameY, zOffset + zSize, 0, 1, 0, girderV);
             RenderHelper.renderCubeWithUV(buffer, xOffset, baseY, zOffset + zSize - size, xOffset + size, frameY, zOffset + zSize, 0, 1, 0, girderV);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
         } finally {
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightX, lightY);
             GlStateManager.alphaFunc(GL11.GL_GREATER, .1f);

@@ -49,13 +49,13 @@ public class RendererRailgun extends TileEntitySpecialRenderer {
 
 
         if (tile.getWorld().getTotalWorldTime() - multiBlockTile.recoil - 20 <= 0) {
-            model.renderOnly("Base");
+            MultiblockRenderHelper.renderOnly(model, "Base");
             GL11.glPushMatrix();
             GL11.glTranslated(0, (-20 + (tile.getWorld().getTotalWorldTime() - multiBlockTile.recoil)) / 50f, 0);
-            model.renderOnly("Barrel");
+            MultiblockRenderHelper.renderOnly(model, "Barrel");
             GL11.glPopMatrix();
         } else
-            model.renderAll();
+            MultiblockRenderHelper.renderAll(model);
 
         GL11.glPopMatrix();
     }

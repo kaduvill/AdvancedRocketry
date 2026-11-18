@@ -84,7 +84,7 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
             }
 
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
             GL11.glPushMatrix();
 
@@ -92,12 +92,12 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
 
             GL11.glRotatef(-6 * multiBlockTile.getProgress(0) % 360, 1, 0, 0);
             GL11.glTranslatef(-1f, -1f, -1.5f);
-            model.renderPart("Saw");
+            MultiblockRenderHelper.renderPart(model, "Saw");
             GL11.glPopMatrix();
 
         } else {
             bindTexture(texture);
-            model.renderAll();
+            MultiblockRenderHelper.renderAll(model);
         }
         GL11.glPopMatrix();
     }

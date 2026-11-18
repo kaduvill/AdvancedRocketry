@@ -15,6 +15,7 @@
 - Fix flickering skylights when high pressure fog is present
 - Fixed a memory leak where Crystal Chasms and Ocean Spires generators was retaining worlds
 - Fixed a possible memory leak per data satellite
+- Hardened multiblock rendering against color-array state leaks from other mods
 
 2.2.19
 - Fixed frozen, duplicate starmap holograms after the console’s chunk unloads

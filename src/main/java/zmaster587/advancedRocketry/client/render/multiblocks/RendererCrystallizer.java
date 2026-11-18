@@ -53,7 +53,7 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0);
 
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
             List<ItemStack> outputList = multiBlockTile.getOutputs();
             if (outputList != null && !outputList.isEmpty()) {
@@ -110,7 +110,7 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
                     GL11.glScaled(1, (1.1 - (progress * 1.111)), 1);
 
                 GL11.glTranslatef(0, -1.1f, 0);
-                model.renderPart("Liquid");
+                MultiblockRenderHelper.renderPart(model, "Liquid");
             }
 
             GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -119,7 +119,7 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
 
         } else {
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
         }
         GL11.glPopMatrix();
     }

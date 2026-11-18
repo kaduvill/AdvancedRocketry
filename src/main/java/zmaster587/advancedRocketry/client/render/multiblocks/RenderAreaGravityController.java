@@ -44,7 +44,7 @@ public class RenderAreaGravityController extends TileEntitySpecialRenderer {
         //GL11.glTranslated(2f, 0, 0f);
         bindTexture(texture);
 
-        model.renderOnly("Hull");
+        MultiblockRenderHelper.renderOnly(model, "Hull");
         GL11.glDisable(GL11.GL_LIGHTING);
         int maxSize = 5;
 
@@ -61,7 +61,7 @@ public class RenderAreaGravityController extends TileEntitySpecialRenderer {
         GL11.glScaled(1.1, 1, 1.1);
         for (int i = 0; i < 4; i++) {
             GL11.glScaled(.93, 1, .93);
-            model.renderOnly("Blur");
+            MultiblockRenderHelper.renderOnly(model, "Blur");
         }
         GL11.glPopMatrix();
 
@@ -78,7 +78,7 @@ public class RenderAreaGravityController extends TileEntitySpecialRenderer {
         GL11.glRotated(multiBlockTile.getArmRotation(), 0, 1, 0);
         for (int i = 0; i < maxSize; i++) {
             GL11.glRotated(360d / maxSize, 0, 1, 0);
-            model.renderOnly("Arm");
+            MultiblockRenderHelper.renderOnly(model, "Arm");
         }
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glPopMatrix();

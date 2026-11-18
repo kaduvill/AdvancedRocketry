@@ -51,7 +51,7 @@ public class RenderOrbitalLaserDrill extends TileEntitySpecialRenderer {
         GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
         GL11.glTranslated(2.5f, 0, 4.5f);
         bindTexture(texture);
-        model.renderAll();
+        MultiblockRenderHelper.renderAll(model);
 
         //Laser
         if (((TileOrbitalLaserDrill) multiBlockTile).isRunning()) {
@@ -83,7 +83,7 @@ public class RenderOrbitalLaserDrill extends TileEntitySpecialRenderer {
                 }
             }
 
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.color(1f, 1f, 1f, 1f);
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

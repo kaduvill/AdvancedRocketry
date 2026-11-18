@@ -53,7 +53,7 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
         GL11.glTranslated(1f, 0, 0f);
 
         bindTexture(texture);
-        model.renderOnly("Base");
+        MultiblockRenderHelper.renderOnly(model, "Base");
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
 
@@ -68,7 +68,7 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         RenderHelper.renderCubeWithUV(buffer, -0.1f, 1, -0.1f, 0.1f, 2, 0.1f, 0, 1, 0, 1);
-        Tessellator.getInstance().draw();
+        MultiblockRenderHelper.draw();
         GL11.glPopMatrix();
         GL11.glEnable(GL11.GL_LIGHTING);
         GlStateManager.color(1f, 1f, 1f, 1f);
@@ -86,22 +86,22 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
                 GlStateManager.color(0.4f, 0.4f, 1f, 0.6f);
                 GL11.glPushMatrix();
                 GL11.glRotated(speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
-                model.renderOnly("Rotate1");
+                MultiblockRenderHelper.renderOnly(model, "Rotate1");
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
                 GL11.glRotated(180 + speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
-                model.renderOnly("Rotate1");
+                MultiblockRenderHelper.renderOnly(model, "Rotate1");
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
                 GL11.glRotated(-speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
-                model.renderOnly("Rotate2");
+                MultiblockRenderHelper.renderOnly(model, "Rotate2");
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
                 GL11.glRotated(180 - speedRotate * System.currentTimeMillis() % 360, 0f, 1f, 0f);
-                model.renderOnly("Rotate2");
+                MultiblockRenderHelper.renderOnly(model, "Rotate2");
                 GL11.glPopMatrix();
 
                 speedRotate = 0.03d * speedMult;
@@ -115,7 +115,7 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
                         GL11.glRotated(((j + 1) * speedRotate * System.currentTimeMillis() % 360) + (i + j / 5f) * offset, 0f, 1f, 0f);
                         GL11.glTranslatef(0, 0.1f * j - .2f + (5 - j) * 0.02f * (float) Math.sin(0.001d * System.currentTimeMillis()), 0.2f);
                         //GL11.glTranslatef(0f, 0.1f*(0.5f - MathHelper.sin((float)(0.001*System.currentTimeMillis() % 100))), 0f);
-                        model.renderOnly("Ball");
+                        MultiblockRenderHelper.renderOnly(model, "Ball");
                         GL11.glPopMatrix();
                     }
                 }

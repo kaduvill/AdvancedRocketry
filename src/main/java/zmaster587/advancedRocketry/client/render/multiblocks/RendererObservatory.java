@@ -60,25 +60,25 @@ public class RendererObservatory extends TileEntitySpecialRenderer {
         float offset = multiBlockTile.getOpenProgress();
 
         if (offset != 0f) {
-            model.renderOnly("Base");
+            MultiblockRenderHelper.renderOnly(model, "Base");
 
-            model.renderPart("Scope");
-            model.renderPart("Axis");
+            MultiblockRenderHelper.renderPart(model, "Scope");
+            MultiblockRenderHelper.renderPart(model, "Axis");
 
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, -offset * 1.125f);
-            model.renderOnly("CasingXMinus");
+            MultiblockRenderHelper.renderOnly(model, "CasingXMinus");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, offset * 1.125f);
-            model.renderOnly("CasingXPlus");
+            MultiblockRenderHelper.renderOnly(model, "CasingXPlus");
             GL11.glPopMatrix();
 
         } else {
-            model.renderOnly("Base");
-            model.renderOnly("CasingXMinus");
-            model.renderOnly("CasingXPlus");
+            MultiblockRenderHelper.renderOnly(model, "Base");
+            MultiblockRenderHelper.renderOnly(model, "CasingXMinus");
+            MultiblockRenderHelper.renderOnly(model, "CasingXPlus");
         }
         GL11.glPopMatrix();
     }

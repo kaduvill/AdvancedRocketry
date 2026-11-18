@@ -25,7 +25,7 @@ public class RendererLathe extends TileEntitySpecialRenderer {
         }
 
         GL11.glNewList(GL11.glGenLists(1), GL11.GL_COMPILE);
-        model.renderOnly("Hull");
+        MultiblockRenderHelper.renderOnly(model, "Hull");
         GL11.glEndList();
     }
 
@@ -52,7 +52,7 @@ public class RendererLathe extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0);
 
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
             GL11.glPushMatrix();
 
@@ -61,13 +61,13 @@ public class RendererLathe extends TileEntitySpecialRenderer {
             else
                 GL11.glTranslatef(0f, 0f, -((1 - progress) / .05f));
 
-            model.renderOnly("Tool");
+            MultiblockRenderHelper.renderOnly(model, "Tool");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(0.375f, 0.9375f, 0f);
             GL11.glRotatef(progress * 1500, 0, 0, 1);
-            model.renderOnly("Shaft");
+            MultiblockRenderHelper.renderOnly(model, "Shaft");
             GL11.glPopMatrix();
 
             int color;
@@ -81,20 +81,20 @@ public class RendererLathe extends TileEntitySpecialRenderer {
             GL11.glColor3d((0xff & color >> 16) / 256f, (0xff & color >> 8) / 256f, (color & 0xff) / 256f);
             GL11.glTranslatef(0.375f, 1.1875f, 0f);
             GL11.glRotatef(progress * 1500, 0, 0, 1);
-            model.renderOnly("Rod");
+            MultiblockRenderHelper.renderOnly(model, "Rod");
             GL11.glPopMatrix();
 
             GL11.glColor4f(1f, 1f, 1f, 1f);
         } else {
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
-            model.renderPart("Tool");
+            MultiblockRenderHelper.renderPart(model, "Tool");
             //model.renderAllExcept("rod", "Cylinder");
 
             GL11.glPushMatrix();
             GL11.glTranslatef(0.375f, 0.9375f, 0f);
-            model.renderOnly("Shaft");
+            MultiblockRenderHelper.renderOnly(model, "Shaft");
             GL11.glPopMatrix();
         }
         GL11.glPopMatrix();

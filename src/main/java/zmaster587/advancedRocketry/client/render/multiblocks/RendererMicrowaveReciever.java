@@ -72,7 +72,7 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
                         RenderHelper.renderTopFaceWithUV(buffer, 1.01 + yLoc[i][g], 5 * i / resolution, 5 * g / resolution, 5 * (i + 1) / resolution, 5 * (g + 1) / resolution, 5 * i / resolution, 5 * (i + 1) / resolution, 5 * g / resolution, 5 * (g + 1) / resolution);
                     }
                 }
-                Tessellator.getInstance().draw();
+                MultiblockRenderHelper.draw();
                 GL11.glPopMatrix();
             }
         }
@@ -80,7 +80,7 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
         //Draw main panel
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         RenderHelper.renderTopFaceWithUV(buffer, 1.01, -2, -2, 3, 3, 0, 5, 0, 5);
-        Tessellator.getInstance().draw();
+        MultiblockRenderHelper.draw();
         //And sides
 
         bindTexture(panelSide);
@@ -100,7 +100,7 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
         RenderHelper.renderCubeWithUV(buffer, 2.9, 0.99, -1.9, 3, 1.1, 3, 0, 0, 0, 0);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-        Tessellator.getInstance().draw();
+        MultiblockRenderHelper.draw();
 
         if (multiBlockTile.getPowerMadeLastTick() > 0) {
             GL11.glDisable(GL11.GL_LIGHTING);
@@ -134,7 +134,7 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
                     buffer.pos(-(radius * Math.cos(i)) + 0.5F, 0, (radius * Math.sin(i)) + 0.5F).endVertex();
                 }
             }
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GL11.glPopMatrix();
             GL11.glDisable(GL11.GL_BLEND);

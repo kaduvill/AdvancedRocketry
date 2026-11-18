@@ -49,7 +49,7 @@ public class RenderBlackHoleGenerator extends TileEntitySpecialRenderer {
 
         bindTexture(texture);
 
-        model.renderAll();
+        MultiblockRenderHelper.renderAll(model);
 
         if (multiBlockTile.isProducingPower()) {
             GlStateManager.disableTexture2D();
@@ -64,7 +64,7 @@ public class RenderBlackHoleGenerator extends TileEntitySpecialRenderer {
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
             RenderHelper.renderCube(buffer, -0.45, 0.95, 0.55, 0.45, 1.05, 1.45);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GL11.glPopMatrix();
 
@@ -73,7 +73,7 @@ public class RenderBlackHoleGenerator extends TileEntitySpecialRenderer {
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
             RenderHelper.renderCube(buffer, -0.45, 0.95, 0.55, 0.45, 1.05, 1.45);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
             GL11.glPopMatrix();
 
             GlStateManager.disableBlend();

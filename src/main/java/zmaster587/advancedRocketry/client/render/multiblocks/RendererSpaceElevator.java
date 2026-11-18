@@ -65,9 +65,9 @@ public class RendererSpaceElevator extends TileEntitySpecialRenderer {
 
         //GL11.glTranslated(2f, 0, 0f);
         bindTexture(baseTexture);
-        model.renderOnly("Anchor");
+        MultiblockRenderHelper.renderOnly(model, "Anchor");
         if (multiBlockTile.isTetherConnected()) {
-            model.renderOnly("Tether");
+            MultiblockRenderHelper.renderOnly(model, "Tether");
         }
         GL11.glPopMatrix();
 
@@ -77,7 +77,13 @@ public class RendererSpaceElevator extends TileEntitySpecialRenderer {
             double renderX = x + multiBlockTile.getLandingLocationX() - multiBlockTile.getPos().getX() - ((front.getAxis() == EnumFacing.Axis.X) ? 0.5 : 2.5);
             double renderZ = z + multiBlockTile.getLandingLocationZ() - multiBlockTile.getPos().getZ() - ((front.getAxis() == EnumFacing.Axis.X) ? -1.5 : 0.5);
 
-            laser.doRender((Entity) null, renderX, y + 4f, renderZ, 0, f);
+            GL11.glPushClientAttrib(GL11.GL_CLIENT_VERTEX_ARRAY_BIT);
+            try {
+                GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                laser.doRender((Entity) null, renderX, y + 4f, renderZ, 0, f);
+            } finally {
+                GL11.glPopClientAttrib();
+            }
 
             GL11.glPushMatrix();
             GL11.glTranslated(renderX + 0.5f, y + 4, renderZ + 0.5f);
@@ -110,7 +116,7 @@ public class RendererSpaceElevator extends TileEntitySpecialRenderer {
                 }
             }
 
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();

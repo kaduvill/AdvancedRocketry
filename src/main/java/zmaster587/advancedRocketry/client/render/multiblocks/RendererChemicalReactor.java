@@ -42,7 +42,7 @@ public class RendererChemicalReactor extends TileEntitySpecialRenderer {
         GL11.glTranslated(1.5f, -1.0f, -.5f);
 
         bindTexture(texture);
-        model.renderOnly("Hull");
+        MultiblockRenderHelper.renderOnly(model, "Hull");
         GL11.glPopMatrix();
     }
 }

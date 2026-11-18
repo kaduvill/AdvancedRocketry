@@ -46,7 +46,7 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0) + f / (float) multiBlockTile.getTotalProgress(0);
 
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
             //Full assembly translation and render
             GL11.glPushMatrix();
@@ -60,7 +60,7 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
             } else
                 GL11.glTranslatef(0f, 0f, ((1 - progress) / .15f));
 
-            model.renderPart("Mount");
+            MultiblockRenderHelper.renderPart(model, "Mount");
 
             //Render laser and laser translation
             GL11.glPushMatrix();
@@ -70,14 +70,14 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
                 else
                     GL11.glTranslatef(-((1 - progress2) / .15f), 0f, 0f);
             }
-            model.renderPart("Laser");
+            MultiblockRenderHelper.renderPart(model, "Laser");
             GL11.glPopMatrix();
             GL11.glPopMatrix();
 
 
         } else {
             bindTexture(texture);
-            model.renderAll();
+            MultiblockRenderHelper.renderAll(model);
         }
         GL11.glPopMatrix();
     }

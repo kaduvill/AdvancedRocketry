@@ -78,10 +78,10 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
             }
 
             bindTexture(texture);
-            model.renderPart("Hull");
+            MultiblockRenderHelper.renderPart(model, "Hull");
 
             GL11.glTranslated(0, 0, tray);
-            model.renderPart("Tray"); // 0-> 3
+            MultiblockRenderHelper.renderPart(model, "Tray"); // 0-> 3
             GL11.glTranslated(0, 0, -tray);
 
             process *= 6;
@@ -93,10 +93,10 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
                     process = -process + 4;
                 }
                 GL11.glTranslatef(0, -.25f * process, 0); // 0 -> -.25
-                model.renderPart("ProcessA");
+                MultiblockRenderHelper.renderPart(model, "ProcessA");
                 GL11.glTranslatef(0, .25f * process, 0);
             } else
-                model.renderPart("ProcessA");
+                MultiblockRenderHelper.renderPart(model, "ProcessA");
 
 
             process -= 6;
@@ -108,10 +108,10 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
                     process = -process + 4;
                 }
                 GL11.glTranslatef(0, -.25f * process, 0); // 0 -> -.25
-                model.renderPart("ProcessB");
+                MultiblockRenderHelper.renderPart(model, "ProcessB");
                 GL11.glTranslatef(0, .25f * process, 0);
             } else
-                model.renderPart("ProcessB");
+                MultiblockRenderHelper.renderPart(model, "ProcessB");
 
             process -= 6;
             if (process > 1 && process < 3) {
@@ -125,14 +125,14 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
                 GL11.glTranslated(1.55, 1.47, 0);
                 GL11.glRotatef(90 * process, 0, 0, 1);
                 GL11.glTranslated(-1.55, -1.47, 0);
-                model.renderPart("ProcessC");
+                MultiblockRenderHelper.renderPart(model, "ProcessC");
             } else
-                model.renderPart("ProcessC");
+                MultiblockRenderHelper.renderPart(model, "ProcessC");
 
 
         } else {
             bindTexture(texture);
-            model.renderAll();
+            MultiblockRenderHelper.renderAll(model);
         }
 
 

@@ -51,29 +51,29 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
         GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
         GL11.glTranslated(1f, 0, 0f);
         bindTexture(TextureResources.fan);
-        model.renderOnly("Fan");
+        MultiblockRenderHelper.renderOnly(model, "Fan");
 
         bindTexture(TextureResources.metalPlate);
-        model.renderOnly("Body");
+        MultiblockRenderHelper.renderOnly(model, "Body");
         float col = .4f;
         GL11.glColor3f(col, col, col);
-        model.renderOnly("DarkBody");
+        MultiblockRenderHelper.renderOnly(model, "DarkBody");
         col = 1f;
         GL11.glColor3f(col, col, col);
 
         bindTexture(TextureResources.diamondMetal);
-        model.renderOnly("Floor");
+        MultiblockRenderHelper.renderOnly(model, "Floor");
 
 
         //Baked a light map, make tubes smooth
         GlStateManager.disableLighting();
         bindTexture(tubeTexture);
-        model.renderOnly("Tubes");
+        MultiblockRenderHelper.renderOnly(model, "Tubes");
         GlStateManager.disableTexture2D();
 
         GlStateManager.color(0, 0.9f, col);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 196, 196);
-        model.renderOnly("BlueRing");
+        MultiblockRenderHelper.renderOnly(model, "BlueRing");
         GlStateManager.color(col, col, col);
         GlStateManager.enableLighting();
         GlStateManager.enableTexture2D();

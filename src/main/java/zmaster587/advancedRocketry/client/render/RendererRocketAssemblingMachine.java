@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
+import zmaster587.advancedRocketry.client.render.multiblocks.MultiblockRenderHelper;
 import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.libVulpes.render.RenderHelper;
 
@@ -85,7 +86,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
 
                 //TOP
             }
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
@@ -106,7 +107,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             RenderHelper.renderSouthFaceWithUV(buffer, zMax, xMin, yMin, xMax, yMax, uMin, uMax, vMin, vMax);
             RenderHelper.renderNorthFaceWithUV(buffer, zMin, xMin, yMin, xMax, yMax, uMin, uMax, vMin, vMax);
             RenderHelper.renderTopFaceWithUV(buffer, yMax, xMin, zMin, xMax, zMax, uMin, uMax, vMin, vMax);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.disableTexture2D();
             //Set ignore light then draw the glowy bits
@@ -125,7 +126,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             xMax = xOffset + xSize;
 
             RenderHelper.renderWestFace(buffer, xMin, yMin, zMin, yMax, zMax);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             GlStateManager.enableTexture2D();
             GlStateManager.color(1f, 1f, 1f, 1f);
@@ -136,7 +137,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             RenderHelper.renderSouthFaceWithUV(buffer, zMax, xMin, yMin, xMax, yMax, uMin, uMax, vMin, vMax);
             RenderHelper.renderNorthFaceWithUV(buffer, zMin, xMin, yMin, xMax, yMax, uMin, uMax, vMin, vMax);
             RenderHelper.renderTopFaceWithUV(buffer, yMax, xMin, zMin, xMax, zMax, uMin, uMax, vMin, vMax);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
             //Draw Supports
             GlStateManager.color(0.78f, 0.5f, 0.34f, 1f);
@@ -153,7 +154,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset, xOffset + xSize, yOffset + yLocation, zOffset + size, uMin, uMax, vMin, vMax);
             RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset + zSize - size, xOffset + xSize, yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
             RenderHelper.renderCubeWithUV(buffer, xOffset, 0d, zOffset + zSize - size, xOffset + size, yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
 
 
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);

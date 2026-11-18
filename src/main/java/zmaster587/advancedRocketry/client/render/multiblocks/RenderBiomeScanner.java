@@ -42,7 +42,7 @@ public class RenderBiomeScanner extends TileEntitySpecialRenderer {
 
         bindTexture(texture);
 
-        model.renderAll();
+        MultiblockRenderHelper.renderAll(model);
 
         GL11.glPopMatrix();
     }

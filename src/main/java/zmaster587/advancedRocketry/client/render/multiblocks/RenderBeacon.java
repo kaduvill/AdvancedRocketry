@@ -44,19 +44,19 @@ public class RenderBeacon extends TileEntitySpecialRenderer {
         GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
         //GL11.glTranslated(2f, 0, 0f);
         bindTexture(baseTexture);
-        model.renderOnly("Base");
+        MultiblockRenderHelper.renderOnly(model, "Base");
 
         GL11.glTranslatef(1, 0, 0);
         GL11.glPushMatrix();
         if (multiBlockTile.getMachineEnabled())
             GL11.glRotated((System.currentTimeMillis() & 0xFFFF) / 20d, 0, 1, 0);
-        model.renderOnly("OuterSpin");
+        MultiblockRenderHelper.renderOnly(model, "OuterSpin");
         GL11.glPopMatrix();
 
         GL11.glPushMatrix();
         if (multiBlockTile.getMachineEnabled())
             GL11.glRotated(-(System.currentTimeMillis() & 0xFFFF) / 6d, 0, 1, 0);
-        model.renderOnly("InnerSpin");
+        MultiblockRenderHelper.renderOnly(model, "InnerSpin");
         GL11.glPopMatrix();
 
 

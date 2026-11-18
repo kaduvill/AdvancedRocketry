@@ -22,7 +22,7 @@ public class RendererRollingMachine extends TileEntitySpecialRenderer {
         } catch (ModelFormatException e) {
             e.printStackTrace();
         }
-        model.renderOnly("Hull");
+        MultiblockRenderHelper.renderOnly(model, "Hull");
     }
 
     @Override
@@ -46,43 +46,43 @@ public class RendererRollingMachine extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0);
 
             bindTexture(texture);
-            model.renderOnly("Hull");
+            MultiblockRenderHelper.renderOnly(model, "Hull");
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.375f, 0.6875f, 0);
             GL11.glRotatef(-progress * 720, 0, 0, 1);
-            model.renderOnly("Roller_1");
+            MultiblockRenderHelper.renderOnly(model, "Roller_1");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.9375f, 0.6875f, 0f);
             GL11.glRotatef(-progress * 720, 0, 0, 1);
-            model.renderOnly("Roller_2");
+            MultiblockRenderHelper.renderOnly(model, "Roller_2");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.625f + 0.03125f, 1.125f, 0f);
             GL11.glRotatef(progress * 720, 0, 0, 1);
-            model.renderOnly("Roller_2");
+            MultiblockRenderHelper.renderOnly(model, "Roller_2");
             GL11.glPopMatrix();
 
         } else {
             bindTexture(texture);
-            model.renderOnly("Hull");
+            MultiblockRenderHelper.renderOnly(model, "Hull");
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.375f, 0.6875f, 0);
-            model.renderOnly("Roller_1");
+            MultiblockRenderHelper.renderOnly(model, "Roller_1");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.9375f, 0.6875f, 0f);
-            model.renderOnly("Roller_2");
+            MultiblockRenderHelper.renderOnly(model, "Roller_2");
             GL11.glPopMatrix();
 
             GL11.glPushMatrix();
             GL11.glTranslatef(1.625f + 0.03125f, 1.125f, 0f);
-            model.renderOnly("Roller_2");
+            MultiblockRenderHelper.renderOnly(model, "Roller_2");
             GL11.glPopMatrix();
 
         }

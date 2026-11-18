@@ -49,7 +49,7 @@ public class RendererElectrolyser extends TileEntitySpecialRenderer {
         GL11.glTranslated(1.5f, 0f, -0.5f);
 
         bindTexture(texture);
-        model.renderAll();
+        MultiblockRenderHelper.renderAll(model);
 
         //Lightning effect
 
@@ -96,7 +96,7 @@ public class RendererElectrolyser extends TileEntitySpecialRenderer {
 
             RenderHelper.renderCrossXZ(buffer, width, xMin, yPos + ySkew, zMin + xSkew, xMax, yPos, zMax);
 
-            Tessellator.getInstance().draw();
+            MultiblockRenderHelper.draw();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_BLEND);

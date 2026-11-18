@@ -45,20 +45,20 @@ public class RenderCentrifuge extends TileEntitySpecialRenderer {
 
         bindTexture(texture);
 
-        model.renderOnly("Hull");
+        MultiblockRenderHelper.renderOnly(model, "Hull");
 
 
         if (multiBlockTile.hadPowerLastTick && multiBlockTile.isRunning()) {
             GL11.glPushMatrix();
             this.angle = multiBlockTile.getWorld().getTotalWorldTime() * -8f;
             GL11.glRotated(angle, 0, 1, 0);
-            model.renderOnly("Cylinder");
+            MultiblockRenderHelper.renderOnly(model, "Cylinder");
             GL11.glPopMatrix();
 
         } else {
             GL11.glPushMatrix();
             GL11.glRotated(angle, 0, 1, 0);
-            model.renderOnly("Cylinder");
+            MultiblockRenderHelper.renderOnly(model, "Cylinder");
             GL11.glPopMatrix();
         }
         GL11.glPopMatrix();
