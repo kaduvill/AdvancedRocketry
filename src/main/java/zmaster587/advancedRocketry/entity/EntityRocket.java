@@ -6,7 +6,6 @@ import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -2377,8 +2376,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         super.setDead();
         releaseDestinationPreload();
 
-        if (storage != null && storage.world.displayListIndex != -1)
-            GLAllocation.deleteDisplayLists(storage.world.displayListIndex);
+        if (world.isRemote)
+            AdvancedRocketry.proxy.releaseRocketDisplayList(storage);
 
         //unlink any connected tiles
         Iterator<IInfrastructure> connectedTiles = connectedInfrastructure.iterator();
@@ -2387,6 +2386,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             connectedTiles.remove();
         }
 
+    }
+
+    @Override
+    public void onRemovedFromWorld() {
+        super.onRemovedFromWorld();
+        if (world.isRemote)
+            AdvancedRocketry.proxy.releaseRocketDisplayList(storage);
     }
 
     public void setOverriddenCoords(int dimId, float x, float y, float z) {
@@ -2614,7 +2620,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 storage.readtiles(in);
         }
         if (packetId == PacketType.RECIEVENBT.ordinal()) {
+            StorageChunk previous = storage;
             storage = new StorageChunk(); //this re-loading makes the rocket not render for a tick or two when launching
+            if (world.isRemote)
+                AdvancedRocketry.proxy.releaseRocketDisplayList(previous);
             storage.setEntity(this);
             storage.readFromNetwork(in);
         } else if (packetId == PacketType.SENDPLANETDATA.ordinal()) {

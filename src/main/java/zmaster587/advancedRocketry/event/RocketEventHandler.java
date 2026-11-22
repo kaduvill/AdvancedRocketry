@@ -22,11 +22,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
@@ -63,6 +65,16 @@ public class RocketEventHandler extends Gui {
     public static void setOverlay(long endTime, String msg) {
         displayString = msg;
         lastDisplayTime = endTime;
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+        if (!event.getWorld().isRemote) return;
+
+        for (Entity entity : event.getWorld().loadedEntityList) {
+            if (entity instanceof EntityRocket)
+                AdvancedRocketry.proxy.releaseRocketDisplayList(((EntityRocket) entity).storage);
+        }
     }
 
     @SubscribeEvent

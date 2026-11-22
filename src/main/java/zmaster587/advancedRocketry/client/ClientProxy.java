@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.client;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -65,6 +66,7 @@ import zmaster587.advancedRocketry.tile.multiblock.energy.TileSolarArray;
 import zmaster587.advancedRocketry.tile.multiblock.machine.*;
 import zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill.TileOrbitalLaserDrill;
 import zmaster587.advancedRocketry.tile.TileRocketPrinter;
+import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.entity.fx.FxErrorBlock;
 import zmaster587.libVulpes.inventory.modules.ModuleContainerPan;
 import zmaster587.libVulpes.tile.TileSchematic;
@@ -103,6 +105,20 @@ public class ClientProxy extends CommonProxy {
             }
         }
         return model;
+    }
+
+    @Override
+    public void releaseRocketDisplayList(StorageChunk storage) {
+        if (storage == null) return;
+
+        // A storage packet can retire this owner while the client is still rendering it.
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            int list = storage.world.displayListIndex;
+            if (list != -1) {
+                GLAllocation.deleteDisplayLists(list);
+                storage.world.displayListIndex = -1;
+            }
+        });
     }
 
     @Override

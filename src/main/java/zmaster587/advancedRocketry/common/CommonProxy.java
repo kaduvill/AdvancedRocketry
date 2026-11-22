@@ -13,6 +13,7 @@ import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.tile.atmosphere.TileAtmosphereDetector;
 import zmaster587.advancedRocketry.tile.TileRocketPrinter;
+import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleButton;
 import zmaster587.libVulpes.inventory.modules.ModuleContainerPanYOnly;
@@ -28,6 +29,7 @@ public class CommonProxy {
     private static final zmaster587.advancedRocketry.dimension.DimensionManager dimensionManagerServer = new zmaster587.advancedRocketry.dimension.DimensionManager();
 
     public void registerRenderers() {}
+    public void releaseRocketDisplayList(StorageChunk storage) {}
     public ModuleBase createRocketBlueprintPreview(int x, int y, TileRocketPrinter printer) { return null; }
     public void registerEventHandlers() {}
 

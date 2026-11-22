@@ -1,5 +1,5 @@
 2.2.21
-- a
+- Fixed a client OpenGL memory leak when rockets unload
 
 2.2.20
 - Added "Set" target pressure for Atmospheric Terraformer GUI, (no more babysitting the machine)
